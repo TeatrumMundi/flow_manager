@@ -28,6 +28,7 @@
 | Baza danych  | [PostgreSQL](https://www.postgresql.org/)                                        |
 | ORM          | [Prisma ORM](https://www.prisma.io/)                                             |
 | Dev Tools    | ESLint, Prettier, Commitlint, Vitest                                             |
+| Hosting      | Vercel                                                                           |
 
 ---
 
@@ -71,9 +72,7 @@ npm install
 Utwórz plik `.env` na podstawie `.env.example`:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/promanage
-NEXTAUTH_SECRET=your-secret
-JWT_SECRET=your-jwt-secret
+DATABASE_URL=postgresql://user:password@localhost:5432/promanage (example)
 ```
 
 ### 4. Zainicjuj bazę danych
