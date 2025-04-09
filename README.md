@@ -23,12 +23,11 @@
 | Warstwa      | Technologia                                                                      |
 |--------------|-----------------------------------------------------------------------------------|
 | Frontend     | [Next.js](https://nextjs.org/) (App Router) + [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) |
-| UI / Design  | [Tailwind CSS 4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
+| UI / Design  | [Tailwind CSS 4](https://tailwindcss.com/)                                       |
 | Backend      | Next.js API Routes / Server Actions (TypeScript)                                 |
 | Baza danych  | [PostgreSQL](https://www.postgresql.org/)                                        |
 | ORM          | [Prisma ORM](https://www.prisma.io/)                                             |
-| Autoryzacja  | JWT + Role-Based Access Control (RBAC)                                           |
-| Dev Tools    | ESLint, Prettier, Husky, Commitlint, Vitest                                      |
+| Dev Tools    | ESLint, Prettier, Commitlint, Vitest                                             |
 
 ---
 
