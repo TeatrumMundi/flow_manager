@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧭 ProManage System
 
-## Getting Started
+**ProManage** to nowoczesny system do kompleksowego zarządzania projektami, personelem, czasem pracy oraz kosztami operacyjnymi. Został zaprojektowany z myślą o organizacjach, które potrzebują narzędzia wspierającego efektywne planowanie, monitorowanie i analizę danych związanych z działalnością projektową i HR.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 📌 Kluczowe funkcje
+
+- Zarządzanie użytkownikami i rolami (HR, Administracja, Księgowość, Pracownik)
+- Rejestracja czasu pracy z podziałem na projekty i zadania
+- Ewidencja nadgodzin i nieobecności
+- Planowanie projektów oraz przypisywanie zadań
+- Obsługa wniosków urlopowych z kalendarzem urlopowym
+- Generowanie raportów operacyjnych i strategicznych
+- Monitorowanie kosztów projektów i wynagrodzeń
+- Statystyki finansowe i dashboard w czasie rzeczywistym
+- Profil pracownika z historią zadań i projektów
+
+---
+
+## 🛠️ Stack technologiczny
+
+| Warstwa      | Technologia                                                                      |
+|--------------|-----------------------------------------------------------------------------------|
+| Frontend     | [Next.js](https://nextjs.org/) (App Router) + [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) |
+| UI / Design  | [Tailwind CSS 4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
+| Backend      | Next.js API Routes / Server Actions (TypeScript)                                 |
+| Baza danych  | [PostgreSQL](https://www.postgresql.org/)                                        |
+| ORM          | [Prisma ORM](https://www.prisma.io/)                                             |
+| Autoryzacja  | JWT + Role-Based Access Control (RBAC)                                           |
+| Dev Tools    | ESLint, Prettier, Husky, Commitlint, Vitest                                      |
+
+---
+
+## 📁 Struktura projektu
+
+```
+src/
+├── app/                     # App Router (Next.js 15+)
+│   ├── api/                 # API routes (backend logic)
+│   ├── dashboard/           # Główna aplikacja (po zalogowaniu)
+│   └── login/               # Widok logowania
+├── components/              # Komponenty UI
+├── hooks/                   # Hooki (np. auth, state management)
+├── lib/                     # Utils, helpers, middlewares
+├── prisma/                  # Schematy i seed bazy danych
+├── styles/                  # Tailwind i globalne style
+└── types/                   # Typy TypeScript
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Jak uruchomić lokalnie
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Sklonuj repozytorium
 
-## Learn More
+```bash
+git clone [https://github.com/twoj-user/promanage-system.git](https://github.com/TeatrumMundi/flow_manager.git)
+cd promanage-system
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Zainstaluj zależności
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm install
+# lub
+npm install
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Skonfiguruj środowisko
 
-## Deploy on Vercel
+Utwórz plik `.env` na podstawie `.env.example`:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/promanage
+NEXTAUTH_SECRET=your-secret
+JWT_SECRET=your-jwt-secret
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Zainicjuj bazę danych
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+### 5. Uruchom aplikację
+
+```bash
+pnpm dev
+# lub
+npm run dev
+```
+
+---
+
+## 🧪 Testy
+
+Projekt korzysta z [Vitest](https://vitest.dev/). Aby uruchomić testy:
+
+```bash
+pnpm test
+```
+
+---
