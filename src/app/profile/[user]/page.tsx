@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaUsers, FaClock, FaProjectDiagram, FaCalendarCheck, FaChartBar, FaDollarSign, FaChartPie, FaUser } from "react-icons/fa";
