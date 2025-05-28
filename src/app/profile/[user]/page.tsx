@@ -44,7 +44,7 @@ export default function UserDashboard() {
       />
 
       {/* Top bar */}
-      <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-md rounded-2xl shadow-md px-8 py-3 mt-10 mb-25 gap-2">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-md rounded-2xl shadow-[0_0_24px_4px_rgba(0,100,200,0.1)] px-8 py-3 mt-10 mb-25 gap-2">
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center">
             <Image
@@ -72,7 +72,7 @@ export default function UserDashboard() {
           {tiles.map((tile) => (
             <div
               key={tile.label}
-              className="flex flex-col items-center justify-center bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8 w-48 h-48 hover:bg-blue-50 transition cursor-pointer"
+              className="flex flex-col items-center justify-center bg-white/30 backdrop-blur-md rounded-2xl shadow-[0_0_24px_4px_rgba(0,100,200,0.1)] p-8 w-48 h-48 hover:bg-blue-50 transition cursor-pointer"
             >
               {tile.icon}
               <span className="mt-4 text-lg font-semibold text-gray-700 text-center">{tile.label}</span>
