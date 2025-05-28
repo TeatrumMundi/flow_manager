@@ -43,7 +43,7 @@ export default function UserDashboard() {
         </div>
         <div className="flex flex-col md:flex-row items-center md:space-x-8 space-y-1 md:space-y-0 w-full md:w-auto justify-end">
           <span className="text-gray-700 font-medium">Jan Kowalski</span>
-          <span className="text-gray-500">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <span className="text-gray-500">{new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
           <span className="text-gray-500">{new Date().toLocaleDateString('pl-PL', { month: 'short', day: '2-digit', year: 'numeric' })}</span>
           <button className="text-blue-600 hover:underline font-medium">Wyloguj</button>
         </div>
