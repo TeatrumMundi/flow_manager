@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaUsers, FaClock, FaProjectDiagram, FaCalendarCheck, FaChartBar, FaDollarSign, FaChartPie, FaUser } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 const tiles = [
   { icon: <FaUsers size={40} className="text-blue-500" />, label: "Użytkownicy" },
@@ -14,6 +15,20 @@ const tiles = [
 ];
 
 export default function UserDashboard() {
+  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    function updateTime() {
+      const now = new Date();
+      setTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      setDate(now.toLocaleDateString("pl-PL", { month: "short", day: "2-digit", year: "numeric" }));
+    }
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
       {/* Background image */}
@@ -43,8 +58,8 @@ export default function UserDashboard() {
         </div>
         <div className="flex flex-col md:flex-row items-center md:space-x-8 space-y-1 md:space-y-0 w-full md:w-auto justify-end">
           <span className="text-gray-700 font-medium">Jan Kowalski</span>
-          <span className="text-gray-500">{new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
-          <span className="text-gray-500">{new Date().toLocaleDateString('pl-PL', { month: 'short', day: '2-digit', year: 'numeric' })}</span>
+          <span className="text-gray-500">{time}</span>
+          <span className="text-gray-500">{date}</span>
           <button className="text-blue-600 hover:underline font-medium">Wyloguj</button>
         </div>
       </div>
