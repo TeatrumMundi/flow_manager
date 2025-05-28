@@ -1,6 +1,6 @@
-# 🧭 ProManage System
+# 🧭 FlowManager
 
-**ProManage** to nowoczesny system do kompleksowego zarządzania projektami, personelem, czasem pracy oraz kosztami operacyjnymi. Został zaprojektowany z myślą o organizacjach, które potrzebują narzędzia wspierającego efektywne planowanie, monitorowanie i analizę danych związanych z działalnością projektową i HR.
+**FlowManager** to nowoczesny system do kompleksowego zarządzania projektami, personelem, czasem pracy oraz kosztami operacyjnymi. Został zaprojektowany z myślą o organizacjach, które potrzebują narzędzia wspierającego efektywne planowanie, monitorowanie i analizę danych związanych z działalnością projektową i HR.
 
 ---
 
@@ -55,8 +55,8 @@ src/
 ### 1. Sklonuj repozytorium
 
 ```bash
-git clone [https://github.com/twoj-user/promanage-system.git](https://github.com/TeatrumMundi/flow_manager.git)
-cd promanage-system
+git clone [https://github.com/twoj-user/flow_manager.git](https://github.com/TeatrumMundi/flow_manager.git)
+cd flow_manager
 ```
 
 ### 2. Zainstaluj zależności
@@ -72,7 +72,7 @@ npm install
 Utwórz plik `.env` na podstawie `.env.example`:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/promanage (example)
+DATABASE_URL=postgresql://user:password@localhost:5432/flow_manager (example)
 ```
 
 ### 4. Zainicjuj bazę danych

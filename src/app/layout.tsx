@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "ProManage System – Zarządzanie projektami i personelem",
+    title: "FlowManager – Zarządzanie projektami i personelem",
     description:
-        "ProManage to nowoczesna aplikacja do kompleksowego zarządzania projektami, czasem pracy oraz zasobami ludzkimi.",
+        "FlowManager to nowoczesna aplikacja do kompleksowego zarządzania projektami, czasem pracy oraz zasobami ludzkimi.",
 };
 
 export default function RootLayout({
