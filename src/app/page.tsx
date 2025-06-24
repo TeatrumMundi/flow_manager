@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRegistration } from "@/hooks/useRegistration";
 import { useLogin } from "@/hooks/useLogin";
 import {
@@ -11,6 +10,7 @@ import {
   MessageDisplay,
   Header
 } from "@/components/mainPage";
+import BackgroundImage from "@/components/common/BackgroundImage";
 
 export default function Home() {
   const [showResetPassword, setShowResetPassword] = useState(false);
@@ -51,14 +51,7 @@ export default function Home() {
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
       {/* Background Image */}
-      <Image
-        src="/loginBG.png"
-        alt="Background"
-        fill
-        priority
-        className="object-cover z-[-1]"
-        quality={100}
-      />
+      <BackgroundImage />
 
       {/* Main Content */}
       <div className="w-full max-w-md bg-white/50 backdrop-blur-md rounded-3xl shadow-xl p-7 pl-14 pr-14 flex flex-col items-center space-y-8">
