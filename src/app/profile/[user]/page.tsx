@@ -6,7 +6,6 @@ import { User } from "@/types/user";
 import { motion, AnimatePresence } from "framer-motion";
 import TopBar from "@/components/profile/TopBar";
 import DashboardTiles from "@/components/profile/DashboardTiles";
-import LogoutOverlay from "@/components/profile/LogoutOverlay";
 import BackgroundImage from "@/components/common/BackgroundImage";
 
 export default function UserDashboard() {
@@ -56,29 +55,19 @@ export default function UserDashboard() {
 
   return (
     <AnimatePresence>
-      {!isLoggingOut ? (
-        <motion.main 
-          className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8"
-          exit={{ 
-            opacity: 0, 
-            scale: 0.95,
-            filter: "blur(10px)",
-            transition: { duration: 0.5, ease: "easeInOut" }
-          }}
-        >
-          <BackgroundImage />
-          <TopBar 
-            user={user}
-            time={time}
-            date={date}
-            isLoggingOut={isLoggingOut}
-            onLogout={handleLogout}
-          />
-          <DashboardTiles isLoggingOut={isLoggingOut} />
-        </motion.main>
-      ) : (
-        <LogoutOverlay />
-      )}
+      <motion.main 
+        className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8"
+      >
+        <BackgroundImage />
+        <TopBar 
+          user={user}
+          time={time}
+          date={date}
+          isLoggingOut={isLoggingOut}
+          onLogout={handleLogout}
+        />
+        <DashboardTiles isLoggingOut={isLoggingOut} />
+      </motion.main>
     </AnimatePresence>
   );
 }
