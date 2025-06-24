@@ -4,6 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaUsers, FaClock, FaProjectDiagram, FaCalendarCheck, FaChartBar, FaDollarSign, FaChartPie, FaUser } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { User } from "@/types/user";
+
 
 const tiles = [
   { icon: <FaUsers size={40} className="text-blue-500" />, label: "Użytkownicy" },
@@ -19,8 +22,19 @@ const tiles = [
 export default function UserDashboard() {
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    } else {
+      // Redirect to login if no user data
+      router.push('/');
+    }
+
     function updateTime() {
       const now = new Date();
       setTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
@@ -29,7 +43,20 @@ export default function UserDashboard() {
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    router.push('/');
+  };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
@@ -59,10 +86,17 @@ export default function UserDashboard() {
           <span className="text-2xl font-semibold text-gray-700 tracking-tight">FlowManager</span>
         </div>
         <div className="flex flex-col md:flex-row items-center md:space-x-8 space-y-1 md:space-y-0 w-full md:w-auto justify-end">
-          <span className="text-gray-700 font-medium">Jan Kowalski</span>
+          <span className="text-gray-700 font-medium">
+            {user.firstName} {user.lastName}
+          </span>
           <span className="text-gray-500">{time}</span>
           <span className="text-gray-500">{date}</span>
-          <button className="text-blue-600 hover:underline font-medium">Wyloguj</button>
+          <button 
+            onClick={handleLogout}
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Wyloguj
+          </button>
         </div>
       </div>
 

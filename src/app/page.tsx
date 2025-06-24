@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRegistration } from "@/hooks/useRegistration";
+import { useLogin } from "@/hooks/useLogin";
 import {
   LoginForm,
   RegisterForm,
@@ -18,7 +19,7 @@ export default function Home() {
 
   const {
     registerForm,
-    isLoading,
+    isLoading: isRegisterLoading,
     handleRegisterChange,
     handleRegisterSubmit
   } = useRegistration({
@@ -26,16 +27,18 @@ export default function Home() {
     onMessage: setMessage
   });
 
-  // Handle login submission
-  const handleLoginSubmit = (email: string, password: string) => {
-    // Add your login logic here
-    console.log('Login:', { email, password });
-  };
+  const {
+    isLoading: isLoginLoading,
+    handleLogin
+  } = useLogin({
+    onMessage: setMessage
+  });
 
   // Handle reset password submission
   const handleResetPasswordSubmit = (email: string) => {
     // Add your reset password logic here
     console.log('Reset password for:', email);
+    setMessage({ type: 'success', text: 'Password reset link sent to your email!' });
   };
 
   // Handle back to login
@@ -70,9 +73,10 @@ export default function Home() {
           {/* Form Content */}
           {!showResetPassword && !showRegister ? (
             <LoginForm
-              onSubmit={handleLoginSubmit}
+              onSubmit={handleLogin}
               onForgotPassword={() => setShowResetPassword(true)}
               onCreateAccount={() => setShowRegister(true)}
+              isLoading={isLoginLoading}
             />
           ) : showResetPassword ? (
             <ResetPasswordForm
@@ -82,7 +86,7 @@ export default function Home() {
           ) : (
             <RegisterForm
               registerForm={registerForm}
-              isLoading={isLoading}
+              isLoading={isRegisterLoading}
               onSubmit={handleRegisterSubmit}
               onChange={handleRegisterChange}
               onBackToLogin={handleBackToLogin}

@@ -6,9 +6,10 @@ interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;
   onForgotPassword: () => void;
   onCreateAccount: () => void;
+  isLoading?: boolean;
 }
 
-export default function LoginForm({ onSubmit, onForgotPassword, onCreateAccount }: LoginFormProps) {
+export default function LoginForm({ onSubmit, onForgotPassword, onCreateAccount, isLoading }: LoginFormProps) {
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
@@ -39,9 +40,11 @@ export default function LoginForm({ onSubmit, onForgotPassword, onCreateAccount 
           id="email"
           name="email"
           type="email"
+          required
           value={loginForm.email}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"
+          disabled={isLoading}
         />
       </div>
 
@@ -56,9 +59,11 @@ export default function LoginForm({ onSubmit, onForgotPassword, onCreateAccount 
           id="password"
           name="password"
           type="password"
+          required
           value={loginForm.password}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-500"
+          disabled={isLoading}
         />
       </div>
 
@@ -71,9 +76,10 @@ export default function LoginForm({ onSubmit, onForgotPassword, onCreateAccount 
 
       <button
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[0.97] duration-100"
+        disabled={isLoading}
+        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[0.97] duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Login
+        {isLoading ? 'Logging in...' : 'Login'}
       </button>
 
       <div 
