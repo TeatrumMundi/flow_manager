@@ -1,0 +1,14 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    ".vscode": true,
+    ".vercel": true,
+    ".next": true,
+    "node_modules": true
+  },
+  "hide-files.files": [".vscode", ".vercel", ".next", "node_modules"]
+}
