@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useRegistration } from "@/hooks/useRegistration";
@@ -8,37 +8,39 @@ import {
   RegisterForm,
   ResetPasswordForm,
   MessageDisplay,
-  Header
+  Header,
 } from "@/components/mainPage";
-import BackgroundImage from "@/components/common/BackgroundImage";
 
 export default function Home() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const {
     registerForm,
     isLoading: isRegisterLoading,
     handleRegisterChange,
-    handleRegisterSubmit
+    handleRegisterSubmit,
   } = useRegistration({
     onSuccess: () => setShowRegister(false),
-    onMessage: setMessage
+    onMessage: setMessage,
   });
 
-  const {
-    isLoading: isLoginLoading,
-    handleLogin
-  } = useLogin({
-    onMessage: setMessage
+  const { isLoading: isLoginLoading, handleLogin } = useLogin({
+    onMessage: setMessage,
   });
 
   // Handle reset password submission
   const handleResetPasswordSubmit = (email: string) => {
     // Add your reset password logic here
-    console.log('Reset password for:', email);
-    setMessage({ type: 'success', text: 'Password reset link sent to your email!' });
+    console.log("Reset password for:", email);
+    setMessage({
+      type: "success",
+      text: "Password reset link sent to your email!",
+    });
   };
 
   // Handle back to login
@@ -50,9 +52,6 @@ export default function Home() {
 
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
-      {/* Background Image */}
-      <BackgroundImage />
-
       {/* Main Content */}
       <div className="w-full max-w-md bg-white/50 backdrop-blur-md rounded-3xl shadow-xl p-7 pl-14 pr-14 flex flex-col items-center space-y-8">
         {/* Header */}
