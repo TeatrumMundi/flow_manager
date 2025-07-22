@@ -8,7 +8,28 @@
     ".vscode": true,
     ".vercel": true,
     ".next": true,
-    "node_modules": true
+    "node_modules": true,
+    "tsconfig.json": true,
+    "README.md": true,
+    "package-lock.json": true,
+    "next.config.ts": true,
+    "next-env.d.ts": true,
+    "eslint.config.mjs": true,
+    ".gitignore": true,
+    ".env": true
   },
-  "hide-files.files": [".vscode", ".vercel", ".next", "node_modules"]
+  "hide-files.files": [
+    ".vscode",
+    ".vercel",
+    ".next",
+    "node_modules",
+    "tsconfig.json",
+    "README.md",
+    "package-lock.json",
+    "next.config.ts",
+    "next-env.d.ts",
+    "eslint.config.mjs",
+    ".gitignore",
+    ".env"
+  ]
 }
