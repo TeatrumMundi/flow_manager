@@ -6,30 +6,22 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     ".vscode": true,
-    ".vercel": true,
     ".next": true,
+    ".vercel": true,
     "node_modules": true,
     "tsconfig.json": true,
-    "README.md": true,
-    "package-lock.json": true,
-    "next.config.ts": true,
-    "next-env.d.ts": true,
-    "eslint.config.mjs": true,
-    ".gitignore": true,
-    ".env": true
+    "tailwind.config.ts": true,
+    "postcss.config.mjs": true,
+    "package-lock.json": true
   },
   "hide-files.files": [
     ".vscode",
-    ".vercel",
     ".next",
+    ".vercel",
     "node_modules",
     "tsconfig.json",
-    "README.md",
-    "package-lock.json",
-    "next.config.ts",
-    "next-env.d.ts",
-    "eslint.config.mjs",
-    ".gitignore",
-    ".env"
+    "tailwind.config.ts",
+    "postcss.config.mjs",
+    "package-lock.json"
   ]
 }
