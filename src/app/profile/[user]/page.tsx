@@ -33,16 +33,6 @@ export default function UserDashboard() {
 
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      {/* Background image */}
-      <Image
-        src="/loginBG.png"
-        alt="Background"
-        fill
-        priority
-        className="object-cover z-[-1]"
-        quality={100}
-      />
-
       {/* Top bar */}
       <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-md rounded-2xl shadow-[0_0_24px_4px_rgba(0,100,200,0.1)] px-8 py-3 mt-10 mb-25 gap-2">
         <div className="flex items-center space-x-3">
