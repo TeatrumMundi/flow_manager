@@ -7,7 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "list:users": "tsx src/scripts/listUsers.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
