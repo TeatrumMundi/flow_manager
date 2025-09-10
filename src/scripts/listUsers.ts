@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/neon-http";
-import { users } from "@/db/schema";
+import { users } from "@/DataBase/schema";
 import "dotenv/config";
 
 if (!process.env.DATABASE_URL) {

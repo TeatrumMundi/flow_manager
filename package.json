@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "list:users": "tsx src/scripts/listUsers.ts"
+    "db:listUsers": "tsx src/scripts/listUsers.ts",
+    "db:createUser": "tsx src/scripts/createUser.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
