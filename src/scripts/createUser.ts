@@ -8,8 +8,6 @@ import {
 import { database } from "@/Library/db";
 import readline from "readline";
 
-// Reuse shared database instance
-
 // Create readline interface for user input
 const consoleInput = readline.createInterface({
   input: process.stdin,

@@ -31,7 +31,7 @@ export default function Home() {
 
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[0.97] duration-100"
+              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[1.05] duration-500 cursor-pointer"
             >
               Login
             </button>

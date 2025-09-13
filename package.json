@@ -17,6 +17,7 @@
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
     "next": "15.5.2",
+    "next-auth": "^5.0.0-beta.29",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0"
