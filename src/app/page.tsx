@@ -36,10 +36,6 @@ export default function Home() {
               Login
             </button>
           </form>
-
-          <div className="mt-4 text-center text-sm text-blue-600 hover:underline cursor-pointer">
-            Create an account
-          </div>
         </div>
       </div>
     </main>
