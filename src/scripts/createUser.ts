@@ -1,4 +1,3 @@
-import { drizzle } from "drizzle-orm/neon-http";
 import { users, userRoles, userProfiles } from "@/DataBase/schema";
 import { eq, ilike } from "drizzle-orm";
 import {
@@ -6,17 +5,10 @@ import {
   isEmailFormatValid,
   normalizeEmail,
 } from "@/Library/email";
-import "dotenv/config";
+import { database } from "@/Library/db";
 import readline from "readline";
 
-// Check if the database URL is set in environment variables
-if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is not set!");
-  process.exit(1);
-}
-
-// Initialize Drizzle ORM with Neon database URL
-const database = drizzle(process.env.DATABASE_URL);
+// Reuse shared database instance
 
 // Create readline interface for user input
 const consoleInput = readline.createInterface({
