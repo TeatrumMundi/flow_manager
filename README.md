@@ -26,7 +26,7 @@
 | UI / Design  | [Tailwind CSS 4](https://tailwindcss.com/)                                       |
 | Backend      | Next.js API Routes / Server Actions (TypeScript)                                 |
 | Baza danych  | [PostgreSQL](https://www.postgresql.org/) hostowany na [Neon](https://neon.com/) (serverless)                                        |
-| ORM          | [Drizzle ORM]([https://www.prisma.io/](https://neon.com/))                                             |
+| ORM          | [Drizzle ORM](https://neon.com/)                                             |
 | Dev Tools    | ESLint, Prettier, Commitlint, Vitest                                             |
 | Hosting      | Vercel                                                                           |
 
