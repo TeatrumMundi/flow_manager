@@ -43,7 +43,7 @@ src/
 ├── components/              # Komponenty UI
 ├── hooks/                   # Hooki (np. auth, state management)
 ├── lib/                     # Utils, helpers, middlewares
-├── prisma/                  # Schematy i seed bazy danych
+├── drizzle/                 # Schematy i konfiguracja bazy danych (Drizzle ORM)
 ├── styles/                  # Tailwind i globalne style
 └── types/                   # Typy TypeScript
 ```
