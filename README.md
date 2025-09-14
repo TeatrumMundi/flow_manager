@@ -78,8 +78,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/flow_manager (example)
 ### 4. Zainicjuj bazę danych
 
 ```bash
-npx prisma generate
-npx prisma migrate dev --name init
+npx drizzle-kit push
 ```
 
 ### 5. Uruchom aplikację
