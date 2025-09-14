@@ -25,7 +25,7 @@
 | Frontend     | [Next.js](https://nextjs.org/) (App Router) + [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) |
 | UI / Design  | [Tailwind CSS 4](https://tailwindcss.com/)                                       |
 | Backend      | Next.js API Routes / Server Actions (TypeScript)                                 |
-| Baza danych  | [PostgreSQL](https://www.postgresql.org/)                                        |
+| Baza danych  | [PostgreSQL](https://www.postgresql.org/) hostowany na [Neon](https://neon.com/) (serverless)                                        |
 | ORM          | [Prisma ORM](https://www.prisma.io/)                                             |
 | Dev Tools    | ESLint, Prettier, Commitlint, Vitest                                             |
 | Hosting      | Vercel                                                                           |
