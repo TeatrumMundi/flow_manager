@@ -2,6 +2,7 @@
 
 import Input from "@/Components/Input";
 import Image from "next/image";
+import { signInAction } from "@/app/actions/signInAction";
 
 export default function Home() {
   return (
@@ -25,9 +26,14 @@ export default function Home() {
 
         {/* Login Form */}
         <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
-          <form className="space-y-5">
-            <Input id="email" type="email" label="Email" />
-            <Input id="password" type="password" label="Password" />
+          <form action={signInAction} className="space-y-5">
+            <Input id="email" type="email" label="Email" name="email" />
+            <Input
+              id="password"
+              type="password"
+              label="Password"
+              name="password"
+            />
 
             <button
               type="submit"

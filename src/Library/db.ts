@@ -1,5 +1,4 @@
 import { drizzle } from "drizzle-orm/neon-http";
-require("dotenv-flow").config();
 
 /**
  * @summary Shared Drizzle database instance for scripts and server code.
