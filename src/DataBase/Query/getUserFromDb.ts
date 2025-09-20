@@ -1,5 +1,3 @@
-"use server";
-
 import { eq } from "drizzle-orm";
 import { userCredentials, users } from "@/DataBase/schema";
 import { saltAndHashPassword } from "@/Library/auth";
