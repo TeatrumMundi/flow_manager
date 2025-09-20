@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "db:listUsers": "tsx src/scripts/listUsers.ts",
-    "db:createUser": "tsx src/scripts/createUser.ts",
-    "db:deleteUser": "tsx src/scripts/deleteUser.ts",
-    "db:readDbURL": "tsx src/scripts/readDbURL.ts"
+    "db:listUsers": "tsx scripts/listUsers.ts",
+    "db:createUser": "tsx scripts/createUser.ts",
+    "db:deleteUser": "tsx scripts/deleteUser.ts",
+    "db:readDbURL": "tsx scripts/readDbURL.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
