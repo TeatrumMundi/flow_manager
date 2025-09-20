@@ -10,13 +10,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-
-
-        
         // Get user from DB and validate password
         const user = await getUserFromDb(
           credentials.email as string,
-          credentials.password as string
+          credentials.password as string,
         );
         if (!user) throw new Error("Invalid credentials.");
 

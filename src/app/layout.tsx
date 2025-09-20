@@ -1,8 +1,8 @@
-import Background from "@/Components/Background";
-import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import type React from "react";
+import Background from "@/Components/Background";
 import "@/styles/globals.css";
-import React from "react";
 
 const inter = Inter({
   variable: "--font-inter",

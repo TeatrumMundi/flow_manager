@@ -1,19 +1,19 @@
-import {
-  users,
-  userProfiles,
-  userCredentials,
-  projectAssignments,
-  workLogs,
-  vacations,
-} from "@/DataBase/schema";
+import readline from "node:readline";
 import { eq } from "drizzle-orm";
 import {
-  MAX_EMAIL_LENGTH,
+  projectAssignments,
+  userCredentials,
+  userProfiles,
+  users,
+  vacations,
+  workLogs,
+} from "@/DataBase/schema";
+import { database } from "@/Library/db";
+import {
   isEmailFormatValid,
+  MAX_EMAIL_LENGTH,
   normalizeEmail,
 } from "@/Library/email";
-import { database } from "@/Library/db";
-import readline from "readline";
 
 const consoleInput = readline.createInterface({
   input: process.stdin,

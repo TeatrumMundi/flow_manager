@@ -1,18 +1,18 @@
 "use client";
 
-import {
-  FaUsers,
-  FaClock,
-  FaProjectDiagram,
-  FaCalendarCheck,
-  FaChartBar,
-  FaDollarSign,
-  FaChartPie,
-  FaUser,
-} from "react-icons/fa";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  FaCalendarCheck,
+  FaChartBar,
+  FaChartPie,
+  FaClock,
+  FaDollarSign,
+  FaProjectDiagram,
+  FaUser,
+  FaUsers,
+} from "react-icons/fa";
 
 const tiles = [
   {
@@ -92,7 +92,10 @@ export default function UserDashboard() {
           <span className="text-gray-700 font-medium">Jan Kowalski</span>
           <span className="text-gray-500">{time}</span>
           <span className="text-gray-500">{date}</span>
-          <button className="text-blue-600 hover:underline font-medium">
+          <button
+            type="button"
+            className="text-blue-600 hover:underline font-medium"
+          >
             Wyloguj
           </button>
         </div>

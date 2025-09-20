@@ -1,6 +1,6 @@
 "use server";
 
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 export async function login(email: string, password: string) {
   // 1. Validate Input
@@ -22,7 +22,7 @@ export async function login(email: string, password: string) {
  */
 export async function saltAndHashPassword(
   password: string,
-  salt?: string
+  salt?: string,
 ): Promise<string> {
   if (typeof password !== "string" || password.length === 0) {
     throw new Error("Password must be a non-empty string");

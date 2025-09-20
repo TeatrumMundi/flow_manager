@@ -1,17 +1,16 @@
 import {
-  pgTable,
-  unique,
-  serial,
-  varchar,
-  text,
+  boolean,
+  date,
   foreignKey,
   integer,
-  timestamp,
   numeric,
-  date,
-  boolean,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  unique,
+  varchar,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const userRoles = pgTable(
   "user_roles",

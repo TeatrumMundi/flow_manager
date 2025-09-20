@@ -1,7 +1,7 @@
-import { database } from "@/Library/db";
-import { users, userCredentials } from "@/DataBase/schema";
 import { eq } from "drizzle-orm";
+import { userCredentials, users } from "@/DataBase/schema";
 import { saltAndHashPassword } from "@/Library/auth";
+import { database } from "@/Library/db";
 
 async function getUserFromDb(email: string, plainPassword: string) {
   // Find user by email first

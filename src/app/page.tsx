@@ -1,8 +1,8 @@
 "use client";
 
-import Input from "@/Components/Input";
 import Image from "next/image";
 import { signInAction } from "@/app/actions/signInAction";
+import Input from "@/Components/Input";
 
 export default function Home() {
   return (
