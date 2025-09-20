@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import crypto from "crypto";
 
 /**
  * Salt and hash a plaintext password using Node's crypto.scryptSync.
