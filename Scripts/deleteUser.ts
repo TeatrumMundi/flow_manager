@@ -1,3 +1,4 @@
+import "dotenv-flow/config";
 import readline from "node:readline";
 import { eq } from "drizzle-orm";
 import {
@@ -7,13 +8,13 @@ import {
   users,
   vacations,
   workLogs,
-} from "@/DataBase/schema";
-import { database } from "@/Library/db";
+} from "../src/DataBase/schema";
+import { database } from "../src/Library/db";
 import {
   isEmailFormatValid,
   MAX_EMAIL_LENGTH,
   normalizeEmail,
-} from "@/Library/email";
+} from "../src/Library/email";
 
 const consoleInput = readline.createInterface({
   input: process.stdin,
@@ -81,7 +82,7 @@ async function main() {
       .limit(1);
     if (!user) {
       console.error(
-        `No user found with email ${targetEmail}. Nothing to delete.`,
+        `No user found with email ${targetEmail}. Nothing to delete.`
       );
       consoleInput.close();
       process.exit(1);
@@ -118,7 +119,7 @@ async function main() {
     });
 
     const proceed = await confirmProceed(
-      "This will permanently delete the user and related records. Continue? (y/N): ",
+      "This will permanently delete the user and related records. Continue? (y/N): "
     );
     if (!proceed) {
       console.log("Aborted.");

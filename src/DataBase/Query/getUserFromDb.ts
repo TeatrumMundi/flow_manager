@@ -1,32 +1,27 @@
 import { eq } from "drizzle-orm";
-import { userCredentials, users } from "@/DataBase/schema";
-import { saltAndHashPassword } from "@/Library/auth";
+import { users } from "@/DataBase/schema";
 import { database } from "@/Library/db";
+import getUserCredentialsFromDB from "./getUserCredentialsFromDB";
+import bcrypt from "bcryptjs";
 
-async function getUserFromDb(email: string, plainPassword: string) {
+async function getUserFromDb(inputEmail: string, inputPassword: string) {
   // Find user by email first
   const [user] = await database
     .select()
     .from(users)
-    .where(eq(users.email, email))
+    .where(eq(users.email, inputEmail))
     .limit(1);
 
-  if (!user) return null;
+  if (!user) throw new Error("No user found with that email.");
 
-  // Fetch credentials for that user and compare passwordHash in JS
-  const [cred] = await database
-    .select()
-    .from(userCredentials)
-    .where(eq(userCredentials.userId, user.id))
-    .limit(1);
+  const credentialsFromDB = await getUserCredentialsFromDB(String(user.id));
 
-  if (!cred) return null;
+  if (!credentialsFromDB) throw new Error("No credentials found for user with ID=" + user.id);
 
-  // Stored format is "{salt}${derivedHex}". Recreate the hash from the
-  // provided plaintext password using the same salt and compare.
-  const [storedSalt] = cred.passwordHash.split("$");
-  const computed = await saltAndHashPassword(plainPassword, storedSalt);
-  if (cred.passwordHash !== computed) return null;
+  const result = bcrypt.compare(inputPassword, credentialsFromDB);
+  if (!result) {
+    throw new Error("Invalid password.");
+  }
 
   return user;
 }
