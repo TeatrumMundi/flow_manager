@@ -12,15 +12,21 @@ async function getUserFromDb(inputEmail: string, inputPassword: string) {
     .where(eq(users.email, inputEmail))
     .limit(1);
 
-  if (!user) throw new Error("No user found with that email.");
+  // Use a consistent error message to prevent timing attacks and email enumeration
+  let credentialsFromDB: string | null = null;
+  let userFound = false;
 
-  const credentialsFromDB = await getUserCredentialsFromDB(String(user.id));
+  if (user) {
+    credentialsFromDB = await getUserCredentialsFromDB(String(user.id));
+    userFound = !!credentialsFromDB;
+  }
 
-  if (!credentialsFromDB) throw new Error("No credentials found for user with ID=" + user.id);
+  // Always perform bcrypt.compare to avoid timing attacks
+  const passwordHash = credentialsFromDB || "$2a$10$invalidinvalidinvalidinvalidinv";
+  const result = await bcrypt.compare(inputPassword, passwordHash);
 
-  const result = bcrypt.compare(inputPassword, credentialsFromDB);
-  if (!result) {
-    throw new Error("Invalid password.");
+  if (!userFound || !result) {
+    throw new Error("Invalid email or password.");
   }
 
   return user;
