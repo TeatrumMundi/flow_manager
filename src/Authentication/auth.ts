@@ -17,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!user) throw new Error("Invalid credentials.");
 
-        // return user object
+        // Return minimal, safe user object; extra data should be fetched on demand
         return {
           ...user,
           id: String(user.id),
@@ -26,22 +26,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   // Redirect unauthenticated users to the root login page
-  pages: {
-    signIn: "/",
-  },
+  pages: { signIn: "/" },
   callbacks: {
-    // This is respected by the middleware export to allow/deny access
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-
-      // Protect the profile area
-      const isProfile =
-        nextUrl.pathname === "/profile" ||
-        nextUrl.pathname.startsWith("/profile/");
-
-      if (isProfile) return isLoggedIn; // only allow when logged in
-
-      return true; // allow other routes
+    // Allow access only when a user session exists.
+    authorized({ auth }) {
+      return !!auth?.user;
     },
   },
 });
