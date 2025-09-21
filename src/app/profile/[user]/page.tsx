@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { signOutAction } from "@/app/actions/signOutAction";
 import {
   FaCalendarCheck,
   FaChartBar,
@@ -54,14 +55,14 @@ export default function UserDashboard() {
     function updateTime() {
       const now = new Date();
       setTime(
-        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       );
       setDate(
         now.toLocaleDateString("pl-PL", {
           month: "short",
           day: "2-digit",
           year: "numeric",
-        }),
+        })
       );
     }
     updateTime();
@@ -92,12 +93,14 @@ export default function UserDashboard() {
           <span className="text-gray-700 font-medium">Jan Kowalski</span>
           <span className="text-gray-500">{time}</span>
           <span className="text-gray-500">{date}</span>
-          <button
-            type="button"
-            className="text-blue-600 hover:underline font-medium"
-          >
-            Wyloguj
-          </button>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Wyloguj
+            </button>
+          </form>
         </div>
       </div>
 
