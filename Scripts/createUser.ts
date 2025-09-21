@@ -1,5 +1,5 @@
 import "dotenv-flow/config";
-import crypto from "node:crypto";
+import bcrypt from "bcryptjs";
 import readline from "node:readline";
 import { eq, ilike } from "drizzle-orm";
 import {
@@ -54,11 +54,9 @@ async function main() {
       .returning();
     console.log("User created successfully:", insertedUser);
 
-    // Hash and persist credentials
-    const salt = crypto.randomBytes(16).toString("hex");
-    // Use scrypt to derive a key from the password
-    const derived = crypto.scryptSync(password, salt, 64);
-    const passwordHash = `${salt}$${derived.toString("hex")}`;
+    // Hash and persist credentials using bcrypt
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
 
     await database.insert(userCredentials).values({
       userId: insertedUser.id as number,
