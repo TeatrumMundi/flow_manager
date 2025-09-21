@@ -1,5 +1,5 @@
-import { auth } from "@/Authentication/auth";
 import { redirect } from "next/navigation";
+import { auth } from "@/Authentication/auth";
 
 export default async function ProfileRedirectPage() {
   const session = await auth();

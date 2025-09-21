@@ -82,7 +82,7 @@ async function main() {
       .limit(1);
     if (!user) {
       console.error(
-        `No user found with email ${targetEmail}. Nothing to delete.`
+        `No user found with email ${targetEmail}. Nothing to delete.`,
       );
       consoleInput.close();
       process.exit(1);
@@ -119,7 +119,7 @@ async function main() {
     });
 
     const proceed = await confirmProceed(
-      "This will permanently delete the user and related records. Continue? (y/N): "
+      "This will permanently delete the user and related records. Continue? (y/N): ",
     );
     if (!proceed) {
       console.log("Aborted.");

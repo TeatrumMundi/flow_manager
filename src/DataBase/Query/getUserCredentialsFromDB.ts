@@ -1,9 +1,9 @@
+import { eq } from "drizzle-orm";
 import { userCredentials } from "@/DataBase/schema";
 import { database } from "@/Library/db";
-import { eq } from "drizzle-orm";
 
 async function getUserCredentialsFromDB(
-  userId: string
+  userId: string,
 ): Promise<string | null> {
   const [credentials] = await database
     .select()

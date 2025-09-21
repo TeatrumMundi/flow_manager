@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { Tile } from "@/Components/Tile";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { signOutAction } from "@/app/actions/signOutAction";
+import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 import {
   FaCalendarCheck,
   FaChartBar,
@@ -14,6 +14,7 @@ import {
   FaUser,
   FaUsers,
 } from "react-icons/fa";
+import { signOutAction } from "@/app/actions/signOutAction";
 
 const tiles = [
   {
@@ -48,27 +49,7 @@ const tiles = [
 ];
 
 export default function UserDashboard() {
-  const [time, setTime] = useState("");
-  const [date, setDate] = useState("");
-
-  useEffect(() => {
-    function updateTime() {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      );
-      setDate(
-        now.toLocaleDateString("pl-PL", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        })
-      );
-    }
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const { time, date } = useTimeAndDate();
 
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
@@ -108,15 +89,7 @@ export default function UserDashboard() {
       <div className="flex flex-1 items-start justify-center w-full">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {tiles.map((tile) => (
-            <div
-              key={tile.label}
-              className="flex flex-col items-center justify-center bg-white/30 backdrop-blur-md rounded-2xl shadow-[0_0_24px_4px_rgba(0,100,200,0.1)] p-8 w-48 h-48 hover:bg-blue-50 transition cursor-pointer"
-            >
-              {tile.icon}
-              <span className="mt-4 text-lg font-semibold text-gray-700 text-center">
-                {tile.label}
-              </span>
-            </div>
+            <Tile key={tile.label} icon={tile.icon} label={tile.label} />
           ))}
         </div>
       </div>

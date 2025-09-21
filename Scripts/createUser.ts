@@ -1,6 +1,6 @@
 import "dotenv-flow/config";
-import bcrypt from "bcryptjs";
 import readline from "node:readline";
+import bcrypt from "bcryptjs";
 import { eq, ilike } from "drizzle-orm";
 import {
   userCredentials,
@@ -128,7 +128,7 @@ async function askEmail(): Promise<string> {
     }
     if (candidate.length > MAX_EMAIL_LENGTH) {
       console.warn(
-        `Email must be ${MAX_EMAIL_LENGTH} characters or fewer. You entered ${candidate.length}.`
+        `Email must be ${MAX_EMAIL_LENGTH} characters or fewer. You entered ${candidate.length}.`,
       );
       continue;
     }
@@ -145,7 +145,7 @@ async function askEmail(): Promise<string> {
       .limit(1);
     if (existingUser) {
       console.warn(
-        `A user with email ${candidate} already exists (id=${existingUser.id}). Please try a different email.`
+        `A user with email ${candidate} already exists (id=${existingUser.id}). Please try a different email.`,
       );
       continue;
     }
@@ -160,7 +160,7 @@ async function askRoleId(): Promise<number | null> {
   while (true) {
     const roleNameInput = (
       await promptUser(
-        `Enter role name (press Enter for default "${DEFAULT_ROLE_NAME}"): `
+        `Enter role name (press Enter for default "${DEFAULT_ROLE_NAME}"): `,
       )
     ).trim();
 
@@ -175,7 +175,7 @@ async function askRoleId(): Promise<number | null> {
     if (foundRole) {
       if (!roleNameInput) {
         console.log(
-          `Using default role "${DEFAULT_ROLE_NAME}" (id=${foundRole.id}).`
+          `Using default role "${DEFAULT_ROLE_NAME}" (id=${foundRole.id}).`,
         );
       }
       return foundRole.id;
@@ -184,11 +184,11 @@ async function askRoleId(): Promise<number | null> {
     // If default was requested but not present, ask again.
     if (!roleNameInput) {
       console.warn(
-        `Default role "${DEFAULT_ROLE_NAME}" not found. Please enter an existing role name or create the default role first.`
+        `Default role "${DEFAULT_ROLE_NAME}" not found. Please enter an existing role name or create the default role first.`,
       );
     } else {
       console.warn(
-        `Role "${roleNameInput}" not found. Please enter an existing role name. (Ctrl+C to cancel)`
+        `Role "${roleNameInput}" not found. Please enter an existing role name. (Ctrl+C to cancel)`,
       );
     }
   }
@@ -231,7 +231,7 @@ async function askUserProfileInputs(userId: number) {
   let supervisorId: number | null = null;
   while (true) {
     const supervisorEmailRaw = await promptUser(
-      "Supervisor email (optional, press Enter to skip): "
+      "Supervisor email (optional, press Enter to skip): ",
     );
     const supervisorEmail = normalizeEmail(supervisorEmailRaw);
     if (!supervisorEmail) break; // skip
@@ -246,17 +246,17 @@ async function askUserProfileInputs(userId: number) {
       break;
     }
     console.warn(
-      `No user found with email ${supervisorEmail}. Press Enter to skip or try another email.`
+      `No user found with email ${supervisorEmail}. Press Enter to skip or try another email.`,
     );
   }
 
   const salaryRateRaw = await promptUser(
-    "Salary rate (optional, e.g., 25.50): "
+    "Salary rate (optional, e.g., 25.50): ",
   );
   const salaryRate = parseOptionalDecimal(salaryRateRaw);
 
   const vacationDaysRaw = await promptUser(
-    "Vacation days total (optional, integer): "
+    "Vacation days total (optional, integer): ",
   );
   const vacationDaysTotal = parseOptionalInt(vacationDaysRaw);
 
