@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useActionState } from "react";
 import { signInAction } from "@/app/actions/signInAction";
-import Input from "@/Components/Input";
+import Input from "@/app/Components/Input";
 
 export default function Home() {
   const [state, formAction] = useActionState(signInAction, undefined);
