@@ -19,10 +19,10 @@
     "dotenv": "^17.2.2",
     "dotenv-flow": "^4.1.0",
     "drizzle-orm": "^0.44.5",
-    "next": "15.5.2",
+    "next": "15.5.3",
     "next-auth": "^5.0.0-beta.29",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
@@ -30,11 +30,15 @@
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.1.13",
+    "@types/react-dom": "19.1.9",
     "drizzle-kit": "^0.31.4",
     "tailwindcss": "^4",
     "tsx": "^4.20.5",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.1.13",
+    "@types/react-dom": "19.1.9"
   }
 }

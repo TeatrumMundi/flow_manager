@@ -1,18 +1,15 @@
-import { eq } from "drizzle-orm";
-import { userCredentials } from "@/DataBase/schema";
+import { userCredentials, users } from "@/DataBase/schema";
 import { database } from "@/Library/db";
+import { eq } from "drizzle-orm";
 
-async function getUserCredentialsFromDB(
-  userId: string,
-): Promise<string | null> {
+async function getUserCredentialsFromDB( userId: string): Promise<string | null> 
+{
   const [credentials] = await database
     .select()
     .from(userCredentials)
-    .where(eq(userCredentials.userId, Number(userId)))
+    .where(eq(userCredentials.userId, users.id))
     .limit(1);
 
-  if (!credentials) return null;
-  return credentials.passwordHash ?? null;
+    return credentials.passwordHash;
 }
-
 export default getUserCredentialsFromDB;
