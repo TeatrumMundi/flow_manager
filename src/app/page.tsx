@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { useActionState } from "react";
 import { signInAction } from "@/app/actions/signInAction";
 import Input from "@/Components/Input";
 
 export default function Home() {
+  const [state, formAction] = useActionState(signInAction, undefined);
+
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
       {/* Main content */}
@@ -26,7 +29,7 @@ export default function Home() {
 
         {/* Login Form */}
         <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
-          <form action={signInAction} className="space-y-5">
+          <form action={formAction} className="space-y-5">
             <Input id="email" type="email" label="Email" name="email" />
             <Input
               id="password"
@@ -34,6 +37,10 @@ export default function Home() {
               label="Password"
               name="password"
             />
+
+            {state?.error && (
+              <p className="text-sm text-red-600 text-center">{state.error}</p>
+            )}
 
             <button
               type="submit"

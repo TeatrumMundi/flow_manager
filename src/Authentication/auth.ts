@@ -17,7 +17,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!user) throw new Error("Invalid credentials.");
 
-        // retrun user object
+        // Return minimal, safe user object; extra data should be fetched on demand
         return {
           ...user,
           id: String(user.id),
@@ -25,4 +25,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  // Redirect unauthenticated users to the root login page
+  pages: { signIn: "/" },
+  callbacks: {
+    // Allow access only when a user session exists.
+    authorized({ auth }) {
+      return !!auth?.user;
+    },
+  },
 });

@@ -1,18 +1,19 @@
-import crypto from "node:crypto";
+import "dotenv-flow/config";
 import readline from "node:readline";
+import bcrypt from "bcryptjs";
 import { eq, ilike } from "drizzle-orm";
 import {
   userCredentials,
   userProfiles,
   userRoles,
   users,
-} from "@/DataBase/schema";
-import { database } from "@/Library/db";
+} from "../src/DataBase/schema";
+import { database } from "../src/Library/db";
 import {
   isEmailFormatValid,
   MAX_EMAIL_LENGTH,
   normalizeEmail,
-} from "@/Library/email";
+} from "../src/Library/email";
 
 // Create readline interface for user input
 const consoleInput = readline.createInterface({
@@ -53,11 +54,9 @@ async function main() {
       .returning();
     console.log("User created successfully:", insertedUser);
 
-    // Hash and persist credentials
-    const salt = crypto.randomBytes(16).toString("hex");
-    // Use scrypt to derive a key from the password
-    const derived = crypto.scryptSync(password, salt, 64);
-    const passwordHash = `${salt}$${derived.toString("hex")}`;
+    // Hash and persist credentials using bcrypt
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
 
     await database.insert(userCredentials).values({
       userId: insertedUser.id as number,

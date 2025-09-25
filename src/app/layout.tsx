@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "FlowManager to nowoczesna aplikacja do kompleksowego zarządzania projektami, czasem pracy oraz zasobami ludzkimi.",
   icons: {
-    icon: "/flowicon.png",
+    icon: "/flowIcon.png",
   },
 };
 

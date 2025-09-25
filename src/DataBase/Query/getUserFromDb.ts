@@ -1,32 +1,34 @@
+import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { userCredentials, users } from "@/DataBase/schema";
-import { saltAndHashPassword } from "@/Library/auth";
+import { users } from "@/DataBase/schema";
 import { database } from "@/Library/db";
+import getUserCredentialsFromDB from "./getUserCredentialsFromDB";
 
-async function getUserFromDb(email: string, plainPassword: string) {
+async function getUserFromDb(inputEmail: string, inputPassword: string) {
   // Find user by email first
   const [user] = await database
     .select()
     .from(users)
-    .where(eq(users.email, email))
+    .where(eq(users.email, inputEmail))
     .limit(1);
 
-  if (!user) return null;
+  // Use a consistent error message to prevent timing attacks and email enumeration
+  let credentialsFromDB: string | null = null;
+  let userFound = false;
 
-  // Fetch credentials for that user and compare passwordHash in JS
-  const [cred] = await database
-    .select()
-    .from(userCredentials)
-    .where(eq(userCredentials.userId, user.id))
-    .limit(1);
+  if (user) {
+    credentialsFromDB = await getUserCredentialsFromDB(String(user.id));
+    userFound = !!credentialsFromDB;
+  }
 
-  if (!cred) return null;
+  // Always perform bcrypt.compare to avoid timing attacks
+  const passwordHash =
+    credentialsFromDB || "$2a$10$invalidinvalidinvalidinvalidinv";
+  const result = await bcrypt.compare(inputPassword, passwordHash);
 
-  // Stored format is "{salt}${derivedHex}". Recreate the hash from the
-  // provided plaintext password using the same salt and compare.
-  const [storedSalt] = cred.passwordHash.split("$");
-  const computed = await saltAndHashPassword(plainPassword, storedSalt);
-  if (cred.passwordHash !== computed) return null;
+  if (!userFound || !result) {
+    throw new Error("Invalid email or password.");
+  }
 
   return user;
 }

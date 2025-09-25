@@ -1,8 +1,28 @@
 "use server";
 
+import { AuthError } from "next-auth";
 import { signIn } from "@/Authentication/auth";
 
-export async function signInAction(formData: FormData) {
-  // Forward the form data to the NextAuth signIn server action
-  await signIn("credentials", formData);
+export async function signInAction(_prevState: unknown, formData: FormData) {
+  try {
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    if (typeof email !== "string" || typeof password !== "string") {
+      return { error: "Email i hasło są wymagane." };
+    }
+
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: "/profile",
+    });
+
+    return {};
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: "Nieprawidłowy email lub hasło." };
+    }
+    throw error;
+  }
 }

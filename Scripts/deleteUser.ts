@@ -1,3 +1,4 @@
+import "dotenv-flow/config";
 import readline from "node:readline";
 import { eq } from "drizzle-orm";
 import {
@@ -7,13 +8,13 @@ import {
   users,
   vacations,
   workLogs,
-} from "@/DataBase/schema";
-import { database } from "@/Library/db";
+} from "../src/DataBase/schema";
+import { database } from "../src/Library/db";
 import {
   isEmailFormatValid,
   MAX_EMAIL_LENGTH,
   normalizeEmail,
-} from "@/Library/email";
+} from "../src/Library/email";
 
 const consoleInput = readline.createInterface({
   input: process.stdin,
