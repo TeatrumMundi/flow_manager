@@ -13,11 +13,11 @@ async function getUserFromDb(inputEmail: string, inputPassword: string) {
     .limit(1);
 
   // Use a consistent error message to prevent timing attacks and email enumeration
-  let credentialsFromDB: string | null = null;
   let userFound = false;
+  let credentialsFromDB: string | null = null;
 
   if (user) {
-    credentialsFromDB = await getUserCredentialsFromDB(String(user.id));
+    credentialsFromDB = await getUserCredentialsFromDB(user.id);
     userFound = !!credentialsFromDB;
   }
 
