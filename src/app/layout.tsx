@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type React from "react";
 import Background from "@/app/components/Background";
-import "@/Styles/globals.css";
+import "@/styles/globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
