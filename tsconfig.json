@@ -30,5 +30,5 @@
     ".next/types/**/*.ts",
     "src/types/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "Scripts", "Scripts/**", "scripts", "scripts/**"]
+  "exclude": ["node_modules", "scripts", "scripts/**", "scripts", "scripts/**"]
 }

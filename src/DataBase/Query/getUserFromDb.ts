@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { users } from "@/DataBase/schema";
-import { database } from "@/Library/db";
+import { users } from "@/dataBase/schema";
+import { database } from "@/library/db";
 import getUserCredentialsFromDB from "./getUserCredentialsFromDB";
 
 async function getUserFromDb(inputEmail: string, inputPassword: string) {

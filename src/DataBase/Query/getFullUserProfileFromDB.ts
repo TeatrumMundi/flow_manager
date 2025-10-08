@@ -5,8 +5,8 @@ import {
   userProfiles,
   userRoles,
   users,
-} from "@/DataBase/schema";
-import { database } from "@/Library/db";
+} from "@/dataBase/schema";
+import { database } from "@/library/db";
 
 export interface FullUserProfile {
   id: number;
