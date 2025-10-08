@@ -1,6 +1,6 @@
 import "dotenv-flow/config";
 import { users } from "../src/DataBase/schema";
-import { database } from "../src/Library/db";
+import { database } from "../src/library/db";
 
 if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL is not set!");

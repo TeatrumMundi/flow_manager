@@ -11,7 +11,7 @@ import {
   users,
   vacations,
   workLogs,
-} from "@/DataBase/schema";
+} from "@/dataBase/schema";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   userRole: one(userRoles, {

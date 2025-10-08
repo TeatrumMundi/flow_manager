@@ -7,13 +7,13 @@ import {
   userProfiles,
   userRoles,
   users,
-} from "../src/DataBase/schema";
-import { database } from "../src/Library/db";
+} from "../src/dataBase/schema";
+import { database } from "../src/library/db";
 import {
   isEmailFormatValid,
   MAX_EMAIL_LENGTH,
   normalizeEmail,
-} from "../src/Library/email";
+} from "../src/library/email";
 
 // Create readline interface for user input
 const consoleInput = readline.createInterface({

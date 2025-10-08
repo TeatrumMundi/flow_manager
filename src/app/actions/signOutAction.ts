@@ -1,6 +1,6 @@
 "use server";
 
-import { signOut } from "@/Authentication/auth";
+import { signOut } from "@/authentication/auth";
 
 export async function signOutAction() {
   // NextAuth will clear the session and redirect
