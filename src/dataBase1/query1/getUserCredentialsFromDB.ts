@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { userCredentials } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/library1/db";
 
 async function getUserCredentialsFromDB(
   userId: number,
