@@ -10,8 +10,8 @@ import {
   FaUser,
   FaUsers,
 } from "react-icons/fa";
-import { Tile } from "@/app/components1/Tile";
-import { TopBar } from "@/app/components1/userProfile/TopBar";
+import { Tile } from "@/app/components/Tile";
+import { TopBar } from "@/app/components/userProfile/TopBar";
 
 const tiles = [
   {
