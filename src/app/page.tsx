@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useActionState } from "react";
-import { signInAction } from "@/app/actions/signInAction";
+// import { signInAction } from "@/app/actions/signInAction"; // jsauth removed
 import Input from "@/app/components/Input";
 
 export default function Home() {
-  const [state, formAction] = useActionState(signInAction, undefined);
+  // const [state, formAction] = useActionState(signInAction, undefined); // jsauth removed
 
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
@@ -29,7 +29,7 @@ export default function Home() {
 
         {/* Login Form */}
         <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
-          <form action={formAction} className="space-y-5">
+          <form className="space-y-5"> {/* jsauth removed */}
             <Input id="email" type="email" label="Email" name="email" />
             <Input
               id="password"
@@ -38,9 +38,7 @@ export default function Home() {
               name="password"
             />
 
-            {state?.error && (
-              <p className="text-sm text-red-600 text-center">{state.error}</p>
-            )}
+            {/* Error display removed: jsauth (NextAuth) system deleted */}
 
             <button
               type="submit"
