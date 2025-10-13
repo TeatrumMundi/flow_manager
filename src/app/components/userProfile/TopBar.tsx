@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { signOutAction } from "@/app/actions/signOutAction";
+// import { signOutAction } from "@/app/actions/signOutAction"; // jsauth removed
 import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 
 interface TopBarProps {
@@ -33,14 +33,14 @@ export function TopBar({ userName }: TopBarProps) {
         <span className="text-gray-700 font-medium">{userName}</span>
         <span className="text-gray-500">{time}</span>
         <span className="text-gray-500">{date}</span>
-        <form action={signOutAction}>
+        {/* <form action={signOutAction}> jsauth removed
           <button
             type="submit"
             className="text-blue-600 hover:underline font-medium"
           >
             Wyloguj
           </button>
-        </form>
+        </form> */}
       </div>
     </div>
   );
