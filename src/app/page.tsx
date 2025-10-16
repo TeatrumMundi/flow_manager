@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import Input from "@/app/components/Input";
-
-import { signInAction } from "./signInAction";
+import { signIn } from "next-auth/react";
 
 export default function Home() {
+  const credentialsAction = (formData: FormData) => {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    signIn("credentials", { email, password, redirectTo: "/profile/me" });
+  };
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
       {/* Main content */}
@@ -27,7 +31,7 @@ export default function Home() {
 
         {/* Login Form */}
         <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
-          <form className="space-y-5" action={signInAction}>
+          <form className="space-y-5" action={credentialsAction}>
             {/* Email Input */}
             <Input id="email" type="email" label="Email" name="email" />
 
