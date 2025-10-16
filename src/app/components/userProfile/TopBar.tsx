@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-// import { signOutAction } from "@/app/actions/signOutAction"; // jsauth removed
 import { useTimeAndDate } from "@/hooks/useTimeAndDate";
+import { signOut } from "next-auth/react";
+import { GoSignOut } from "react-icons/go";
 
 interface TopBarProps {
   userName: string;
@@ -33,14 +34,15 @@ export function TopBar({ userName }: TopBarProps) {
         <span className="text-gray-700 font-medium">{userName}</span>
         <span className="text-gray-500">{time}</span>
         <span className="text-gray-500">{date}</span>
-        {/* <form action={signOutAction}> jsauth removed
-          <button
-            type="submit"
-            className="text-blue-600 hover:underline font-medium"
-          >
-            Wyloguj
-          </button>
-        </form> */}
+        <button
+          onClick={() => {
+            signOut();
+          }}
+          className="bg-red-500 font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
+        >
+          Wyloguj
+          <GoSignOut className="inline-block ml-2" />
+        </button>
       </div>
     </div>
   );

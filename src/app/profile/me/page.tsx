@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { Tile } from "@/app/components/Tile";
 import { TopBar } from "@/app/components/userProfile/TopBar";
+import { auth } from "@/auth";
 
 const tiles = [
   {
@@ -46,9 +47,14 @@ const tiles = [
 ];
 
 export default async function UserDashboard() {
+  const session = await auth()
+ 
+  if (!session?.user) return null
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      <TopBar userName="Jan Kowalski" />
+      <TopBar 
+        userName={session.user.email ?? "Unknown"}
+      />
       {/* Tiles grid */}
       <div className="flex flex-1 items-start justify-center w-full">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
