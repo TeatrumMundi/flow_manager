@@ -1,10 +1,9 @@
-"use client"; // To musi być komponent kliencki dla interaktywności
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaArrowLeft } from "react-icons/fa";
 
-// Przykładowe dane - później zastąpisz je danymi z bazy
 const mockUsers = [
   { id: 1, name: "Jan Kowalski", email: "jan.kowalski@example.com", role: "Pracownik", team: "Developement" },
   { id: 2, name: "Anna Nowak", email: "anna.nowak@example.com", role: "HR", team: "HR" },
@@ -48,7 +47,6 @@ export default function UsersPage() {
   return (
       <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
         <main className="w-full max-w-6xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
-          {/* Nagłówek i powrót */}
           <div className="flex items-center justify-between mb-8">
             <Link href="/profile/me" className="flex items-center text-blue-600 hover:text-blue-800 transition-colors">
               <FaArrowLeft className="mr-2" />
@@ -57,7 +55,6 @@ export default function UsersPage() {
             <h1 className="text-3xl font-bold text-gray-800">Zarządzanie Użytkownikami</h1>
           </div>
 
-          {/* Panel filtrów i akcji */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <button className="flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow cursor-pointer">
               <FaPlus className="mr-2" /> Dodaj użytkownika
@@ -86,13 +83,11 @@ export default function UsersPage() {
             )}
           </div>
 
-          {/* Tabela użytkowników */}
           <div className="overflow-x-auto bg-white/50 rounded-lg shadow">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
               <tr>
-                {/* ZMIANA: Kolor na czerwony do testów */}
-                <th className="p-4 w-12"><input type="checkbox" className="h-4 w-4 cursor-pointer rounded border-red-500 text-red-500 focus:ring-red-500" /></th>
+                <th className="p-4 w-12"><input type="checkbox" className="h-4 w-4 cursor-pointer" /></th>
                 <th className="p-4 font-semibold text-gray-600">Imię i nazwisko</th>
                 <th className="p-4 font-semibold text-gray-600">Email</th>
                 <th className="p-4 font-semibold text-gray-600">Rola</th>
@@ -103,8 +98,7 @@ export default function UsersPage() {
               <tbody>
               {filteredUsers.map(user => (
                   <tr key={user.id} className="border-t border-gray-200 hover:bg-gray-50/50">
-                    {/* ZMIANA: Kolor na czerwony do testów */}
-                    <td className="p-4"><input type="checkbox" className="h-4 w-4 cursor-pointer rounded border-red-500 text-red-500 focus:ring-red-500" checked={selectedUsers.includes(user.id)} onChange={() => handleSelectUser(user.id)} /></td>
+                    <td className="p-4"><input type="checkbox" className="h-4 w-4 cursor-pointer" checked={selectedUsers.includes(user.id)} onChange={() => handleSelectUser(user.id)} /></td>
                     <td className="p-4 text-gray-800">{user.name}</td>
                     <td className="p-4 text-gray-700">{user.email}</td>
                     <td className="py-4 pr-4 pl-2"><span className="px-2 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">{user.role}</span></td>
@@ -112,7 +106,7 @@ export default function UsersPage() {
                     <td className="p-4">
                       <div className="flex gap-2">
                         <button className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors cursor-pointer border border-blue-200"><FaEdit size={16} /></button>
-                        <button className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-600 transition-colors cursor-pointer border-red-200"><FaTrash size={16} /></button>
+                        <button className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-600 transition-colors cursor-pointer border border-red-200"><FaTrash size={16} /></button>
                       </div>
                     </td>
                   </tr>
@@ -125,3 +119,4 @@ export default function UsersPage() {
       </div>
   );
 }
+
