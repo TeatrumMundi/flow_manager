@@ -30,6 +30,7 @@ async function getUserFromDb(inputEmail: string, inputPassword: string) {
     throw new Error("Invalid email or password.");
   }
 
-  return user;
+  // Cast user.id to string before returning (useful for NextAuth expectations)
+  return { ...user, id: String(user.id) };
 }
 export default getUserFromDb;

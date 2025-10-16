@@ -1,13 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState } from "react";
-// import { signInAction } from "@/app/actions/signInAction"; // jsauth removed
 import Input from "@/app/components/Input";
 
-export default function Home() {
-  // const [state, formAction] = useActionState(signInAction, undefined); // jsauth removed
+import { signInAction } from "./signInAction";
 
+export default function Home() {
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
       {/* Main content */}
@@ -29,8 +27,11 @@ export default function Home() {
 
         {/* Login Form */}
         <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
-          <form className="space-y-5"> {/* jsauth removed */}
+          <form className="space-y-5" action={signInAction}>
+            {/* Email Input */}
             <Input id="email" type="email" label="Email" name="email" />
+
+            {/* Password Input */}
             <Input
               id="password"
               type="password"
@@ -38,13 +39,12 @@ export default function Home() {
               name="password"
             />
 
-            {/* Error display removed: jsauth (NextAuth) system deleted */}
-
+            {/* Submit Button */}
             <button
               type="submit"
               className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[1.05] duration-500 cursor-pointer"
             >
-              Login
+              Sign In
             </button>
           </form>
         </div>
