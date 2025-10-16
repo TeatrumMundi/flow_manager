@@ -38,7 +38,7 @@ export function TopBar({ userName }: TopBarProps) {
           onClick={() => {
             signOut();
           }}
-          className="bg-red-500 font-medium px-2 py-1 rounded-md hover:bg-red-700 cursor-pointer transition-all duration-500 hover:scale-105"
+          className="bg-red-500 font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
         >
           Wyloguj
           <GoSignOut className="inline-block ml-2" />
