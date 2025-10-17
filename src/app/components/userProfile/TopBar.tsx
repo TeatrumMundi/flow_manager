@@ -1,10 +1,10 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 import { signOut } from "next-auth/react";
+import toast from "react-hot-toast";
 import { GoSignOut } from "react-icons/go";
+import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 
 interface TopBarProps {
   userName: string;
@@ -35,8 +35,19 @@ export function TopBar({ userName }: TopBarProps) {
         <span className="text-gray-500">{time}</span>
         <span className="text-gray-500">{date}</span>
         <button
+          type="button"
           onClick={() => {
-            signOut();
+            const logoutPromise = signOut({ redirect: false }).then(() => {
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 1000);
+            });
+
+            toast.promise(logoutPromise, {
+              loading: "Wylogowywanie...",
+              success: "Pomyślnie wylogowano!",
+              error: "Błąd podczas wylogowywania.",
+            });
           }}
           className="bg-red-500 font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
         >

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import type React from "react";
 import Background from "@/app/components/Background";
 import "@/styles/globals.css";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <Background />
         {children}
+        <Toaster />
       </body>
     </html>
   );
