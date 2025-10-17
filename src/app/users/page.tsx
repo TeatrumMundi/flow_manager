@@ -150,7 +150,7 @@ export default function UsersPage() {
                 </th>
                 <th className="p-4 font-semibold text-gray-600">Email</th>
                 <th className="p-4 font-semibold text-gray-600">Rola</th>
-                <th className="p-4 font-semibold text-gray-600">Zespół</th>
+                <th className="p-4 font-semibold text-gray-600">Jednostka</th>
                 <th className="p-4 font-semibold text-gray-600">Akcje</th>
               </tr>
             </thead>
@@ -171,7 +171,7 @@ export default function UsersPage() {
                   <td className="p-4 text-gray-800">{user.name}</td>
                   <td className="p-4 text-gray-700">{user.email}</td>
                   <td className="py-4 pr-4 pl-2">
-                    <span className="px-2 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
+                    <span className="px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
                       {user.role}
                     </span>
                   </td>
