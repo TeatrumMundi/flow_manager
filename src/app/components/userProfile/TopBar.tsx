@@ -1,6 +1,8 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import { GoSignOut } from "react-icons/go";
@@ -11,6 +13,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ userName }: TopBarProps) {
+  const router = useRouter();
   const { time, date } = useTimeAndDate();
 
   return (
@@ -39,8 +42,8 @@ export function TopBar({ userName }: TopBarProps) {
           onClick={() => {
             const logoutPromise = signOut({ redirect: false }).then(() => {
               setTimeout(() => {
-                window.location.href = "/";
-              }, 1000);
+                router.push("/");
+              });
             });
 
             toast.promise(logoutPromise, {
@@ -49,9 +52,9 @@ export function TopBar({ userName }: TopBarProps) {
               error: "Błąd podczas wylogowywania.",
             });
           }}
-          className="bg-red-500 font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
+          className="bg-red-500/50 backdrop-blur-2xl font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
         >
-          Wyloguj
+            Wyloguj
           <GoSignOut className="inline-block ml-2" />
         </button>
       </div>

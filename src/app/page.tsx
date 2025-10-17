@@ -29,9 +29,9 @@ export default function Home() {
     });
 
     toast.promise(loginPromise, {
-      loading: "Signing in...",
-      success: "Successfully logged in!",
-      error: "Login failed. Please check your credentials.",
+      loading: "Logowanie...",
+      success: "Pomyślnie zalogowano!",
+      error: "Logowanie nieudane. Proszę sprawdź swoje dane logowania.",
     });
   };
   return (
@@ -72,7 +72,7 @@ export default function Home() {
               type="submit"
               className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[1.05] duration-500 cursor-pointer"
             >
-              Sign In
+              Zaloguj się
             </button>
           </form>
         </div>
