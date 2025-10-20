@@ -10,9 +10,10 @@ import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 
 interface TopBarProps {
   userName: string;
+  userRole?: string | null;
 }
 
-export function TopBar({ userName }: TopBarProps) {
+export function TopBar({ userName, userRole }: TopBarProps) {
   const router = useRouter();
   const { time, date } = useTimeAndDate();
 
@@ -34,7 +35,14 @@ export function TopBar({ userName }: TopBarProps) {
         </span>
       </div>
       <div className="flex flex-col md:flex-row items-center md:space-x-8 space-y-1 md:space-y-0 w-full md:w-auto justify-end">
-        <span className="text-gray-700 font-medium">{userName}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-700 font-medium">{userName}</span>
+          {userRole && (
+            <span className="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
+              {userRole}
+            </span>
+          )}
+        </div>
         <span className="text-gray-500">{time}</span>
         <span className="text-gray-500">{date}</span>
         <button
@@ -52,7 +60,7 @@ export function TopBar({ userName }: TopBarProps) {
               error: "Błąd podczas wylogowywania.",
             });
           }}
-          className="bg-red-500/50 backdrop-blur-2xl font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
+          className="bg-red-500/80 backdrop-blur-2xl font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
         >
             Wyloguj
           <GoSignOut className="inline-block ml-2" />

@@ -31,11 +31,12 @@ export interface FullUserProfile {
   }>;
 }
 
-async function getFullUserProfileFromDB(
-  userId: string | number,
+async function getFullUserProfileFromDbByEmail(
+  email: string,
 ): Promise<FullUserProfile | null> {
-  const id = Number(userId);
-  if (!Number.isFinite(id)) throw new Error("Invalid user id");
+  if (!email || typeof email !== "string") {
+    throw new Error("Invalid email");
+  }
 
   // Base user + profile + role
   const [row] = await database
@@ -66,7 +67,7 @@ async function getFullUserProfileFromDB(
     .from(users)
     .leftJoin(userProfiles, eq(userProfiles.userId, users.id))
     .leftJoin(userRoles, eq(users.roleId, userRoles.id))
-    .where(eq(users.id, id))
+    .where(eq(users.email, email))
     .limit(1);
 
   if (!row) return null;
@@ -92,7 +93,7 @@ async function getFullUserProfileFromDB(
     })
     .from(projectAssignments)
     .innerJoin(projects, eq(projectAssignments.projectId, projects.id))
-    .where(eq(projectAssignments.userId, id));
+    .where(eq(projectAssignments.userId, row.user.id));
 
   const result: FullUserProfile = {
     id: row.user.id,
@@ -128,4 +129,4 @@ async function getFullUserProfileFromDB(
   return result;
 }
 
-export default getFullUserProfileFromDB;
+export default getFullUserProfileFromDbByEmail;
