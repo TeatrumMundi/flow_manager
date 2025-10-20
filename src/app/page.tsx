@@ -30,7 +30,7 @@ export default function Home() {
 
     toast.promise(loginPromise, {
       loading: "Logowanie...",
-      success: "Pomyślnie zalogowano!!",
+      success: "Pomyślnie zalogowano!",
       error: "Błąd podczas logowania. Sprawdź swoje dane",
     });
   };
