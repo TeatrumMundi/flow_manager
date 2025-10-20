@@ -29,9 +29,9 @@ export default function Home() {
     });
 
     toast.promise(loginPromise, {
-      loading: "Signing in...",
-      success: "Successfully logged in!",
-      error: "Login failed. Please check your credentials.",
+      loading: "Logowanie...",
+      success: "Pomyślnie zalogowano!",
+      error: "Błąd podczas logowania. Sprawdź swoje dane",
     });
   };
   return (
