@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 import LogoutButton from "@/app/components/LogoutButton";
+import { useTimeAndDate } from "@/hooks/useTimeAndDate";
 
 interface TopBarProps {
   userName: string;
@@ -41,7 +41,7 @@ export function TopBar({ userName, userRole }: TopBarProps) {
         </div>
         <span className="text-gray-500">{time}</span>
         <span className="text-gray-500">{date}</span>
-        <LogoutButton 
+        <LogoutButton
           className="bg-red-500/80 backdrop-blur-2xl font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105 text-white flex items-center gap-2"
           fullWidth={false}
         />

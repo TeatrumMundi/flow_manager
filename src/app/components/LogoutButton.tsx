@@ -10,7 +10,10 @@ interface LogoutButtonProps {
   fullWidth?: boolean;
 }
 
-export default function LogoutButton({ className, fullWidth = true }: LogoutButtonProps) {
+export default function LogoutButton({
+  className,
+  fullWidth = true,
+}: LogoutButtonProps) {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -28,7 +31,7 @@ export default function LogoutButton({ className, fullWidth = true }: LogoutButt
     });
   };
 
-  const defaultClassName = `${fullWidth ? 'w-full' : ''} bg-red-500/80 backdrop-blur-2xl font-medium px-4 py-2 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105 text-white flex items-center justify-center gap-2`;
+  const defaultClassName = `${fullWidth ? "w-full" : ""} bg-red-500/80 backdrop-blur-2xl font-medium px-4 py-2 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105 text-white flex items-center justify-center gap-2`;
 
   return (
     <button

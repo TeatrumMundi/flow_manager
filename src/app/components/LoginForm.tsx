@@ -42,12 +42,7 @@ export default function LoginForm() {
         <Input id="email" type="email" label="Email" name="email" />
 
         {/* Password Input */}
-        <Input
-          id="password"
-          type="password"
-          label="Password"
-          name="password"
-        />
+        <Input id="password" type="password" label="Password" name="password" />
 
         {/* Submit Button */}
         <button

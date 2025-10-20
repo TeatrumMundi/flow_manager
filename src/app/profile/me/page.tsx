@@ -63,9 +63,10 @@ export default async function UserDashboard() {
 
   const userProfile = await getFullUserProfileFromDbByEmail(session.user.email);
 
-  const displayName = userProfile?.profile?.firstName && userProfile?.profile?.lastName
-    ? `${userProfile.profile.firstName} ${userProfile.profile.lastName}`
-    : userProfile?.email ?? "Unknown";
+  const displayName =
+    userProfile?.profile?.firstName && userProfile?.profile?.lastName
+      ? `${userProfile.profile.firstName} ${userProfile.profile.lastName}`
+      : (userProfile?.email ?? "Unknown");
 
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
