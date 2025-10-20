@@ -2,11 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
-import toast from "react-hot-toast";
-import { GoSignOut } from "react-icons/go";
 import { useTimeAndDate } from "@/hooks/useTimeAndDate";
+import LogoutButton from "@/app/components/LogoutButton";
 
 interface TopBarProps {
   userName: string;
@@ -14,7 +11,6 @@ interface TopBarProps {
 }
 
 export function TopBar({ userName, userRole }: TopBarProps) {
-  const router = useRouter();
   const { time, date } = useTimeAndDate();
 
   return (
@@ -45,26 +41,10 @@ export function TopBar({ userName, userRole }: TopBarProps) {
         </div>
         <span className="text-gray-500">{time}</span>
         <span className="text-gray-500">{date}</span>
-        <button
-          type="button"
-          onClick={() => {
-            const logoutPromise = signOut({ redirect: false }).then(() => {
-              setTimeout(() => {
-                router.push("/");
-              });
-            });
-
-            toast.promise(logoutPromise, {
-              loading: "Wylogowywanie...",
-              success: "Pomyślnie wylogowano!",
-              error: "Błąd podczas wylogowywania.",
-            });
-          }}
-          className="bg-red-500/80 backdrop-blur-2xl font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105"
-        >
-            Wyloguj
-          <GoSignOut className="inline-block ml-2" />
-        </button>
+        <LogoutButton 
+          className="bg-red-500/80 backdrop-blur-2xl font-medium px-2 py-1 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-500 hover:scale-105 text-white flex items-center gap-2"
+          fullWidth={false}
+        />
       </div>
     </div>
   );
