@@ -4,6 +4,9 @@ import LoginForm from "@/app/components/LoginForm";
 import LogoutButton from "@/app/components/LogoutButton";
 import { auth } from "@/auth";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   const session = await auth();
 
