@@ -4,14 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import LogoutButton from "@/app/components/LogoutButton";
 import { useTimeAndDate } from "@/hooks/useTimeAndDate";
+import useUserStore from "@/store/userStore";
 
-interface TopBarProps {
-  userName: string;
-  userRole?: string | null;
-}
-
-export function TopBar({ userName, userRole }: TopBarProps) {
+export function TopBar() {
   const { time, date } = useTimeAndDate();
+  const userProfile = useUserStore((state) => state.userProfile);
+  const userName = userProfile?.profile?.firstName;
+  const userRole = userProfile?.role?.name;
 
   return (
     <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-md rounded-2xl shadow-[0_0_24px_4px_rgba(0,100,200,0.1)] px-8 py-3 mt-10 mb-25 gap-2">

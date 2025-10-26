@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import { GoSignOut } from "react-icons/go";
+import useUserStore from "@/store/userStore";
 
 interface LogoutButtonProps {
   className?: string;
@@ -15,9 +16,11 @@ export default function LogoutButton({
   fullWidth = true,
 }: LogoutButtonProps) {
   const router = useRouter();
+  const clearUserProfile = useUserStore((state) => state.clearUserProfile);
 
   const handleLogout = () => {
     const logoutPromise = signOut({ redirect: false }).then(() => {
+      clearUserProfile();
       setTimeout(() => {
         router.push("/");
         router.refresh();

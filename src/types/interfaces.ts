@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 export interface FullUserProfile {
   id: number;
   email: string;
@@ -19,4 +21,11 @@ export interface FullUserProfile {
     roleOnProject: string | null;
     isArchived: boolean | null;
   }>;
+}
+
+export interface menuTile {
+  icon: JSX.Element;
+  label: string;
+  href: string;
+  accessibleByRoles?: string[];
 }
