@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
-import { UsersTable } from "./UsersTable";
+import { UsersTable } from "../components/users/UsersTable";
 
 export default async function UsersPage() {
   // Fetch users from database
