@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { TopBar } from "@/app/components/userProfile/TopBar";
 import useUserStore from "@/store/userStore";
 import type { FullUserProfile } from "@/types/interfaces";
-import { TilesGrid } from "./tilesGrid";
+import { TilesGrid } from "./TilesGrid";
 
 interface UserProfileProps {
   userProfileData: FullUserProfile;

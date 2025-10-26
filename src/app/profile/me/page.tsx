@@ -1,4 +1,4 @@
-import { UserProfile } from "@/app/profile/me/userProfile";
+import { UserProfile } from "@/app/components/userProfile/UserProfile";
 import { auth } from "@/auth";
 import getFullUserProfileFromDbByEmail from "@/dataBase/query/getFullUserProfileFromDbByEmail";
 
