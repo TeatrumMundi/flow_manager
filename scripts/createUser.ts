@@ -156,7 +156,7 @@ async function askEmail(): Promise<string> {
 
 // Ask for role, defaulting to "User"; keep prompting until an existing role is provided
 async function askRoleId(): Promise<number | null> {
-  const DEFAULT_ROLE_NAME = "User";
+  const DEFAULT_ROLE_NAME = "Użytkownik";
   while (true) {
     const roleNameInput = (
       await promptUser(
