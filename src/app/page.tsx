@@ -1,39 +1,12 @@
-"use client";
-
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import toast from "react-hot-toast";
-import Input from "@/app/components/Input";
+import Link from "next/link";
+import LoginForm from "@/app/components/LoginForm";
+import LogoutButton from "@/app/components/LogoutButton";
+import { auth } from "@/auth";
 
-export default function Home() {
-  const router = useRouter();
-  const credentialsAction = async (formData: FormData) => {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+export default async function Home() {
+  const session = await auth();
 
-    const loginPromise = signIn("credentials", {
-      email,
-      password,
-      redirectTo: "/profile/me",
-      redirect: false,
-    }).then((result) => {
-      if (result?.error) {
-        throw new Error("Invalid credentials");
-      }
-      // Redirect on success after a short delay to show the success toast
-      setTimeout(() => {
-        router.push("/profile/me");
-      });
-      return result;
-    });
-
-    toast.promise(loginPromise, {
-      loading: "Logowanie...",
-      success: "Pomyślnie zalogowano!",
-      error: "Błąd podczas logowania. Sprawdź swoje dane",
-    });
-  };
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
       {/* Main content */}
@@ -53,29 +26,23 @@ export default function Home() {
           </h1>
         </div>
 
-        {/* Login Form */}
-        <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
-          <form className="space-y-5" action={credentialsAction}>
-            {/* Email Input */}
-            <Input id="email" type="email" label="Email" name="email" />
-
-            {/* Password Input */}
-            <Input
-              id="password"
-              type="password"
-              label="Password"
-              name="password"
-            />
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[1.05] duration-500 cursor-pointer"
+        {/* Login Form or Profile Link */}
+        {session?.user ? (
+          <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200 flex flex-col items-center space-y-4">
+            <p className="text-gray-700 text-center">
+              Jesteś zalogowany jako <strong>{session.user.email}</strong>
+            </p>
+            <Link
+              href="/profile/me"
+              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[1.05] duration-500 cursor-pointer text-center"
             >
-              Sign In
-            </button>
-          </form>
-        </div>
+              Wróć do profilu
+            </Link>
+            <LogoutButton />
+          </div>
+        ) : (
+          <LoginForm />
+        )}
       </div>
     </main>
   );
