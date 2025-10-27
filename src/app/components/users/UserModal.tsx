@@ -86,7 +86,8 @@ export function UserModal({
       className="fixed inset-0 z-50 grid place-items-center bg-black/50 backdrop-blur-sm p-4"
       onClick={onClose}
       onKeyUp={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
+        // Only close if Escape is pressed and the backdrop itself has focus
+        if (event.key === "Escape" && event.target === event.currentTarget) {
           onClose();
         }
       }}
