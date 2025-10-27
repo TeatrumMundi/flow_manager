@@ -16,12 +16,16 @@ export function UsersTable({
   availableRoles,
   availableEmploymentTypes,
 }: UsersTableProps) {
+  // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Wszystkie");
-  const [selectedEmploymentType, setSelectedEmploymentType] =
-    useState("Wszystkie");
+  const [selectedEmploymentType, setSelectedEmploymentType] = useState("Wszystkie");
   const [filteredUsers, setFilteredUsers] = useState(initialUsers);
+
+  // Selection state for bulk actions
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+
+  // Modal state for add/edit operations
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     mode: "add" | "edit";
@@ -32,19 +36,23 @@ export function UsersTable({
     user: null,
   });
 
+  // Apply filters whenever search term, role, employment type, or initial users change
   useEffect(() => {
     let users = initialUsers;
 
+    // Filter by selected role
     if (selectedRole !== "Wszystkie") {
       users = users.filter((user) => user.roleName === selectedRole);
     }
 
+    // Filter by selected employment type
     if (selectedEmploymentType !== "Wszystkie") {
       users = users.filter(
         (user) => user.employmentType === selectedEmploymentType,
       );
     }
 
+    // Filter by search term (name or email)
     if (searchTerm) {
       users = users.filter(
         (user) =>
@@ -57,6 +65,7 @@ export function UsersTable({
     setFilteredUsers(users);
   }, [searchTerm, selectedRole, selectedEmploymentType, initialUsers]);
 
+  // Toggle individual user selection
   const handleSelectUser = (id: number) => {
     setSelectedUsers((prev) =>
       prev.includes(id)
@@ -65,6 +74,7 @@ export function UsersTable({
     );
   };
 
+  // Toggle select all users
   const handleSelectAll = () => {
     if (selectedUsers.length === filteredUsers.length) {
       setSelectedUsers([]);
@@ -73,6 +83,7 @@ export function UsersTable({
     }
   };
 
+  // Open modal in add mode
   const handleAddUser = () => {
     setModalState({
       isOpen: true,
@@ -81,6 +92,7 @@ export function UsersTable({
     });
   };
 
+  // Open modal in edit mode with selected user
   const handleEditUser = (user: UserListItem) => {
     setModalState({
       isOpen: true,
@@ -89,6 +101,7 @@ export function UsersTable({
     });
   };
 
+  // Close modal and reset state
   const handleCloseModal = () => {
     setModalState({
       isOpen: false,
@@ -99,6 +112,7 @@ export function UsersTable({
 
   return (
     <>
+      {/* Render user modal when open */}
       {modalState.isOpen && (
         <UserModal
           mode={modalState.mode}
@@ -109,7 +123,9 @@ export function UsersTable({
         />
       )}
 
+      {/* Toolbar with filters and actions */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
+        {/* Add user button */}
         <button
           type="button"
           onClick={handleAddUser}
@@ -117,6 +133,8 @@ export function UsersTable({
         >
           <FaPlus className="mr-2" /> Dodaj użytkownika
         </button>
+
+        {/* Search input */}
         <div className="relative flex-grow">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -127,6 +145,8 @@ export function UsersTable({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+
+        {/* Role filter dropdown */}
         <select
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
           value={selectedRole}
@@ -139,6 +159,8 @@ export function UsersTable({
             </option>
           ))}
         </select>
+
+        {/* Employment type filter dropdown */}
         <select
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
           value={selectedEmploymentType}
@@ -151,6 +173,8 @@ export function UsersTable({
             </option>
           ))}
         </select>
+
+        {/* Bulk delete button - shown only when users are selected */}
         {selectedUsers.length > 0 && (
           <button
             type="button"
@@ -162,10 +186,12 @@ export function UsersTable({
         )}
       </div>
 
+      {/* Users table */}
       <div className="overflow-x-auto bg-white/50 rounded-lg shadow">
         <table className="w-full text-left">
           <thead className="bg-gray-50/50">
             <tr>
+              {/* Select all checkbox */}
               <th className="p-4 w-12">
                 <input
                   type="checkbox"
@@ -188,6 +214,7 @@ export function UsersTable({
           </thead>
           <tbody>
             {filteredUsers.map((user) => {
+              // Construct full name from first and last name
               const fullName =
                 [user.firstName, user.lastName].filter(Boolean).join(" ") ||
                 "Brak danych";
@@ -197,6 +224,7 @@ export function UsersTable({
                   key={user.id}
                   className="border-t border-gray-200 hover:bg-gray-50/50"
                 >
+                  {/* Individual row checkbox */}
                   <td className="p-4">
                     <input
                       type="checkbox"
@@ -215,8 +243,10 @@ export function UsersTable({
                   <td className="p-4 text-gray-700">
                     {user.employmentType || "-"}
                   </td>
+                  {/* Action buttons */}
                   <td className="p-4">
                     <div className="flex gap-2">
+                      {/* Edit button */}
                       <button
                         type="button"
                         onClick={() => handleEditUser(user)}
@@ -224,6 +254,7 @@ export function UsersTable({
                       >
                         <FaEdit size={16} />
                       </button>
+                      {/* Delete button */}
                       <button
                         type="button"
                         className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-600 transition-colors cursor-pointer border border-red-200"
@@ -238,6 +269,8 @@ export function UsersTable({
           </tbody>
         </table>
       </div>
+
+      {/* Empty state message */}
       {filteredUsers.length === 0 && (
         <p className="text-center text-gray-500 mt-8">
           Nie znaleziono użytkowników pasujących do kryteriów.
