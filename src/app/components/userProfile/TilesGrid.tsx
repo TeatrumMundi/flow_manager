@@ -1,12 +1,12 @@
 import {
-    FaCalendarCheck,
-    FaChartBar,
-    FaChartPie,
-    FaClock,
-    FaDollarSign,
-    FaProjectDiagram,
-    FaUser,
-    FaUsers,
+  FaCalendarCheck,
+  FaChartBar,
+  FaChartPie,
+  FaClock,
+  FaDollarSign,
+  FaProjectDiagram,
+  FaUser,
+  FaUsers,
 } from "react-icons/fa";
 import { Tile } from "@/app/components/Tile";
 import useUserStore from "@/store/userStore";

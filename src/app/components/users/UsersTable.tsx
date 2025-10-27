@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { UserModal } from "@/app/components/users/UserModal";
+import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 
 interface UsersTableProps {
   initialUsers: UserListItem[];
@@ -188,9 +188,9 @@ export function UsersTable({
           </thead>
           <tbody>
             {filteredUsers.map((user) => {
-              const fullName = [user.firstName, user.lastName]
-                .filter(Boolean)
-                .join(" ") || "Brak danych";
+              const fullName =
+                [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+                "Brak danych";
 
               return (
                 <tr
