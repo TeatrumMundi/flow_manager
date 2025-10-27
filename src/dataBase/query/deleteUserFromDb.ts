@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
-import { database } from "@/library/db";
 import {
-  users,
+  projectAssignments,
   userCredentials,
   userProfiles,
-  projectAssignments,
+  users,
 } from "@/dataBase/schema";
+import { database } from "@/library/db";
 
 /**
  * Deletes a user and all related records from the database.

@@ -1,6 +1,7 @@
-import { and, eq, ilike, or, sql, SQL } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { userProfiles, userRoles, users } from "@/dataBase/schema";
 import { database } from "@/library/db";
-import { users, userProfiles, userRoles } from "@/dataBase/schema";
 
 export interface UserListFilters {
   firstName?: string;
@@ -149,9 +150,7 @@ export async function countUsersFromDb(
     .leftJoin(userRoles, eq(users.roleId, userRoles.id));
 
   const result =
-    conditions.length > 0
-      ? await query.where(and(...conditions))
-      : await query;
+    conditions.length > 0 ? await query.where(and(...conditions)) : await query;
 
   return result[0]?.count ?? 0;
 }

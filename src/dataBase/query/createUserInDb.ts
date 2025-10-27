@@ -1,12 +1,12 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { database } from "@/library/db";
 import {
-  users,
   userCredentials,
   userProfiles,
   userRoles,
+  users,
 } from "@/dataBase/schema";
+import { database } from "@/library/db";
 import { normalizeEmail } from "@/library/email";
 
 interface CreateUserInput {
