@@ -70,7 +70,7 @@ const menuTiles: menuTile[] = [
   {
     icon: <FaUser size={40} className="text-blue-500" />,
     label: "Pracownicy",
-    href: "#",
+    href: "/employees",
     accessibleByRoles: [
       "Administrator",
       "Zarząd",
