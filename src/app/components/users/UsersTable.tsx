@@ -19,7 +19,8 @@ export function UsersTable({
   // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Wszystkie");
-  const [selectedEmploymentType, setSelectedEmploymentType] = useState("Wszystkie");
+  const [selectedEmploymentType, setSelectedEmploymentType] =
+    useState("Wszystkie");
   const [filteredUsers, setFilteredUsers] = useState(initialUsers);
 
   // Selection state for bulk actions
