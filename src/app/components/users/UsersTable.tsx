@@ -3,19 +3,25 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { UserModal } from "@/app/components/users/UserModal";
+import { useDeleteUser } from "@/hooks/useDeleteUser";
+import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 
 interface UsersTableProps {
   initialUsers: UserListItem[];
   availableRoles: string[];
   availableEmploymentTypes: string[];
+  supervisors: SupervisorListItem[];
 }
 
 export function UsersTable({
   initialUsers,
   availableRoles,
   availableEmploymentTypes,
+  supervisors,
 }: UsersTableProps) {
+  const { deleteUser } = useDeleteUser();
+  
   // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Wszystkie");
@@ -102,6 +108,11 @@ export function UsersTable({
     });
   };
 
+  // Delete single user using the hook
+  const handleDeleteUser = async (user: UserListItem) => {
+    await deleteUser(user);
+  };
+
   // Close modal and reset state
   const handleCloseModal = () => {
     setModalState({
@@ -121,6 +132,7 @@ export function UsersTable({
           onClose={handleCloseModal}
           availableRoles={availableRoles}
           availableEmploymentTypes={availableEmploymentTypes}
+          supervisors={supervisors}
         />
       )}
 
@@ -143,7 +155,7 @@ export function UsersTable({
             placeholder="Szukaj po imieniu, nazwisku lub emailu..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
         </div>
 
@@ -157,20 +169,6 @@ export function UsersTable({
           {availableRoles.map((role) => (
             <option key={role} value={role}>
               {role}
-            </option>
-          ))}
-        </select>
-
-        {/* Employment type filter dropdown */}
-        <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-          value={selectedEmploymentType}
-          onChange={(e) => setSelectedEmploymentType(e.target.value)}
-        >
-          <option value="Wszystkie">Wszystkie jednostki</option>
-          {availableEmploymentTypes.map((type) => (
-            <option key={type} value={type}>
-              {type}
             </option>
           ))}
         </select>
@@ -209,7 +207,7 @@ export function UsersTable({
               </th>
               <th className="p-4 font-semibold text-gray-600">Email</th>
               <th className="p-4 font-semibold text-gray-600">Rola</th>
-              <th className="p-4 font-semibold text-gray-600">Jednostka</th>
+
               <th className="p-4 font-semibold text-gray-600">Akcje</th>
             </tr>
           </thead>
@@ -241,9 +239,7 @@ export function UsersTable({
                       {user.roleName || "Brak roli"}
                     </span>
                   </td>
-                  <td className="p-4 text-gray-700">
-                    {user.employmentType || "-"}
-                  </td>
+
                   {/* Action buttons */}
                   <td className="p-4">
                     <div className="flex gap-2">
@@ -259,6 +255,7 @@ export function UsersTable({
                       <button
                         type="button"
                         className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-600 transition-colors cursor-pointer border border-red-200"
+                        onClick={() => handleDeleteUser(user)}
                       >
                         <FaTrash size={16} />
                       </button>

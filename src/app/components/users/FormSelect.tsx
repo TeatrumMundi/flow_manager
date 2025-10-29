@@ -1,11 +1,18 @@
 import type { ChangeEvent } from "react";
 
+export type SelectOption =
+  | string
+  | {
+      label: string;
+      value: string | number;
+    };
+
 export interface FormSelectProps {
   label: string;
   name: string;
-  value: string;
+  value: string | number;
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
-  options: string[];
+  options: SelectOption[];
 }
 
 export function FormSelect({
@@ -30,11 +37,14 @@ export function FormSelect({
         onChange={onChange}
         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
       >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+        {options.map((opt) => {
+          const o = typeof opt === "string" ? { label: opt, value: opt } : opt;
+          return (
+            <option key={String(o.value)} value={o.value}>
+              {o.label}
+            </option>
+          );
+        })}
       </select>
     </div>
   );

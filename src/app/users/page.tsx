@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
+import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { UsersTable } from "../components/users/UsersTable";
 
 export default async function UsersPage() {
   // Fetch users from database
   const users = await listUsersFromDb();
+  // Fetch supervisors (roleId 1 or 2)
+  const supervisors = await listSupervisorsFromDb();
 
   // Extract unique roles and employment types for filters
   const availableRoles = Array.from(
@@ -36,6 +39,7 @@ export default async function UsersPage() {
           initialUsers={users}
           availableRoles={availableRoles}
           availableEmploymentTypes={availableEmploymentTypes}
+          supervisors={supervisors}
         />
       </main>
     </div>

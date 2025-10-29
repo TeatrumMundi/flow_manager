@@ -1,9 +1,13 @@
 ﻿"use client";
 
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
+import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import { Button } from "../Button";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
 
@@ -13,6 +17,7 @@ interface UserModalProps {
   onClose: () => void;
   availableRoles: string[];
   availableEmploymentTypes: string[];
+  supervisors: SupervisorListItem[];
 }
 
 export function UserModal({
@@ -21,7 +26,10 @@ export function UserModal({
   onClose,
   availableRoles,
   availableEmploymentTypes,
+  supervisors,
 }: UserModalProps) {
+  const router = useRouter();
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     const original = document.body.style.overflow;
@@ -38,11 +46,13 @@ export function UserModal({
       last_name: "",
       email: "",
       password: "",
+      confirm_password: "",
       role: availableRoles[0] || "Użytkownik",
       position: "",
       employment_type: availableEmploymentTypes[0] || "Full-time",
       salary_rate: "",
       vacation_days_total: "26",
+      supervisor_id: "",
     };
 
     // Populate form with existing user data in edit mode
@@ -52,11 +62,13 @@ export function UserModal({
         last_name: user.lastName || "",
         email: user.email,
         password: "",
+        confirm_password: "",
         role: user.roleName || defaults.role,
         position: user.position || "",
         employment_type: user.employmentType || defaults.employment_type,
         salary_rate: "",
         vacation_days_total: "26",
+        supervisor_id: "",
       };
     }
     return defaults;
@@ -71,8 +83,77 @@ export function UserModal({
   };
 
   // Handle form submission
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    // Validate password confirmation when password provided (always in add mode; optional in edit)
+    if (
+      (mode === "add" || formData.password) &&
+      formData.password !== formData.confirm_password
+    ) {
+      toast.error("Hasła nie są zgodne");
+      return;
+    }
+    if (mode === "add") {
+      const supervisorId = formData.supervisor_id
+        ? Number(formData.supervisor_id)
+        : null;
+
+      const createPromise = (async () => {
+        const res = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            roleName: formData.role,
+            profile: {
+              firstName: formData.first_name || null,
+              lastName: formData.last_name || null,
+              position: formData.position || null,
+              employmentType: formData.employment_type || null,
+              supervisorId,
+              salaryRate:
+                formData.salary_rate === ""
+                  ? null
+                  : String(formData.salary_rate),
+              vacationDaysTotal:
+                formData.vacation_days_total === ""
+                  ? null
+                  : Number(formData.vacation_days_total),
+            },
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.ok) {
+          throw new Error(data?.error || "Nie udało się utworzyć użytkownika");
+        }
+        return data;
+      })();
+
+      const fullNamePlanned = [formData.first_name, formData.last_name]
+        .filter(Boolean)
+        .join(" ");
+      await toast.promise(createPromise as Promise<any>, {
+        loading: `Tworzenie użytkownika: ${
+          fullNamePlanned || "-"
+        } <${formData.email}>...`,
+        success: (resp: any) => {
+          const u = resp?.data?.user;
+          const p = resp?.data?.profile;
+          const name = [p?.firstName, p?.lastName].filter(Boolean).join(" ");
+          return `Utworzono użytkownika [ID ${u?.id}] ${name || "-"} <${
+            u?.email
+          }>`;
+        },
+        error: (e: any) => e?.message || "Błąd podczas tworzenia użytkownika",
+      });
+
+      onClose();
+      router.refresh();
+      return;
+    }
+
+    // Edit mode not wired yet to API
     onClose();
   };
 
@@ -132,14 +213,25 @@ export function UserModal({
             onChange={handleChange}
           />
 
-          {/* Password field - optional in edit mode */}
-          <FormInput
-            label={mode === "add" ? "Hasło *" : "Nowe hasło"}
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-          />
+          {/* Passwords row: password + confirm password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              label={mode === "add" ? "Hasło *" : "Nowe hasło"}
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <FormInput
+              label={
+                mode === "add" ? "Potwierdź hasło *" : "Potwierdź nowe hasło"
+              }
+              name="confirm_password"
+              type="password"
+              value={formData.confirm_password}
+              onChange={handleChange}
+            />
+          </div>
 
           {/* Role and employment type fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -158,6 +250,21 @@ export function UserModal({
               options={availableEmploymentTypes}
             />
           </div>
+
+          {/* Supervisor field */}
+          <FormSelect
+            label="Przełożony"
+            name="supervisor_id"
+            value={formData.supervisor_id}
+            onChange={handleChange}
+            options={[
+              { label: "Brak", value: "" },
+              ...supervisors.map((s) => ({
+                label: `${[s.firstName, s.lastName].filter(Boolean).join(" ") || s.email} (${s.email})`,
+                value: s.id,
+              })),
+            ]}
+          />
 
           {/* Position field */}
           <FormInput
@@ -187,19 +294,12 @@ export function UserModal({
 
           {/* Action buttons */}
           <div className="flex justify-end gap-4 pt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-            >
+            <Button type="button" onClick={onClose} variant="secondary">
               Anuluj
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-            >
+            </Button>
+            <Button type="submit" variant="primary">
               {mode === "add" ? "Dodaj użytkownika" : "Zapisz zmiany"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
