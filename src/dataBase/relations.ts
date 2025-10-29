@@ -11,6 +11,7 @@ import {
   users,
   vacations,
   workLogs,
+  employmentTypes,
 } from "@/dataBase/schema";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -55,6 +56,11 @@ export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
     fields: [userProfiles.supervisorId],
     references: [users.id],
     relationName: "userProfiles_supervisorId_users_id",
+  }),
+  employmentType: one(employmentTypes, {
+    fields: [userProfiles.employmentTypeId],
+    references: [employmentTypes.id],
+    relationName: "userProfiles_employmentTypeId_employmentTypes_id",
   }),
 }));
 

@@ -12,6 +12,19 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+export const employmentTypes = pgTable(
+  "employment_types",
+  {
+    id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    abbreviation: varchar({ length: 50 }).notNull(),
+  },
+  (table) => [
+    unique("employment_types_name_key").on(table.name),
+    unique("employment_types_abbreviation_key").on(table.abbreviation),
+  ],
+);
+
 export const userRoles = pgTable(
   "user_roles",
   {
@@ -70,6 +83,7 @@ export const userProfiles = pgTable(
     lastName: varchar("last_name", { length: 255 }),
     position: varchar({ length: 255 }),
     employmentType: varchar("employment_type", { length: 100 }),
+    employmentTypeId: integer("employment_type_id"),
     supervisorId: integer("supervisor_id"),
     salaryRate: numeric("salary_rate", { precision: 10, scale: 2 }),
     vacationDaysTotal: integer("vacation_days_total"),
@@ -84,6 +98,11 @@ export const userProfiles = pgTable(
       columns: [table.supervisorId],
       foreignColumns: [users.id],
       name: "user_profiles_supervisor_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.employmentTypeId],
+      foreignColumns: [employmentTypes.id],
+      name: "user_profiles_employment_type_id_fkey",
     }),
     unique("user_profiles_user_id_key").on(table.userId),
   ],
