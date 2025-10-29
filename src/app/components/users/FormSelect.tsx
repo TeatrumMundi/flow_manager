@@ -13,6 +13,7 @@ export interface FormSelectProps {
   value: string | number;
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   options: SelectOption[];
+  required?: boolean;
 }
 
 export function FormSelect({
@@ -21,6 +22,7 @@ export function FormSelect({
   value,
   onChange,
   options,
+  required,
 }: FormSelectProps) {
   return (
     <div>
@@ -35,6 +37,7 @@ export function FormSelect({
         name={name}
         value={value}
         onChange={onChange}
+        required={required}
         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
       >
         {options.map((opt) => {

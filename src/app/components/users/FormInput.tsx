@@ -7,6 +7,7 @@ export interface FormInputProps {
   step?: string;
   value: string | number;
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  required?: boolean;
 }
 
 export function FormInput({
@@ -16,6 +17,7 @@ export function FormInput({
   step,
   value,
   onChange,
+  required,
 }: FormInputProps) {
   return (
     <div>
@@ -32,6 +34,7 @@ export function FormInput({
         step={step}
         value={value}
         onChange={onChange}
+        required={required}
         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
       />
     </div>

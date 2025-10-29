@@ -20,7 +20,7 @@ export function useDeleteUser() {
       success: `Usunięto ID ${user.id}; ${user.firstName} ${user.lastName} <${user.email}>`,
       error: (deleteError: unknown) =>
         deleteError instanceof Error
-          ? "Błąd podczas usuwania użytkownika" + deleteError.message
+          ? `Błąd·podczas·usuwania·użytkownika${deleteError.message}`
           : "Błąd podczas usuwania użytkownika",
     });
 

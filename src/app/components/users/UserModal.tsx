@@ -74,12 +74,37 @@ export function UserModal({
     return defaults;
   });
 
+  // Generate email from first and last name
+  const generateEmail = (firstName: string, lastName: string): string => {
+    if (!firstName && !lastName) return "";
+
+    const firstLetter = firstName ? firstName.charAt(0).toLowerCase() : "";
+    const fullLastName = lastName
+      ? lastName.toLowerCase().replace(/\s+/g, "")
+      : "";
+
+    if (!firstLetter && !fullLastName) return "";
+
+    return `${firstLetter}${fullLastName}@flow.com`;
+  };
+
   // Handle input changes for all form fields
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+
+      // Auto-generate email when first_name or last_name changes
+      if (name === "first_name" || name === "last_name") {
+        const firstName = name === "first_name" ? value : prev.first_name;
+        const lastName = name === "last_name" ? value : prev.last_name;
+        updated.email = generateEmail(firstName, lastName);
+      }
+
+      return updated;
+    });
   };
 
   // Handle form submission
@@ -130,22 +155,20 @@ export function UserModal({
         return data;
       })();
 
-      const fullNamePlanned = [formData.first_name, formData.last_name]
-        .filter(Boolean)
-        .join(" ");
-      await toast.promise(createPromise as Promise<any>, {
-        loading: `Tworzenie użytkownika: ${
-          fullNamePlanned || "-"
-        } <${formData.email}>...`,
-        success: (resp: any) => {
-          const u = resp?.data?.user;
-          const p = resp?.data?.profile;
-          const name = [p?.firstName, p?.lastName].filter(Boolean).join(" ");
-          return `Utworzono użytkownika [ID ${u?.id}] ${name || "-"} <${
-            u?.email
-          }>`;
+      await toast.promise(createPromise, {
+        loading: `Tworzenie użytkownika: ${formData.first_name} ${formData.last_name} <${formData.email}>...`,
+        success: (resp: {
+          data?: {
+            user?: { id?: number; email?: string };
+            profile?: { firstName?: string; lastName?: string };
+          };
+        }) => {
+          const userResponse = resp?.data?.user;
+          const profileData = resp?.data?.profile;
+          return `Utworzono użytkownika [ID ${userResponse?.id}] ${profileData?.firstName} ${profileData?.lastName} <${userResponse?.email}>`;
         },
-        error: (e: any) => e?.message || "Błąd podczas tworzenia użytkownika",
+        error: (error: Error) =>
+          error?.message || "Błąd podczas tworzenia użytkownika",
       });
 
       onClose();
@@ -195,23 +218,26 @@ export function UserModal({
               name="first_name"
               value={formData.first_name}
               onChange={handleChange}
+              required
             />
             <FormInput
               label="Nazwisko *"
               name="last_name"
               value={formData.last_name}
               onChange={handleChange}
+              required
             />
           </div>
 
-          {/* Email field */}
-          <FormInput
-            label="Email *"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
+          {/* Email field - auto-generated, read-only */}
+          <div>
+            <div className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </div>
+            <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-700">
+              {formData.email || "@flow.com"}
+            </div>
+          </div>
 
           {/* Passwords row: password + confirm password */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -221,6 +247,7 @@ export function UserModal({
               type="password"
               value={formData.password}
               onChange={handleChange}
+              required={mode === "add"}
             />
             <FormInput
               label={
@@ -230,6 +257,7 @@ export function UserModal({
               type="password"
               value={formData.confirm_password}
               onChange={handleChange}
+              required={mode === "add"}
             />
           </div>
 
@@ -241,6 +269,7 @@ export function UserModal({
               value={formData.role}
               onChange={handleChange}
               options={availableRoles}
+              required
             />
             <FormSelect
               label="Typ zatrudnienia *"
@@ -248,6 +277,7 @@ export function UserModal({
               value={formData.employment_type}
               onChange={handleChange}
               options={availableEmploymentTypes}
+              required
             />
           </div>
 
@@ -272,6 +302,7 @@ export function UserModal({
             name="position"
             value={formData.position}
             onChange={handleChange}
+            required
           />
 
           {/* Salary and vacation fields */}
@@ -289,6 +320,7 @@ export function UserModal({
               type="number"
               value={formData.vacation_days_total}
               onChange={handleChange}
+              required
             />
           </div>
 

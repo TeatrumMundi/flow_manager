@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { UserModal } from "@/app/components/users/UserModal";
-import { useDeleteUser } from "@/hooks/useDeleteUser";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import { useDeleteUser } from "@/hooks/useDeleteUser";
 
 interface UsersTableProps {
   initialUsers: UserListItem[];
@@ -21,12 +21,11 @@ export function UsersTable({
   supervisors,
 }: UsersTableProps) {
   const { deleteUser } = useDeleteUser();
-  
+
   // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("Wszystkie");
-  const [selectedEmploymentType, setSelectedEmploymentType] =
-    useState("Wszystkie");
+  const [selectedEmploymentType] = useState("Wszystkie");
   const [filteredUsers, setFilteredUsers] = useState(initialUsers);
 
   // Selection state for bulk actions
