@@ -1,6 +1,5 @@
-export interface UserRoles
-{
-    id: number;
-    name: string;
-    description: string;
+export interface UserRoles {
+  id: number;
+  name: string;
+  description: string | null;
 }

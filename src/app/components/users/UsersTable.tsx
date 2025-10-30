@@ -6,18 +6,18 @@ import { UserModal } from "@/app/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { useDeleteUser } from "@/hooks/useDeleteUser";
-import { UserRoles } from "@/types/UserRole";
+import type { UserRoles } from "@/types/UserRole";
 
 interface UsersTableProps {
   initialUsers: UserListItem[];
-  availableRoles: UserRoles[];
+  roleTypes: UserRoles[];
   availableEmploymentTypes: string[];
   supervisors: SupervisorListItem[];
 }
 
 export function UsersTable({
   initialUsers,
-  availableRoles,
+  roleTypes: availableRoles,
   availableEmploymentTypes,
   supervisors,
 }: UsersTableProps) {
@@ -202,12 +202,8 @@ export function UsersTable({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="p-2 font-semibold text-gray-600">
-                Imię
-              </th>
-              <th className="p-2 font-semibold text-gray-600">
-                Nazwisko
-              </th>
+              <th className="p-2 font-semibold text-gray-600">Imię</th>
+              <th className="p-2 font-semibold text-gray-600">Nazwisko</th>
               <th className="p-2 font-semibold text-gray-600">Email</th>
               <th className="p-2 font-semibold text-gray-600">Rola</th>
 
