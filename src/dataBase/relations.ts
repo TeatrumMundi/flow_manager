@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm/relations";
 import {
+  employmentTypes,
   financialReports,
   projectAssignments,
   projectCosts,
@@ -11,7 +12,6 @@ import {
   users,
   vacations,
   workLogs,
-  employmentTypes,
 } from "@/dataBase/schema";
 
 export const usersRelations = relations(users, ({ one, many }) => ({

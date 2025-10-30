@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { UserRoles } from "@/types/UserRole";
 import { Button } from "../Button";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
@@ -15,7 +16,7 @@ interface UserModalProps {
   mode: "add" | "edit";
   user: UserListItem | null;
   onClose: () => void;
-  availableRoles: string[];
+  availableRoles: UserRoles[];
   availableEmploymentTypes: string[];
   supervisors: SupervisorListItem[];
 }
@@ -47,7 +48,8 @@ export function UserModal({
       email: "",
       password: "",
       confirm_password: "",
-      role: availableRoles[0] || "Użytkownik",
+      // Use role name string for select value; fall back to a sensible default
+      role: availableRoles[0]?.name || "Użytkownik",
       position: "",
       employment_type: availableEmploymentTypes[0] || "Full-time",
       salary_rate: "",
@@ -268,7 +270,7 @@ export function UserModal({
               name="role"
               value={formData.role}
               onChange={handleChange}
-              options={availableRoles}
+              options={availableRoles.map((r) => r.name)}
               required
             />
             <FormSelect
