@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import LogoutButton from "@/app/components/LogoutButton";
-import { useTimeAndDate } from "@/hooks/useTimeAndDate";
+import { useTimeAndDate } from "@/hooks/users/useTimeAndDate";
 import useUserStore from "@/store/userStore";
 
 export function TopBar() {
