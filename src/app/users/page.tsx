@@ -5,6 +5,7 @@ import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { UsersTable } from "../components/users/UsersTable";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
+import { listUserRolesFromDb } from "@/dataBase/query/listUserRolesFromDb";
 
 
 export default async function UsersPage() {
@@ -12,13 +13,10 @@ export default async function UsersPage() {
   const users = await listUsersFromDb();
   // Fetch supervisors (roleId 1 or 2)
   const supervisors = await listSupervisorsFromDb();
-  // Fetch employment types from database
+  // Fetch employment types
   const employmentTypes: EmploymentType[] = await listEmploymentTypesFromDb();
-
-  // Extract unique roles for filters
-  const availableRoles = Array.from(
-    new Set(users.map((user) => user.roleName).filter(Boolean)),
-  ) as string[];
+  // Fetch unique roles
+  const availableRoles = await listUserRolesFromDb();
 
   // Map employment types to abbreviations (short names)
   const availableEmploymentTypes = employmentTypes.map((type) => type.abbreviation);

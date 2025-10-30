@@ -10,12 +10,13 @@ import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { Button } from "../Button";
 import { FormInput } from "./FormInput";
 import { FormSelect } from "./FormSelect";
+import { UserRoles } from "@/types/UserRole";
 
 interface UserModalProps {
   mode: "add" | "edit";
   user: UserListItem | null;
   onClose: () => void;
-  availableRoles: string[];
+  availableRoles: UserRoles[];
   availableEmploymentTypes: string[];
   supervisors: SupervisorListItem[];
 }

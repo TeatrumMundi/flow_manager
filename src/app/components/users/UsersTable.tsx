@@ -6,10 +6,11 @@ import { UserModal } from "@/app/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { useDeleteUser } from "@/hooks/useDeleteUser";
+import { UserRoles } from "@/types/UserRole";
 
 interface UsersTableProps {
   initialUsers: UserListItem[];
-  availableRoles: string[];
+  availableRoles: UserRoles[];
   availableEmploymentTypes: string[];
   supervisors: SupervisorListItem[];
 }
@@ -166,8 +167,8 @@ export function UsersTable({
         >
           <option value="Wszystkie">Wszystkie role</option>
           {availableRoles.map((role) => (
-            <option key={role} value={role}>
-              {role}
+            <option key={role.name} value={role.name}>
+              {role.name}
             </option>
           ))}
         </select>
@@ -187,10 +188,10 @@ export function UsersTable({
       {/* Users table */}
       <div className="overflow-x-auto bg-white/50 rounded-lg shadow">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50">
-            <tr>
+          <thead className="bg-blue-600/50">
+            <tr className="h-10">
               {/* Select all checkbox */}
-              <th className="p-4 w-12">
+              <th className="p-4">
                 <input
                   type="checkbox"
                   className="h-4 w-4 cursor-pointer"
@@ -201,22 +202,20 @@ export function UsersTable({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="p-4 font-semibold text-gray-600">
-                Imię i nazwisko
+              <th className="p-2 font-semibold text-gray-600">
+                Imię
               </th>
-              <th className="p-4 font-semibold text-gray-600">Email</th>
-              <th className="p-4 font-semibold text-gray-600">Rola</th>
+              <th className="p-2 font-semibold text-gray-600">
+                Nazwisko
+              </th>
+              <th className="p-2 font-semibold text-gray-600">Email</th>
+              <th className="p-2 font-semibold text-gray-600">Rola</th>
 
-              <th className="p-4 font-semibold text-gray-600">Akcje</th>
+              <th className="p-2 font-semibold text-gray-600">Akcje</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => {
-              // Construct full name from first and last name
-              const fullName =
-                [user.firstName, user.lastName].filter(Boolean).join(" ") ||
-                "Brak danych";
-
               return (
                 <tr
                   key={user.id}
@@ -231,16 +230,17 @@ export function UsersTable({
                       onChange={() => handleSelectUser(user.id)}
                     />
                   </td>
-                  <td className="p-4 text-gray-800">{fullName}</td>
-                  <td className="p-4 text-gray-700">{user.email}</td>
-                  <td className="py-4 pr-4 pl-2">
+                  <td className="p-2 text-gray-800">{user.firstName}</td>
+                  <td className="p-2 text-gray-800">{user.lastName}</td>
+                  <td className="p-2 text-gray-700">{user.email}</td>
+                  <td className="py-2">
                     <span className="px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
                       {user.roleName || "Brak roli"}
                     </span>
                   </td>
 
                   {/* Action buttons */}
-                  <td className="p-4">
+                  <td>
                     <div className="flex gap-2">
                       {/* Edit button */}
                       <button
