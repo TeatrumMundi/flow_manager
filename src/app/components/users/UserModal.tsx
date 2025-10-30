@@ -16,7 +16,7 @@ import { FormSelect } from "./FormSelect";
 interface UserModalProps {
   mode: "add" | "edit";
   user: UserListItem | null;
-  onClose: () => void;
+  onClose: (shouldRefresh?: boolean) => void;
   availableRoles: UserRoles[];
   availableEmploymentTypes: EmploymentType[];
   supervisors: SupervisorListItem[];
@@ -183,13 +183,13 @@ export function UserModal({
           error?.message || "Błąd podczas tworzenia użytkownika",
       });
 
-      onClose();
+      onClose(true);
       router.refresh();
       return;
     }
 
     // Edit mode not wired yet to API
-    onClose();
+    onClose(false);
   };
 
   // Render modal using portal to ensure proper z-index stacking
@@ -200,11 +200,11 @@ export function UserModal({
       aria-modal="true"
       tabIndex={-1}
       className="fixed inset-0 z-50 grid place-items-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={onClose}
+      onClick={() => onClose(false)}
       onKeyUp={(event) => {
         // Only close if Escape is pressed and the backdrop itself has focus
         if (event.key === "Escape" && event.target === event.currentTarget) {
-          onClose();
+          onClose(false);
         }
       }}
     >
@@ -341,7 +341,7 @@ export function UserModal({
 
           {/* Action buttons */}
           <div className="flex justify-end gap-4 pt-6">
-            <Button type="button" onClick={onClose} variant="secondary">
+            <Button type="button" onClick={() => onClose(false)} variant="secondary">
               Anuluj
             </Button>
             <Button type="submit" variant="primary">

@@ -1,5 +1,33 @@
 import { NextResponse } from "next/server";
 import { createUserInDb } from "@/dataBase/query/createUserInDb";
+import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    
+    // Extract optional filters from query parameters
+    const filters = {
+      firstName: searchParams.get("firstName") || undefined,
+      lastName: searchParams.get("lastName") || undefined,
+      email: searchParams.get("email") || undefined,
+      roleName: searchParams.get("roleName") || undefined,
+      employmentType: searchParams.get("employmentType") || undefined,
+    };
+
+    const users = await listUsersFromDb(filters);
+
+    return NextResponse.json({ ok: true, data: users }, { status: 200 });
+  } catch (error: unknown) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "Failed to list users",
+      },
+      { status: 500 },
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

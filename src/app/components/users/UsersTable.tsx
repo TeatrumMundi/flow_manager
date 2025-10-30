@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+import { IoMdRefresh } from "react-icons/io";
 import { UserModal } from "@/app/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
-import { useDeleteUser } from "@/hooks/useDeleteUser";
+import { useDeleteUser } from "@/hooks/users/useDeleteUser";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 
@@ -23,6 +25,10 @@ export function UsersTable({
   supervisors,
 }: UsersTableProps) {
   const { deleteUser } = useDeleteUser();
+
+  // Users state management
+  const [users, setUsers] = useState(initialUsers);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,25 +50,69 @@ export function UsersTable({
     user: null,
   });
 
-  // Apply filters whenever search term, role, employment type, or initial users change
+  // Refresh users from API (silent refresh without toast)
+  const refreshUsersList = async () => {
+    try {
+      const response = await fetch("/api/users");
+      const result = await response.json();
+      if (result.ok && result.data) {
+        setUsers(result.data);
+      }
+    } catch (error) {
+      console.error("Failed to refresh users:", error);
+    }
+  };
+
+  // Refresh users from API (with toast notification)
+  const handleRefreshUsers = async () => {
+    setIsRefreshing(true);
+    
+    const refreshPromise = fetch("/api/users")
+      .then(async (response) => {
+        const result = await response.json();
+        if (result.ok && result.data) {
+          setUsers(result.data);
+          return result.data;
+        }
+        throw new Error("Nie udało się pobrać danych");
+      });
+
+    toast.promise(
+      refreshPromise,
+      {
+        loading: "Odświeżanie listy użytkowników...",
+        success: (data) => `Odświeżono listę (${data.length} użytkowników)`,
+        error: "Błąd podczas odświeżania listy",
+      },
+      {
+        style: {
+          minWidth: "250px",
+        },
+      }
+    ).finally(() => {
+      setIsRefreshing(false);
+    });
+  };
+
+  // Apply filters whenever search term, role, employment type, or users change
   useEffect(() => {
-    let users = initialUsers;
+    let filteredList = users;
 
     // Filter by selected role
     if (selectedRole !== "Wszystkie") {
-      users = users.filter((user) => user.roleName === selectedRole);
+      filteredList = filteredList.filter((user) => user.roleName === selectedRole);
     }
 
     // Filter by selected employment type
     if (selectedEmploymentType !== "Wszystkie") {
-      users = users.filter(
+      filteredList = filteredList.filter(
         (user) => user.employmentType === selectedEmploymentType,
       );
     }
 
     // Filter by search term (name or email)
     if (searchTerm) {
-      users = users.filter(
+      filteredList = filteredList.filter(
         (user) =>
           user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,8 +120,8 @@ export function UsersTable({
       );
     }
 
-    setFilteredUsers(users);
-  }, [searchTerm, selectedRole, selectedEmploymentType, initialUsers]);
+    setFilteredUsers(filteredList);
+  }, [searchTerm, selectedRole, selectedEmploymentType, users]);
 
   // Toggle individual user selection
   const handleSelectUser = (id: number) => {
@@ -111,16 +161,25 @@ export function UsersTable({
 
   // Delete single user using the hook
   const handleDeleteUser = async (user: UserListItem) => {
-    await deleteUser(user);
+    try {
+      await deleteUser(user);
+      await refreshUsersList();
+    } catch (error) {
+      console.error("Delete user failed:", error);
+    }
   };
 
   // Close modal and reset state
-  const handleCloseModal = () => {
+  const handleCloseModal = async (shouldRefresh = false) => {
     setModalState({
       isOpen: false,
       mode: "add",
       user: null,
     });
+    
+    if (shouldRefresh) {
+      await refreshUsersList();
+    }
   };
 
   return (
@@ -139,14 +198,27 @@ export function UsersTable({
 
       {/* Toolbar with filters and actions */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        {/* Add user button */}
-        <button
-          type="button"
-          onClick={handleAddUser}
-          className="flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow cursor-pointer"
-        >
-          <FaPlus className="mr-2" /> Dodaj użytkownika
-        </button>
+        <div className="flex gap-4">
+          {/* Add user button */}
+          <button
+            type="button"
+            onClick={handleAddUser}
+            className="flex-1 flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow cursor-pointer whitespace-nowrap"
+          >
+            <FaPlus className="mr-2" /> Dodaj użytkownika
+          </button>
+
+          {/* Refresh button */}
+          <button
+            type="button"
+            title="Odśwież listę użytkowników"
+            onClick={handleRefreshUsers}
+            disabled={isRefreshing}
+            className="flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow cursor-pointer p-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <IoMdRefresh size={20} className={isRefreshing ? "animate-spin" : ""} /> Odśwież
+          </button>
+        </div>
 
         {/* Search input */}
         <div className="relative flex-grow">
