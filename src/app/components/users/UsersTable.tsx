@@ -187,27 +187,39 @@ export function UsersTable({
 
       {/* Users table */}
       <div className="overflow-x-auto bg-white/50 rounded-lg shadow">
-        <table className="w-full text-left">
+        <table className="w-full table-fixed text-left">
+          <colgroup>
+            <col className="w-12" />
+            <col className="w-40" />
+            <col className="w-32" />
+            <col className="w-64" />
+            <col className="w-40" />
+            <col className="w-25" />
+          </colgroup>
           <thead className="bg-blue-600/50">
             <tr className="h-10">
               {/* Select all checkbox */}
-              <th className="p-4">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 cursor-pointer"
-                  checked={
-                    selectedUsers.length === filteredUsers.length &&
-                    filteredUsers.length > 0
-                  }
-                  onChange={handleSelectAll}
-                />
+              <th className="p-4 border-r border-blue-600/20">
+                <div className="flex items-center justify-center h-full">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 cursor-pointer"
+                    checked={
+                      selectedUsers.length === filteredUsers.length &&
+                      filteredUsers.length > 0
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </div>
               </th>
-              <th className="p-2 font-semibold text-gray-600">Imię</th>
+              <th className="p-2 pl-6 font-semibold text-gray-600">Imię</th>
               <th className="p-2 font-semibold text-gray-600">Nazwisko</th>
               <th className="p-2 font-semibold text-gray-600">Email</th>
               <th className="p-2 font-semibold text-gray-600">Rola</th>
 
-              <th className="p-2 font-semibold text-gray-600">Akcje</th>
+              <th className="p-2 font-semibold text-gray-600 text-center border-l border-blue-600/20">
+                Akcje
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -218,26 +230,32 @@ export function UsersTable({
                   className="border-t border-gray-200 hover:bg-gray-50/50"
                 >
                   {/* Individual row checkbox */}
-                  <td className="p-4">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 cursor-pointer"
-                      checked={selectedUsers.includes(user.id)}
-                      onChange={() => handleSelectUser(user.id)}
-                    />
+                  <td className="p-4 border-r border-blue-600/20">
+                    <div className="flex items-center justify-center h-full">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 cursor-pointer"
+                        checked={selectedUsers.includes(user.id)}
+                        onChange={() => handleSelectUser(user.id)}
+                      />
+                    </div>
                   </td>
-                  <td className="p-2 text-gray-800">{user.firstName}</td>
-                  <td className="p-2 text-gray-800">{user.lastName}</td>
-                  <td className="p-2 text-gray-700">{user.email}</td>
-                  <td className="py-2">
-                    <span className="px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
+                  <td className="p-2 pl-6 text-gray-800 truncate">
+                    {user.firstName}
+                  </td>
+                  <td className="p-2 text-gray-800 truncate">
+                    {user.lastName}
+                  </td>
+                  <td className="p-2 text-gray-700 truncate">{user.email}</td>
+                  <td className="p-2">
+                    <span className="block truncate px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
                       {user.roleName || "Brak roli"}
                     </span>
                   </td>
 
                   {/* Action buttons */}
-                  <td>
-                    <div className="flex gap-2">
+                  <td className="p-2 border-l border-blue-600/20">
+                    <div className="flex justify-center gap-2">
                       {/* Edit button */}
                       <button
                         type="button"
