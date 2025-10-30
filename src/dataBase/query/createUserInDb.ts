@@ -18,7 +18,7 @@ interface CreateUserInput {
     firstName?: string | null;
     lastName?: string | null;
     position?: string | null;
-    employmentType?: string | null;
+    employmentTypeId?: number | null;
     supervisorId?: number | null;
     salaryRate?: string | null;
     vacationDaysTotal?: number | null;
@@ -121,7 +121,7 @@ export async function createUserInDb(
         firstName: input.profile.firstName ?? null,
         lastName: input.profile.lastName ?? null,
         position: input.profile.position ?? null,
-        employmentType: input.profile.employmentType ?? null,
+        employmentTypeId: input.profile.employmentTypeId ?? null,
         supervisorId: input.profile.supervisorId ?? null,
         salaryRate: input.profile.salaryRate ?? null,
         vacationDaysTotal: input.profile.vacationDaysTotal ?? null,

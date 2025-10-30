@@ -6,12 +6,13 @@ import { UserModal } from "@/app/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { useDeleteUser } from "@/hooks/useDeleteUser";
+import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 
 interface UsersTableProps {
   initialUsers: UserListItem[];
   roleTypes: UserRoles[];
-  availableEmploymentTypes: string[];
+  availableEmploymentTypes: EmploymentType[];
   supervisors: SupervisorListItem[];
 }
 

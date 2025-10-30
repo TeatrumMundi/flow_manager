@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 import { Button } from "../Button";
 import { FormInput } from "./FormInput";
@@ -17,7 +18,7 @@ interface UserModalProps {
   user: UserListItem | null;
   onClose: () => void;
   availableRoles: UserRoles[];
-  availableEmploymentTypes: string[];
+  availableEmploymentTypes: EmploymentType[];
   supervisors: SupervisorListItem[];
 }
 
@@ -42,6 +43,8 @@ export function UserModal({
 
   // Initialize form data with defaults or user data in edit mode
   const [formData, setFormData] = useState(() => {
+    const defaultEmploymentTypeId = availableEmploymentTypes[0]?.id || "";
+
     const defaults = {
       first_name: "",
       last_name: "",
@@ -51,7 +54,7 @@ export function UserModal({
       // Use role name string for select value; fall back to a sensible default
       role: availableRoles[0]?.name || "Użytkownik",
       position: "",
-      employment_type: availableEmploymentTypes[0] || "Full-time",
+      employment_type_id: String(defaultEmploymentTypeId),
       salary_rate: "",
       vacation_days_total: "26",
       supervisor_id: "",
@@ -59,6 +62,11 @@ export function UserModal({
 
     // Populate form with existing user data in edit mode
     if (mode === "edit" && user) {
+      // Find employment type ID by name
+      const employmentTypeId =
+        availableEmploymentTypes.find((et) => et.name === user.employmentType)
+          ?.id || defaultEmploymentTypeId;
+
       return {
         first_name: user.firstName || "",
         last_name: user.lastName || "",
@@ -67,7 +75,7 @@ export function UserModal({
         confirm_password: "",
         role: user.roleName || defaults.role,
         position: user.position || "",
-        employment_type: user.employmentType || defaults.employment_type,
+        employment_type_id: String(employmentTypeId),
         salary_rate: "",
         vacation_days_total: "26",
         supervisor_id: "",
@@ -137,7 +145,9 @@ export function UserModal({
               firstName: formData.first_name || null,
               lastName: formData.last_name || null,
               position: formData.position || null,
-              employmentType: formData.employment_type || null,
+              employmentTypeId: formData.employment_type_id
+                ? Number(formData.employment_type_id)
+                : null,
               supervisorId,
               salaryRate:
                 formData.salary_rate === ""
@@ -275,10 +285,13 @@ export function UserModal({
             />
             <FormSelect
               label="Typ zatrudnienia *"
-              name="employment_type"
-              value={formData.employment_type}
+              name="employment_type_id"
+              value={formData.employment_type_id}
               onChange={handleChange}
-              options={availableEmploymentTypes}
+              options={availableEmploymentTypes.map((et) => ({
+                label: `${et.name} (${et.abbreviation})`,
+                value: et.id,
+              }))}
               required
             />
           </div>

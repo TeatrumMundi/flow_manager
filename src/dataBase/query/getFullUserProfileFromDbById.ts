@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import {
+  employmentTypes,
   projectAssignments,
   projects,
   userProfiles,
@@ -30,7 +31,7 @@ async function getFullUserProfileFromDbById(
         firstName: userProfiles.firstName,
         lastName: userProfiles.lastName,
         position: userProfiles.position,
-        employmentType: userProfiles.employmentType,
+        employmentTypeId: userProfiles.employmentTypeId,
         supervisorId: userProfiles.supervisorId,
         salaryRate: userProfiles.salaryRate,
         vacationDaysTotal: userProfiles.vacationDaysTotal,
@@ -40,10 +41,18 @@ async function getFullUserProfileFromDbById(
         name: userRoles.name,
         description: userRoles.description,
       },
+      employmentType: {
+        id: employmentTypes.id,
+        name: employmentTypes.name,
+      },
     })
     .from(users)
     .leftJoin(userProfiles, eq(userProfiles.userId, users.id))
     .leftJoin(userRoles, eq(users.roleId, userRoles.id))
+    .leftJoin(
+      employmentTypes,
+      eq(userProfiles.employmentTypeId, employmentTypes.id),
+    )
     .where(eq(users.id, id))
     .limit(1);
 
@@ -89,7 +98,7 @@ async function getFullUserProfileFromDbById(
           firstName: row.profile.firstName ?? null,
           lastName: row.profile.lastName ?? null,
           position: row.profile.position ?? null,
-          employmentType: row.profile.employmentType ?? null,
+          employmentType: row.employmentType?.name ?? null,
           supervisor,
           salaryRate: row.profile.salaryRate ?? null,
           vacationDaysTotal: row.profile.vacationDaysTotal ?? null,

@@ -82,7 +82,6 @@ export const userProfiles = pgTable(
     firstName: varchar("first_name", { length: 255 }),
     lastName: varchar("last_name", { length: 255 }),
     position: varchar({ length: 255 }),
-    employmentType: varchar("employment_type", { length: 100 }),
     employmentTypeId: integer("employment_type_id"),
     supervisorId: integer("supervisor_id"),
     salaryRate: numeric("salary_rate", { precision: 10, scale: 2 }),

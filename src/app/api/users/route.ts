@@ -20,7 +20,11 @@ export async function POST(request: Request) {
         firstName: profile.firstName ?? null,
         lastName: profile.lastName ?? null,
         position: profile.position ?? null,
-        employmentType: profile.employmentType ?? null,
+        employmentTypeId:
+          profile.employmentTypeId === null ||
+          profile.employmentTypeId === undefined
+            ? null
+            : Number(profile.employmentTypeId),
         supervisorId:
           profile.supervisorId === null || profile.supervisorId === undefined
             ? null

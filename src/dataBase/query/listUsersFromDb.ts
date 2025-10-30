@@ -1,6 +1,11 @@
 import type { SQL } from "drizzle-orm";
 import { and, eq, ilike, sql } from "drizzle-orm";
-import { userProfiles, userRoles, users } from "@/dataBase/schema";
+import {
+  employmentTypes,
+  userProfiles,
+  userRoles,
+  users,
+} from "@/dataBase/schema";
 import { database } from "@/library/db";
 
 export interface UserListFilters {
@@ -75,9 +80,7 @@ export async function listUsersFromDb(
   }
 
   if (filters?.employmentType) {
-    conditions.push(
-      ilike(userProfiles.employmentType, `%${filters.employmentType}%`),
-    );
+    conditions.push(ilike(employmentTypes.name, `%${filters.employmentType}%`));
   }
 
   // Build and execute query
@@ -88,14 +91,18 @@ export async function listUsersFromDb(
       firstName: userProfiles.firstName,
       lastName: userProfiles.lastName,
       roleName: userRoles.name,
-      employmentType: userProfiles.employmentType,
+      employmentType: employmentTypes.name,
       position: userProfiles.position,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
     })
     .from(users)
     .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-    .leftJoin(userRoles, eq(users.roleId, userRoles.id));
+    .leftJoin(userRoles, eq(users.roleId, userRoles.id))
+    .leftJoin(
+      employmentTypes,
+      eq(userProfiles.employmentTypeId, employmentTypes.id),
+    );
 
   // Apply filters if any
   const result =
@@ -138,16 +145,18 @@ export async function countUsersFromDb(
   }
 
   if (filters?.employmentType) {
-    conditions.push(
-      ilike(userProfiles.employmentType, `%${filters.employmentType}%`),
-    );
+    conditions.push(ilike(employmentTypes.name, `%${filters.employmentType}%`));
   }
 
   const query = database
     .select({ count: sql<number>`count(*)` })
     .from(users)
     .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-    .leftJoin(userRoles, eq(users.roleId, userRoles.id));
+    .leftJoin(userRoles, eq(users.roleId, userRoles.id))
+    .leftJoin(
+      employmentTypes,
+      eq(userProfiles.employmentTypeId, employmentTypes.id),
+    );
 
   const result =
     conditions.length > 0 ? await query.where(and(...conditions)) : await query;

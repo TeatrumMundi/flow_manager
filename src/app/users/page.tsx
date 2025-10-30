@@ -18,11 +18,6 @@ export default async function UsersPage() {
   // Fetch unique roles
   const roleTypes: UserRoles[] = await listUserRolesFromDb();
 
-  // Map employment types to abbreviations (short names)
-  const availableEmploymentTypes = employmentTypes.map(
-    (type) => type.abbreviation,
-  );
-
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-6xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
@@ -42,7 +37,7 @@ export default async function UsersPage() {
         <UsersTable
           initialUsers={users}
           roleTypes={roleTypes}
-          availableEmploymentTypes={availableEmploymentTypes}
+          availableEmploymentTypes={employmentTypes}
           supervisors={supervisors}
         />
       </main>
