@@ -5,7 +5,7 @@ import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    
+
     // Extract optional filters from query parameters
     const filters = {
       firstName: searchParams.get("firstName") || undefined,

@@ -341,7 +341,11 @@ export function UserModal({
 
           {/* Action buttons */}
           <div className="flex justify-end gap-4 pt-6">
-            <Button type="button" onClick={() => onClose(false)} variant="secondary">
+            <Button
+              type="button"
+              onClick={() => onClose(false)}
+              variant="secondary"
+            >
               Anuluj
             </Button>
             <Button type="submit" variant="primary">

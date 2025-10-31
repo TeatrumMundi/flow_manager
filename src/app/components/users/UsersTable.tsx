@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
@@ -51,7 +51,7 @@ export function UsersTable({
   });
 
   // Refresh users from API (silent refresh without toast)
-  const refreshUsersList = async () => {
+  const refreshUsersList = useCallback(async () => {
     try {
       const response = await fetch("/api/users");
       const result = await response.json();
@@ -61,38 +61,44 @@ export function UsersTable({
     } catch (error) {
       console.error("Failed to refresh users:", error);
     }
-  };
+  }, []);
 
   // Refresh users from API (with toast notification)
-  const handleRefreshUsers = async () => {
+  const handleRefreshUsers = useCallback(async () => {
     setIsRefreshing(true);
-    
-    const refreshPromise = fetch("/api/users")
-      .then(async (response) => {
-        const result = await response.json();
-        if (result.ok && result.data) {
-          setUsers(result.data);
-          return result.data;
-        }
-        throw new Error("Nie udało się pobrać danych");
-      });
 
-    toast.promise(
-      refreshPromise,
-      {
-        loading: "Odświeżanie listy użytkowników...",
-        success: (data) => `Odświeżono listę (${data.length} użytkowników)`,
-        error: "Błąd podczas odświeżania listy",
-      },
-      {
-        style: {
-          minWidth: "250px",
-        },
+    const refreshPromise = fetch("/api/users").then(async (response) => {
+      const result = await response.json();
+      if (result.ok && result.data) {
+        setUsers(result.data);
+        return result.data;
       }
-    ).finally(() => {
-      setIsRefreshing(false);
+      throw new Error("Nie udało się pobrać danych");
     });
-  };
+
+    toast
+      .promise(
+        refreshPromise,
+        {
+          loading: "Odświeżanie listy użytkowników...",
+          success: (data) => `Odświeżono listę (${data.length} użytkowników)`,
+          error: "Błąd podczas odświeżania listy",
+        },
+        {
+          style: {
+            minWidth: "250px",
+          },
+        },
+      )
+      .finally(() => {
+        setIsRefreshing(false);
+      });
+  }, []);
+
+  // Refresh users list on component mount
+  useEffect(() => {
+    refreshUsersList();
+  }, [refreshUsersList]);
 
   // Apply filters whenever search term, role, employment type, or users change
   useEffect(() => {
@@ -100,7 +106,9 @@ export function UsersTable({
 
     // Filter by selected role
     if (selectedRole !== "Wszystkie") {
-      filteredList = filteredList.filter((user) => user.roleName === selectedRole);
+      filteredList = filteredList.filter(
+        (user) => user.roleName === selectedRole,
+      );
     }
 
     // Filter by selected employment type
@@ -176,7 +184,7 @@ export function UsersTable({
       mode: "add",
       user: null,
     });
-    
+
     if (shouldRefresh) {
       await refreshUsersList();
     }
@@ -216,7 +224,11 @@ export function UsersTable({
             disabled={isRefreshing}
             className="flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow cursor-pointer p-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <IoMdRefresh size={20} className={isRefreshing ? "animate-spin" : ""} /> Odśwież
+            <IoMdRefresh
+              size={20}
+              className={isRefreshing ? "animate-spin" : ""}
+            />{" "}
+            Odśwież
           </button>
         </div>
 
