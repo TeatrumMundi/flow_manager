@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
 import { UserModal } from "@/app/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import { useBulkDeleteUsers } from "@/hooks/users/useBulkDeleteUsers";
 import { useDeleteUser } from "@/hooks/users/useDeleteUser";
+import { useRefreshUsers } from "@/hooks/users/useRefreshUsers";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 
@@ -25,10 +26,12 @@ export function UsersTable({
   supervisors,
 }: UsersTableProps) {
   const { deleteUser } = useDeleteUser();
+  const { bulkDeleteUsers } = useBulkDeleteUsers();
+  const { isRefreshing, refreshUsersList, refreshUsersWithToast } =
+    useRefreshUsers();
 
   // Users state management
   const [users, setUsers] = useState(initialUsers);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,55 +53,26 @@ export function UsersTable({
     user: null,
   });
 
-  // Refresh users from API (silent refresh without toast)
-  const refreshUsersList = useCallback(async () => {
-    try {
-      const response = await fetch("/api/users");
-      const result = await response.json();
-      if (result.ok && result.data) {
-        setUsers(result.data);
-      }
-    } catch (error) {
-      console.error("Failed to refresh users:", error);
+  // Handle refresh with toast
+  const handleRefreshUsers = async () => {
+    const data = await refreshUsersWithToast();
+    if (data) {
+      setUsers(data);
     }
-  }, []);
+  };
 
-  // Refresh users from API (with toast notification)
-  const handleRefreshUsers = useCallback(async () => {
-    setIsRefreshing(true);
-
-    const refreshPromise = fetch("/api/users").then(async (response) => {
-      const result = await response.json();
-      if (result.ok && result.data) {
-        setUsers(result.data);
-        return result.data;
-      }
-      throw new Error("Nie udało się pobrać danych");
-    });
-
-    toast
-      .promise(
-        refreshPromise,
-        {
-          loading: "Odświeżanie listy użytkowników...",
-          success: (data) => `Odświeżono listę (${data.length} użytkowników)`,
-          error: "Błąd podczas odświeżania listy",
-        },
-        {
-          style: {
-            minWidth: "250px",
-          },
-        },
-      )
-      .finally(() => {
-        setIsRefreshing(false);
-      });
-  }, []);
+  // Handle silent refresh
+  const handleSilentRefresh = useCallback(async () => {
+    const data = await refreshUsersList();
+    if (data) {
+      setUsers(data);
+    }
+  }, [refreshUsersList]);
 
   // Refresh users list on component mount
   useEffect(() => {
-    refreshUsersList();
-  }, [refreshUsersList]);
+    handleSilentRefresh();
+  }, [handleSilentRefresh]);
 
   // Apply filters whenever search term, role, employment type, or users change
   useEffect(() => {
@@ -171,9 +145,22 @@ export function UsersTable({
   const handleDeleteUser = async (user: UserListItem) => {
     try {
       await deleteUser(user);
-      await refreshUsersList();
+      await handleSilentRefresh();
     } catch (error) {
       console.error("Delete user failed:", error);
+    }
+  };
+
+  // Delete multiple users using the bulk delete hook
+  const handleBulkDeleteUsers = async () => {
+    if (selectedUsers.length === 0) return;
+
+    try {
+      await bulkDeleteUsers(selectedUsers);
+      setSelectedUsers([]); // Clear selection after successful delete
+      await handleSilentRefresh();
+    } catch (error) {
+      console.error("Bulk delete failed:", error);
     }
   };
 
@@ -186,7 +173,7 @@ export function UsersTable({
     });
 
     if (shouldRefresh) {
-      await refreshUsersList();
+      await handleSilentRefresh();
     }
   };
 
@@ -262,6 +249,7 @@ export function UsersTable({
         {selectedUsers.length > 0 && (
           <button
             type="button"
+            onClick={handleBulkDeleteUsers}
             className="flex items-center justify-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors shadow cursor-pointer"
           >
             <FaTrash className="mr-2" /> Usuń zaznaczone ({selectedUsers.length}

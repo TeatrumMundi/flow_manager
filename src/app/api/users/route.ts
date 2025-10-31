@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createUserInDb } from "@/dataBase/query/createUserInDb";
+import { deleteMultipleUsersFromDb } from "@/dataBase/query/deleteUserFromDb";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 
 export async function GET(request: Request) {
@@ -77,6 +78,59 @@ export async function POST(request: Request) {
         error: error instanceof Error ? error.message : "Failed to create user",
       },
       { status: 400 },
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+
+    // Validate that userIds is an array of numbers
+    if (!Array.isArray(body.userIds)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "userIds must be an array",
+        },
+        { status: 400 },
+      );
+    }
+
+    const userIds = body.userIds.filter(
+      (id: unknown) => typeof id === "number",
+    );
+
+    if (userIds.length === 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "No valid user IDs provided",
+        },
+        { status: 400 },
+      );
+    }
+
+    const result = await deleteMultipleUsersFromDb(userIds);
+
+    return NextResponse.json(
+      {
+        ok: true,
+        data: {
+          deletedCount: result.deletedCount,
+          emails: result.emails,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (error: unknown) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          error instanceof Error ? error.message : "Failed to delete users",
+      },
+      { status: 500 },
     );
   }
 }

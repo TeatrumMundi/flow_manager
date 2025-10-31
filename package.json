@@ -10,6 +10,7 @@
     "format": "biome format --write",
     "db:listUsers": "tsx scripts/listUsers.ts",
     "db:createUser": "tsx scripts/createUser.ts",
+    "db:createTestUsers": "tsx scripts/createTestUsers.ts",
     "db:deleteUser": "tsx scripts/deleteUser.ts",
     "db:readDbURL": "tsx scripts/readDbURL.ts"
   },
