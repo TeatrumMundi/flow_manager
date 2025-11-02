@@ -8,9 +8,9 @@ import {
   FaUser,
   FaUsers,
 } from "react-icons/fa";
+import { Tile } from "@/components/userProfile/Tile";
 import useUserStore from "@/store/userStore";
 import type { menuTile } from "@/types/interfaces";
-import { Tile } from "../Tile";
 
 const menuTiles: menuTile[] = [
   {

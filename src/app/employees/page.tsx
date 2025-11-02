@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
-import { EmployeeView } from "../components/employees/EmployeeView";
+import { EmployeeView } from "@/components/employees/EmployeeView";
 
 const mockEmployeesData = [
   {

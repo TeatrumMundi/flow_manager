@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
-import { UserModal } from "@/app/components/users/UserModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import {
   DataTable,
   type TableAction,
   type TableColumn,
 } from "@/components/common/DataTable";
+import { UserModal } from "@/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { useBulkDeleteUsers } from "@/hooks/users/useBulkDeleteUsers";

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import LogoutButton from "@/app/components/LogoutButton";
+import LogoutButton from "@/components/common/LogoutButton";
 import { useTimeAndDate } from "@/hooks/users/useTimeAndDate";
 import useUserStore from "@/store/userStore";
 

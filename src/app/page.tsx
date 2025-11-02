@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import LoginForm from "@/app/components/LoginForm";
-import LogoutButton from "@/app/components/LogoutButton";
 import { auth } from "@/auth";
+import LoginForm from "@/components/common/LoginForm";
+import LogoutButton from "@/components/common/LogoutButton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

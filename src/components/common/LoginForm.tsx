@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
-import Input from "@/app/components/Input";
+import Input from "@/components/common/Input";
 
 export default function LoginForm() {
   const router = useRouter();

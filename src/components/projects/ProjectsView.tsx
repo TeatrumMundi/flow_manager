@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
-import { Button } from "@/app/components/Button";
+import { Button } from "@/components/common/Button";
 import {
   DataTable,
   type TableAction,

@@ -10,7 +10,7 @@ import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb"
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
-import { Button } from "../Button";
+import { Button } from "../common/Button";
 import { FormInput } from "./FormInput";
 
 interface UserModalProps {
