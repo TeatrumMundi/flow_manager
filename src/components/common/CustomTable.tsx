@@ -38,7 +38,7 @@ export interface DataTableProps<T> {
 const variantClasses = {
   blue: "bg-blue-100 hover:bg-blue-200 text-blue-600 border-blue-200",
   red: "bg-red-100 hover:bg-red-200 text-red-600 border-red-200",
-  yellow: "bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-200",
+  yellow: "bg-yellow-50 hover:bg-yellow-100 text-yellow-600 border-yellow-200",
   green: "bg-green-100 hover:bg-green-200 text-green-600 border-green-200",
 };
 
@@ -73,7 +73,7 @@ export function DataTable<T>({
       <div
         className={`overflow-x-auto bg-white/50 rounded-lg shadow ${className}`}
       >
-        <table className="w-full table-fixed text-left">
+        <table className="w-full min-w-max text-left">
           {/* Column sizing */}
           <colgroup>
             {selectable && <col className="w-12" />}

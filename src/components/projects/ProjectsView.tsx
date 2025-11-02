@@ -1,15 +1,15 @@
 ﻿"use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
-import { Button } from "@/components/common/Button";
+import { Button } from "@/components/common/CustomButton";
+import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import {
   DataTable,
   type TableAction,
   type TableColumn,
-} from "@/components/common/DataTable";
+} from "@/components/common/CustomTable";
 import { ProgressBar } from "./ProgressBar";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 
@@ -72,11 +72,13 @@ export function ProjectsView({
           Dodaj projekt
         </Button>
         <div className="relative flex-grow w-full">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <CustomInput
             type="text"
+            name="searchProjects"
             placeholder="Szukaj po nazwie lub kierowniku..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 bg-white"
+            className="pl-10"
+            hideLabel
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -143,24 +145,18 @@ export function ProjectsView({
               headerClassName: "p-4",
               className: "p-4",
             },
-            {
-              key: "details",
-              header: "Szczegóły",
-              render: (project) => (
-                <Link
-                  href={`/projects/${project.id}`}
-                  className="p-2 inline-flex rounded-md bg-yellow-100 hover:bg-yellow-200 text-yellow-700 transition-colors cursor-pointer border border-yellow-200"
-                >
-                  <FaInfo size={16} />
-                </Link>
-              ),
-              headerClassName: "p-4",
-              className: "p-4",
-            },
           ] as TableColumn<Project>[]
         }
         actions={
           [
+            {
+              icon: <FaInfo size={16} />,
+              label: "Szczegóły",
+              onClick: (project) => {
+                window.location.href = `/projects/${project.id}`;
+              },
+              variant: "yellow",
+            },
             {
               icon: <FaEdit size={16} />,
               label: "Edytuj",

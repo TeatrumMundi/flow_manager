@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
+import { Button } from "@/components/common/CustomButton";
+import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import {
   DataTable,
   type TableAction,
   type TableColumn,
-} from "@/components/common/DataTable";
+} from "@/components/common/CustomTable";
 import { UserModal } from "@/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
@@ -202,38 +204,35 @@ export function UsersInterface({
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex gap-4">
           {/* Add user button */}
-          <button
-            type="button"
-            onClick={handleAddUser}
-            className="flex-1 flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow cursor-pointer whitespace-nowrap"
-          >
-            <FaPlus className="mr-2" /> Dodaj użytkownika
-          </button>
+          <Button variant="primary" onClick={handleAddUser}>
+            <FaPlus /> Dodaj użytkownika
+          </Button>
 
           {/* Refresh button */}
-          <button
-            type="button"
-            title="Odśwież listę użytkowników"
+          <Button
+            variant="success"
             onClick={handleRefreshUsers}
             disabled={isRefreshing}
-            className="flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow cursor-pointer p-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Odśwież listę użytkowników"
           >
             <IoMdRefresh
               size={20}
               className={isRefreshing ? "animate-spin" : ""}
             />{" "}
             Odśwież
-          </button>
+          </Button>
         </div>
 
         <div className="flex gap-4 flex-1">
           {/* Search input */}
           <div className="relative flex-grow">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+            <CustomInput
               type="text"
+              name="searchUsers"
               placeholder="Szukaj po imieniu, nazwisku lub emailu..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+              className="pl-10"
+              hideLabel
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
@@ -259,14 +258,9 @@ export function UsersInterface({
 
         {/* Bulk delete button - shown only when users are selected */}
         {selectedUsers.length > 0 && (
-          <button
-            type="button"
-            onClick={handleBulkDeleteUsers}
-            className="flex items-center justify-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors shadow cursor-pointer"
-          >
-            <FaTrash className="mr-2" /> Usuń zaznaczone ({selectedUsers.length}
-            )
-          </button>
+          <Button variant="danger" onClick={handleBulkDeleteUsers}>
+            <FaTrash /> Usuń zaznaczone ({selectedUsers.length})
+          </Button>
         )}
       </div>
 
