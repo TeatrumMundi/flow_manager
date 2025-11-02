@@ -6,7 +6,8 @@ import { listUserRolesFromDb } from "@/dataBase/query/listUserRolesFromDb";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
-import { UsersTable } from "../components/users/UsersTable";
+import { UsersInterface } from "@/app/components/users/UsersInterface";
+
 
 export default async function UsersPage() {
   // Fetch users from database
@@ -34,7 +35,7 @@ export default async function UsersPage() {
           </h1>
         </div>
 
-        <UsersTable
+        <UsersInterface
           initialUsers={users}
           roleTypes={roleTypes}
           availableEmploymentTypes={employmentTypes}
