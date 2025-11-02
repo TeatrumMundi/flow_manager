@@ -76,9 +76,11 @@ export function UserModal({
         role: user.roleName || defaults.role,
         position: user.position || "",
         employment_type_id: String(employmentTypeId),
-        salary_rate: "",
-        vacation_days_total: "26",
-        supervisor_id: "",
+        salary_rate: user.salaryRate || "",
+        vacation_days_total: user.vacationDaysTotal
+          ? String(user.vacationDaysTotal)
+          : "26",
+        supervisor_id: user.supervisorId ? String(user.supervisorId) : "",
       };
     }
     return defaults;
@@ -106,8 +108,8 @@ export function UserModal({
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
 
-      // Auto-generate email when first_name or last_name changes
-      if (name === "first_name" || name === "last_name") {
+      // Auto-generate email when first_name or last_name changes (only in add mode)
+      if (mode === "add" && (name === "first_name" || name === "last_name")) {
         const firstName = name === "first_name" ? value : prev.first_name;
         const lastName = name === "last_name" ? value : prev.last_name;
         updated.email = generateEmail(firstName, lastName);
@@ -128,11 +130,28 @@ export function UserModal({
       toast.error("Hasła nie są zgodne");
       return;
     }
-    if (mode === "add") {
-      const supervisorId = formData.supervisor_id
-        ? Number(formData.supervisor_id)
-        : null;
 
+    const supervisorId = formData.supervisor_id
+      ? Number(formData.supervisor_id)
+      : null;
+
+    const profileData = {
+      firstName: formData.first_name || null,
+      lastName: formData.last_name || null,
+      position: formData.position || null,
+      employmentTypeId: formData.employment_type_id
+        ? Number(formData.employment_type_id)
+        : null,
+      supervisorId,
+      salaryRate:
+        formData.salary_rate === "" ? null : String(formData.salary_rate),
+      vacationDaysTotal:
+        formData.vacation_days_total === ""
+          ? null
+          : Number(formData.vacation_days_total),
+    };
+
+    if (mode === "add") {
       const createPromise = (async () => {
         const res = await fetch("/api/users", {
           method: "POST",
@@ -141,23 +160,7 @@ export function UserModal({
             email: formData.email,
             password: formData.password,
             roleName: formData.role,
-            profile: {
-              firstName: formData.first_name || null,
-              lastName: formData.last_name || null,
-              position: formData.position || null,
-              employmentTypeId: formData.employment_type_id
-                ? Number(formData.employment_type_id)
-                : null,
-              supervisorId,
-              salaryRate:
-                formData.salary_rate === ""
-                  ? null
-                  : String(formData.salary_rate),
-              vacationDaysTotal:
-                formData.vacation_days_total === ""
-                  ? null
-                  : Number(formData.vacation_days_total),
-            },
+            profile: profileData,
           }),
         });
         const data = await res.json();
@@ -188,8 +191,48 @@ export function UserModal({
       return;
     }
 
-    // Edit mode not wired yet to API
-    onClose(false);
+    // Edit mode
+    if (mode === "edit" && user) {
+      const updatePromise = (async () => {
+        const res = await fetch(`/api/users/${user.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password || undefined,
+            roleName: formData.role,
+            profile: profileData,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.ok) {
+          throw new Error(
+            data?.error || "Nie udało się zaktualizować użytkownika",
+          );
+        }
+        return data;
+      })();
+
+      await toast.promise(updatePromise, {
+        loading: `Aktualizowanie użytkownika: ${formData.first_name} ${formData.last_name} <${formData.email}>...`,
+        success: (resp: {
+          data?: {
+            user?: { id?: number; email?: string };
+            profile?: { firstName?: string; lastName?: string };
+          };
+        }) => {
+          const userResponse = resp?.data?.user;
+          const profileData = resp?.data?.profile;
+          return `Zaktualizowano użytkownika [ID ${userResponse?.id}] ${profileData?.firstName} ${profileData?.lastName} <${userResponse?.email}>`;
+        },
+        error: (error: Error) =>
+          error?.message || "Błąd podczas aktualizacji użytkownika",
+      });
+
+      onClose(true);
+      router.refresh();
+      return;
+    }
   };
 
   // Render modal using portal to ensure proper z-index stacking
@@ -241,15 +284,26 @@ export function UserModal({
             />
           </div>
 
-          {/* Email field - auto-generated, read-only */}
-          <div>
-            <div className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+          {/* Email field - auto-generated in add mode, editable in edit mode */}
+          {mode === "add" ? (
+            <div>
+              <div className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </div>
+              <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-700">
+                {formData.email || "@flow.com"}
+              </div>
             </div>
-            <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-700">
-              {formData.email || "@flow.com"}
-            </div>
-          </div>
+          ) : (
+            <FormInput
+              label="Email *"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          )}
 
           {/* Passwords row: password + confirm password */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -24,6 +24,9 @@ export interface UserListItem {
   roleName: string | null;
   employmentType: string | null;
   position: string | null;
+  salaryRate: string | null;
+  vacationDaysTotal: number | null;
+  supervisorId: number | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -93,6 +96,9 @@ export async function listUsersFromDb(
       roleName: userRoles.name,
       employmentType: employmentTypes.name,
       position: userProfiles.position,
+      salaryRate: userProfiles.salaryRate,
+      vacationDaysTotal: userProfiles.vacationDaysTotal,
+      supervisorId: userProfiles.supervisorId,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
     })

@@ -31,7 +31,7 @@ export function CustomSelect({
   required,
   className,
   hideLabel = false,
-  placeholder = "Select an option",
+  placeholder = "Wybierz...",
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,7 +50,9 @@ export function CustomSelect({
   );
 
   // Get selected option
-  const selectedOption = normalizedOptions.find((opt) => opt.value === value);
+  const selectedOption = normalizedOptions.find(
+    (opt) => String(opt.value) === String(value),
+  );
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -162,9 +164,9 @@ export function CustomSelect({
         }
       >
         <span
-          className={`overflow-hidden text-ellipsis whitespace-nowrap min-w-0 ${selectedOption ? "" : "text-gray-400"}`}
+          className={`overflow-hidden text-ellipsis whitespace-nowrap min-w-0 ${selectedOption && value !== "" ? "" : "text-gray-400"}`}
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption && value !== "" ? selectedOption.label : placeholder}
         </span>
         <svg
           className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -196,7 +198,7 @@ export function CustomSelect({
                     type="button"
                     onClick={() => handleSelectOption(option.value)}
                     className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors ${
-                      option.value === value
+                      String(option.value) === String(value)
                         ? "bg-blue-100 text-blue-800 font-medium"
                         : "text-gray-800"
                     } ${index === highlightedIndex ? "bg-blue-50" : ""}`}
