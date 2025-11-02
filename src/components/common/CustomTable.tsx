@@ -73,15 +73,15 @@ export function DataTable<T>({
       <div
         className={`overflow-x-auto bg-white/50 rounded-lg shadow ${className}`}
       >
-        <table className="w-full min-w-max text-left">
+        <table className="w-full text-left" style={{ minWidth: "max-content" }}>
           {/* Column sizing */}
           <colgroup>
-            {selectable && <col className="w-12" />}
+            {selectable && <col style={{ width: "48px" }} />}
             {columns.map((col) => (
               <col key={col.key} className={col.width || ""} />
             ))}
             {actions && actions.length > 0 && (
-              <col className={`w-${actions.length * 12 + 8}`} />
+              <col style={{ width: `${actions.length * 48 + 32}px` }} />
             )}
           </colgroup>
 
