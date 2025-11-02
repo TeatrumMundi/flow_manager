@@ -3,8 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
-import { UserModal } from "@/app/components/users/UserModal";
+import { Button } from "@/components/common/CustomButton";
+import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
+import {
+  DataTable,
+  type TableAction,
+  type TableColumn,
+} from "@/components/common/CustomTable";
+import { UserModal } from "@/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { useBulkDeleteUsers } from "@/hooks/users/useBulkDeleteUsers";
@@ -20,7 +27,7 @@ interface UsersTableProps {
   supervisors: SupervisorListItem[];
 }
 
-export function UsersTable({
+export function UsersInterface({
   initialUsers,
   roleTypes: availableRoles,
   availableEmploymentTypes,
@@ -107,11 +114,12 @@ export function UsersTable({
   }, [searchTerm, selectedRole, selectedEmploymentType, users]);
 
   // Toggle individual user selection
-  const handleSelectUser = (id: number) => {
+  const handleSelectUser = (id: string | number) => {
+    const numId = typeof id === "string" ? Number(id) : id;
     setSelectedUsers((prev) =>
-      prev.includes(id)
-        ? prev.filter((userId) => userId !== id)
-        : [...prev, id],
+      prev.includes(numId)
+        ? prev.filter((userId) => userId !== numId)
+        : [...prev, numId],
     );
   };
 
@@ -196,38 +204,35 @@ export function UsersTable({
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex gap-4">
           {/* Add user button */}
-          <button
-            type="button"
-            onClick={handleAddUser}
-            className="flex-1 flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow cursor-pointer whitespace-nowrap"
-          >
-            <FaPlus className="mr-2" /> Dodaj użytkownika
-          </button>
+          <Button variant="primary" onClick={handleAddUser}>
+            <FaPlus /> Dodaj użytkownika
+          </Button>
 
           {/* Refresh button */}
-          <button
-            type="button"
-            title="Odśwież listę użytkowników"
+          <Button
+            variant="success"
             onClick={handleRefreshUsers}
             disabled={isRefreshing}
-            className="flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow cursor-pointer p-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Odśwież listę użytkowników"
           >
             <IoMdRefresh
               size={20}
               className={isRefreshing ? "animate-spin" : ""}
             />{" "}
             Odśwież
-          </button>
+          </Button>
         </div>
 
         <div className="flex gap-4 flex-1">
           {/* Search input */}
           <div className="relative flex-grow">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+            <CustomInput
               type="text"
+              name="searchUsers"
               placeholder="Szukaj po imieniu, nazwisku lub emailu..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+              className="pl-10"
+              hideLabel
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
@@ -253,119 +258,70 @@ export function UsersTable({
 
         {/* Bulk delete button - shown only when users are selected */}
         {selectedUsers.length > 0 && (
-          <button
-            type="button"
-            onClick={handleBulkDeleteUsers}
-            className="flex items-center justify-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors shadow cursor-pointer"
-          >
-            <FaTrash className="mr-2" /> Usuń zaznaczone ({selectedUsers.length}
-            )
-          </button>
+          <Button variant="danger" onClick={handleBulkDeleteUsers}>
+            <FaTrash /> Usuń zaznaczone ({selectedUsers.length})
+          </Button>
         )}
       </div>
 
       {/* Users table */}
-      <div className="overflow-x-auto bg-white/50 rounded-lg shadow">
-        <table className="w-full table-fixed text-left">
-          <colgroup>
-            <col className="w-12" />
-            <col className="w-40" />
-            <col className="w-32" />
-            <col className="w-64" />
-            <col className="w-40" />
-            <col className="w-25" />
-          </colgroup>
-          <thead className="bg-blue-600/50">
-            <tr className="h-10">
-              {/* Select all checkbox */}
-              <th className="p-4 border-r border-blue-600/20">
-                <div className="flex items-center justify-center h-full">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 cursor-pointer"
-                    checked={
-                      selectedUsers.length === filteredUsers.length &&
-                      filteredUsers.length > 0
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </div>
-              </th>
-              <th className="p-2 pl-6 font-semibold text-gray-600">Imię</th>
-              <th className="p-2 font-semibold text-gray-600">Nazwisko</th>
-              <th className="p-2 font-semibold text-gray-600">Email</th>
-              <th className="p-2 font-semibold text-gray-600">Rola</th>
-
-              <th className="p-2 font-semibold text-gray-600 text-center border-l border-blue-600/20">
-                Akcje
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user) => {
-              return (
-                <tr
-                  key={user.id}
-                  className="border-t border-gray-200 hover:bg-gray-50/50"
-                >
-                  {/* Individual row checkbox */}
-                  <td className="p-4 border-r border-blue-600/20">
-                    <div className="flex items-center justify-center h-full">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 cursor-pointer"
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                      />
-                    </div>
-                  </td>
-                  <td className="p-2 pl-6 text-gray-800 truncate">
-                    {user.firstName}
-                  </td>
-                  <td className="p-2 text-gray-800 truncate">
-                    {user.lastName}
-                  </td>
-                  <td className="p-2 text-gray-700 truncate">{user.email}</td>
-                  <td className="p-2">
-                    <span className="block truncate px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
-                      {user.roleName || "Brak roli"}
-                    </span>
-                  </td>
-
-                  {/* Action buttons */}
-                  <td className="p-2 border-l border-blue-600/20">
-                    <div className="flex justify-center gap-2">
-                      {/* Edit button */}
-                      <button
-                        type="button"
-                        onClick={() => handleEditUser(user)}
-                        className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors cursor-pointer border border-blue-200"
-                      >
-                        <FaEdit size={16} />
-                      </button>
-                      {/* Delete button */}
-                      <button
-                        type="button"
-                        className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-600 transition-colors cursor-pointer border border-red-200"
-                        onClick={() => handleDeleteUser(user)}
-                      >
-                        <FaTrash size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Empty state message */}
-      {filteredUsers.length === 0 && (
-        <p className="text-center text-gray-500 mt-8">
-          Nie znaleziono użytkowników pasujących do kryteriów.
-        </p>
-      )}
+      <DataTable
+        data={filteredUsers}
+        keyExtractor={(user) => user.id}
+        selectable
+        selectedItems={selectedUsers}
+        onSelectItem={handleSelectUser}
+        onSelectAll={handleSelectAll}
+        emptyMessage="Nie znaleziono użytkowników pasujących do kryteriów."
+        columns={
+          [
+            {
+              key: "firstName",
+              header: "Imię",
+              width: "w-25",
+              className: "text-gray-800 truncate",
+            },
+            {
+              key: "lastName",
+              header: "Nazwisko",
+              width: "w-40",
+              className: "text-gray-800 truncate",
+            },
+            {
+              key: "email",
+              header: "Email",
+              width: "w-40",
+              className: "text-gray-700 truncate",
+            },
+            {
+              key: "roleName",
+              header: "Rola",
+              width: "w-25",
+              render: (user) => (
+                <span className="block truncate px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
+                  {user.roleName || "Brak roli"}
+                </span>
+              ),
+            },
+          ] as TableColumn<UserListItem>[]
+        }
+        actions={
+          [
+            {
+              icon: <FaEdit size={16} />,
+              label: "Edytuj",
+              onClick: handleEditUser,
+              variant: "blue",
+            },
+            {
+              icon: <FaTrash size={16} />,
+              label: "Usuń",
+              onClick: handleDeleteUser,
+              variant: "red",
+            },
+          ] as TableAction<UserListItem>[]
+        }
+      />
     </>
   );
 }

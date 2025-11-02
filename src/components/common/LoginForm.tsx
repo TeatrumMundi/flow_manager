@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
-import Input from "@/app/components/Input";
+import { CustomInput } from "@/components/common/CustomInput";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -39,10 +39,15 @@ export default function LoginForm() {
     <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
       <form className="space-y-5" action={credentialsAction}>
         {/* Email Input */}
-        <Input id="email" type="email" label="Email" name="email" />
+        <CustomInput id="email" type="email" label="Email" name="email" />
 
         {/* Password Input */}
-        <Input id="password" type="password" label="Password" name="password" />
+        <CustomInput
+          id="password"
+          type="password"
+          label="Password"
+          name="password"
+        />
 
         {/* Submit Button */}
         <button

@@ -10,8 +10,8 @@ import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb"
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
-import { Button } from "../Button";
-import { FormInput } from "./FormInput";
+import { Button } from "../common/CustomButton";
+import { FormInput } from "../common/CustomInput";
 
 interface UserModalProps {
   mode: "add" | "edit";

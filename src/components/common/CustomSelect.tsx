@@ -156,11 +156,11 @@ export function CustomSelect({
         className={
           className
             ? isOpen
-              ? `${className.replace("rounded-lg", "rounded-t-lg rounded-b-none")} flex items-center justify-between gap-2`
-              : `${className} flex items-center justify-between gap-2`
+              ? `${className.replace("rounded-lg", "rounded-t-lg rounded-b-none")} flex items-center justify-between gap-2 cursor-pointer`
+              : `${className} flex items-center justify-between gap-2 cursor-pointer`
             : isOpen
-              ? "w-full px-3 py-2 border border-gray-300 rounded-t-lg rounded-b-none focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2"
-              : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2"
+              ? "w-full px-3 py-2 border border-gray-300 rounded-t-lg rounded-b-none focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2 cursor-pointer"
+              : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2 cursor-pointer"
         }
       >
         <span
@@ -197,7 +197,7 @@ export function CustomSelect({
                   <button
                     type="button"
                     onClick={() => handleSelectOption(option.value)}
-                    className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors ${
+                    className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors cursor-pointer ${
                       String(option.value) === String(value)
                         ? "bg-blue-100 text-blue-800 font-medium"
                         : "text-gray-800"

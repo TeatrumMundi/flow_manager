@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
+import { UsersInterface } from "@/components/users/UsersInterface";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
 import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
 import { listUserRolesFromDb } from "@/dataBase/query/listUserRolesFromDb";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
-import { UsersTable } from "../components/users/UsersTable";
 
 export default async function UsersPage() {
   // Fetch users from database
@@ -34,7 +34,7 @@ export default async function UsersPage() {
           </h1>
         </div>
 
-        <UsersTable
+        <UsersInterface
           initialUsers={users}
           roleTypes={roleTypes}
           availableEmploymentTypes={employmentTypes}

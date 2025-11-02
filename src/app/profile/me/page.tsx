@@ -1,5 +1,5 @@
-import { UserProfile } from "@/app/components/userProfile/UserProfile";
 import { auth } from "@/auth";
+import { UserProfile } from "@/components/userProfile/UserProfile";
 import getFullUserProfileFromDbByEmail from "@/dataBase/query/getFullUserProfileFromDbByEmail";
 
 export default async function UserDashboard() {

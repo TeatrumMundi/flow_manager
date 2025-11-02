@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
-import { Button } from "../Button";
+import { Button } from "@/components/common/CustomButton";
 
 interface Employee {
   id: number;
