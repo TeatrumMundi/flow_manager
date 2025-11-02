@@ -284,25 +284,25 @@ export function UsersInterface({
             {
               key: "firstName",
               header: "Imię",
-              width: "w-40",
+              width: "w-25",
               className: "text-gray-800 truncate",
             },
             {
               key: "lastName",
               header: "Nazwisko",
-              width: "w-32",
+              width: "w-40",
               className: "text-gray-800 truncate",
             },
             {
               key: "email",
               header: "Email",
-              width: "w-64",
+              width: "w-40",
               className: "text-gray-700 truncate",
             },
             {
               key: "roleName",
               header: "Rola",
-              width: "w-40",
+              width: "w-25",
               render: (user) => (
                 <span className="block truncate px-2 py-1 text-sm font-medium text-blue-800 rounded-full">
                   {user.roleName || "Brak roli"}

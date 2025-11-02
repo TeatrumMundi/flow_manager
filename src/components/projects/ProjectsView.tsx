@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/Button";
+import { CustomSelect } from "@/components/common/CustomSelect";
 import {
   DataTable,
   type TableAction,
@@ -65,9 +66,10 @@ export function ProjectsView({
         <Button
           variant="primary"
           onClick={() => alert("Dodawanie projektu (do implementacji)")}
-          className="whitespace-nowrap w-full md:w-auto"
+          className="w-full md:w-auto"
         >
-          <FaPlus className="mr-2" /> Dodaj projekt
+          <FaPlus />
+          Dodaj projekt
         </Button>
         <div className="relative flex-grow w-full">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -79,18 +81,21 @@ export function ProjectsView({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 bg-white w-full md:w-auto"
+        <CustomSelect
+          name="statusFilter"
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
-        >
-          <option value="Wszystkie">Wszystkie statusy</option>
-          {availableStatuses.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
+          hideLabel
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white w-full md:w-auto"
+          placeholder="Wszystkie statusy"
+          options={[
+            { label: "Wszystkie statusy", value: "Wszystkie" },
+            ...availableStatuses.map((status) => ({
+              label: status,
+              value: status,
+            })),
+          ]}
+        />
       </div>
 
       <DataTable
