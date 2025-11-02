@@ -16,8 +16,8 @@ export function useDeleteUser() {
     })();
 
     await toast.promise(deletePromise as Promise<unknown>, {
-      loading: `Usuwanie ID: ${user.id}; ${user.firstName} ${user.lastName} <${user.email}>...`,
-      success: `Usunięto ID ${user.id}; ${user.firstName} ${user.lastName} <${user.email}>`,
+      loading: `Usuwanie ${user.email}...`,
+      success: `Usunięto ${user.email}`,
       error: (deleteError: unknown) =>
         deleteError instanceof Error
           ? `Błąd·podczas·usuwania·użytkownika${deleteError.message}`

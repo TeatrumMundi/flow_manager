@@ -5,13 +5,13 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
+import { CustomSelect } from "@/components/common/CustomSelect";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 import { Button } from "../Button";
 import { FormInput } from "./FormInput";
-import { FormSelect } from "./FormSelect";
 
 interface UserModalProps {
   mode: "add" | "edit";
@@ -275,7 +275,7 @@ export function UserModal({
 
           {/* Role and employment type fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormSelect
+            <CustomSelect
               label="Rola *"
               name="role"
               value={formData.role}
@@ -283,7 +283,7 @@ export function UserModal({
               options={availableRoles.map((r) => r.name)}
               required
             />
-            <FormSelect
+            <CustomSelect
               label="Typ zatrudnienia *"
               name="employment_type_id"
               value={formData.employment_type_id}
@@ -297,7 +297,7 @@ export function UserModal({
           </div>
 
           {/* Supervisor field */}
-          <FormSelect
+          <CustomSelect
             label="Przełożony"
             name="supervisor_id"
             value={formData.supervisor_id}

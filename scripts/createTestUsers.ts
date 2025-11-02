@@ -20,8 +20,13 @@ async function main() {
   try {
     console.log("Starting creation of 10 test users...\n");
 
-    // Default password for all test users
-    const defaultPassword = "Test123!";
+    // Default password for all test users from environment variable
+    const defaultPassword = process.env.TEST_USER_PASSWORD;
+    if (!defaultPassword) {
+      throw new Error(
+        "TEST_USER_PASSWORD environment variable is not set in .env.local",
+      );
+    }
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(defaultPassword, saltRounds);
 

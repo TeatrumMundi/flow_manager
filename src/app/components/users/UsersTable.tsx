@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdRefresh } from "react-icons/io";
 import { UserModal } from "@/app/components/users/UserModal";
+import { CustomSelect } from "@/components/common/CustomSelect";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { useBulkDeleteUsers } from "@/hooks/users/useBulkDeleteUsers";
@@ -219,31 +220,36 @@ export function UsersTable({
           </button>
         </div>
 
-        {/* Search input */}
-        <div className="relative flex-grow">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Szukaj po imieniu, nazwisku lub emailu..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+        <div className="flex gap-4 flex-1">
+          {/* Search input */}
+          <div className="relative flex-grow">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Szukaj po imieniu, nazwisku lub emailu..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+          </div>
+
+          {/* Role filter dropdown */}
+          <CustomSelect
+            name="roleFilter"
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            hideLabel
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-50"
+            placeholder="Wszystkie role"
+            options={[
+              { label: "Wszystkie role", value: "Wszystkie" },
+              ...availableRoles.map((role) => ({
+                label: role.name,
+                value: role.name,
+              })),
+            ]}
           />
         </div>
-
-        {/* Role filter dropdown */}
-        <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-          value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
-        >
-          <option value="Wszystkie">Wszystkie role</option>
-          {availableRoles.map((role) => (
-            <option key={role.name} value={role.name}>
-              {role.name}
-            </option>
-          ))}
-        </select>
 
         {/* Bulk delete button - shown only when users are selected */}
         {selectedUsers.length > 0 && (
