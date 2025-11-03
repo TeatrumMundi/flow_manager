@@ -81,7 +81,7 @@ export function DataTable<T>({
               <col key={col.key} className={col.width || ""} />
             ))}
             {actions && actions.length > 0 && (
-              <col style={{ width: `${actions.length * 48 + 32}px` }} />
+              <col style={{ width: `${actions.length * 12 + 8}px` }} />
             )}
           </colgroup>
 

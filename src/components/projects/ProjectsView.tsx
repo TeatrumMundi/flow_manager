@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
@@ -31,17 +32,23 @@ export function ProjectsView({
   initialProjects,
   availableStatuses,
 }: ProjectsViewProps) {
+  const router = useRouter();
+
+  // Filter state management
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
   const [filteredProjects, setFilteredProjects] = useState(initialProjects);
 
+  // Apply filters whenever search term, status, or projects change
   useEffect(() => {
     let projects = initialProjects;
 
+    // Filter by selected status
     if (selectedStatus !== "Wszystkie") {
       projects = projects.filter((p) => p.status === selectedStatus);
     }
 
+    // Filter by search term (name or manager)
     if (searchTerm) {
       projects = projects.filter(
         (p) =>
@@ -62,15 +69,19 @@ export function ProjectsView({
 
   return (
     <>
+      {/* Toolbar with filters and actions */}
       <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
+        {/* Add project button */}
         <Button
           variant="primary"
           onClick={() => alert("Dodawanie projektu (do implementacji)")}
           className="w-full md:w-auto"
         >
           <FaPlus />
-          Dodaj projekt
+          <span>Dodaj projekt</span>
         </Button>
+
+        {/* Search input */}
         <div className="relative flex-grow w-full">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
           <CustomInput
@@ -83,12 +94,14 @@ export function ProjectsView({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+
+        {/* Status filter dropdown */}
         <CustomSelect
           name="statusFilter"
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
           hideLabel
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white w-full md:w-auto"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-50"
           placeholder="Wszystkie statusy"
           options={[
             { label: "Wszystkie statusy", value: "Wszystkie" },
@@ -100,6 +113,7 @@ export function ProjectsView({
         />
       </div>
 
+      {/* Projects table */}
       <DataTable
         data={filteredProjects}
         keyExtractor={(project) => project.id}
@@ -109,12 +123,14 @@ export function ProjectsView({
             {
               key: "name",
               header: "Nazwa",
-              className: "p-4 text-gray-800 font-medium",
+              width: "w-64",
+              className: "p-4 text-gray-800 font-medium truncate",
               headerClassName: "p-4",
             },
             {
               key: "status",
               header: "Status",
+              width: "w-32",
               render: (project) => (
                 <ProjectStatusBadge status={project.status} />
               ),
@@ -124,12 +140,14 @@ export function ProjectsView({
             {
               key: "manager",
               header: "Kierownik",
-              className: "p-4 text-gray-700",
+              width: "w-48",
+              className: "p-4 text-gray-700 truncate",
               headerClassName: "p-4",
             },
             {
               key: "progress",
               header: "Postęp",
+              width: "w-48",
               render: (project) => <ProgressBar progress={project.progress} />,
               headerClassName: "p-4",
               className: "p-4",
@@ -137,6 +155,7 @@ export function ProjectsView({
             {
               key: "budget",
               header: "Budżet",
+              width: "w-32",
               render: (project) => (
                 <span className="text-gray-700">
                   {formatCurrency(project.budget)}
@@ -153,7 +172,7 @@ export function ProjectsView({
               icon: <FaInfo size={16} />,
               label: "Szczegóły",
               onClick: (project) => {
-                window.location.href = `/projects/${project.id}`;
+                router.push(`/projects/${project.id}`);
               },
               variant: "yellow",
             },
