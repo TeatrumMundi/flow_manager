@@ -3,6 +3,11 @@
 import { useMemo, useState } from "react";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
+import { CustomInput } from "@/components/common/CustomInput";
+import { EmployeeEditModal } from "@/components/employees/EmployeeEditModal";
+import type { EmployeeListItem } from "@/dataBase/query/listEmployeesFromDb";
+import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
+import type { EmploymentType } from "@/types/EmploymentType";
 
 interface Employee {
   id: number;
@@ -17,13 +22,22 @@ interface Employee {
 
 interface EmployeeViewProps {
   initialEmployees: Employee[];
+  employeesData: EmployeeListItem[];
+  availableEmploymentTypes: EmploymentType[];
+  supervisors: SupervisorListItem[];
 }
 
-export function EmployeeView({ initialEmployees }: EmployeeViewProps) {
+export function EmployeeView({
+  initialEmployees,
+  employeesData,
+  availableEmploymentTypes,
+  supervisors,
+}: EmployeeViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
     initialEmployees[0] || null,
   );
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) {
@@ -49,11 +63,13 @@ export function EmployeeView({ initialEmployees }: EmployeeViewProps) {
         </h2>
 
         <div className="relative mb-4">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <CustomInput
             type="text"
+            name="searchEmployee"
             placeholder="Szukaj pracownika..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 bg-white"
+            className="pl-10"
+            hideLabel
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -88,13 +104,31 @@ export function EmployeeView({ initialEmployees }: EmployeeViewProps) {
           <Button
             variant="primary"
             className="w-full"
-            onClick={() => alert("Edycja danych (do implementacji)")}
+            onClick={() => setIsEditModalOpen(true)}
             disabled={!selectedEmployee}
           >
             Edytuj dane
           </Button>
         </div>
       </div>
+
+      {/* Edit modal */}
+      {isEditModalOpen && selectedEmployee && (
+        <EmployeeEditModal
+          employee={
+            employeesData.find((e) => e.id === selectedEmployee.id) ||
+            employeesData[0]
+          }
+          onClose={(shouldRefresh) => {
+            setIsEditModalOpen(false);
+            if (shouldRefresh) {
+              window.location.reload();
+            }
+          }}
+          availableEmploymentTypes={availableEmploymentTypes}
+          supervisors={supervisors}
+        />
+      )}
 
       <div className="md:col-span-2 bg-white/20 p-6 rounded-lg shadow-inner">
         {selectedEmployee ? (

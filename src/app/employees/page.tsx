@@ -2,10 +2,17 @@ import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 import { EmployeeView } from "@/components/employees/EmployeeView";
 import { listEmployeesFromDb } from "@/dataBase/query/listEmployeesFromDb";
+import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
+import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
+import type { EmploymentType } from "@/types/EmploymentType";
 
 export default async function EmployeesPage() {
   // Fetch employees from database with supervisor information
   const employeesData = await listEmployeesFromDb();
+  // Fetch supervisors (roleId 1 or 2)
+  const supervisors = await listSupervisorsFromDb();
+  // Fetch employment types
+  const employmentTypes: EmploymentType[] = await listEmploymentTypesFromDb();
 
   // Transform employees to display format
   const employees = employeesData.map((employee) => ({
@@ -14,9 +21,10 @@ export default async function EmployeesPage() {
       `${employee.firstName || ""} ${employee.lastName || ""}`.trim() ||
       employee.email,
     position: employee.position || employee.roleName || "Brak stanowiska",
-    supervisor: employee.supervisorFirstName && employee.supervisorLastName
-      ? `${employee.supervisorFirstName} ${employee.supervisorLastName}`
-      : "Brak przełożonego",
+    supervisor:
+      employee.supervisorFirstName && employee.supervisorLastName
+        ? `${employee.supervisorFirstName} ${employee.supervisorLastName}`
+        : "Brak przełożonego",
     salaryRate: employee.salaryRate
       ? `${employee.salaryRate} zł`
       : "Nie określono",
@@ -39,7 +47,12 @@ export default async function EmployeesPage() {
           <h1 className="text-3xl font-bold text-gray-800">Pracownicy</h1>
         </div>
 
-        <EmployeeView initialEmployees={employees} />
+        <EmployeeView
+          initialEmployees={employees}
+          employeesData={employeesData}
+          availableEmploymentTypes={employmentTypes}
+          supervisors={supervisors}
+        />
       </main>
     </div>
   );

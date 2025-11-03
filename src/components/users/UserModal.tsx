@@ -2,16 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import toast from "react-hot-toast";
+import { Button } from "@/components/common/CustomButton";
+import { FormInput } from "@/components/common/CustomInput";
+import { CustomModal } from "@/components/common/CustomModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
-import { Button } from "../common/CustomButton";
-import { FormInput } from "../common/CustomInput";
 
 interface UserModalProps {
   mode: "add" | "edit";
@@ -31,15 +31,6 @@ export function UserModal({
   supervisors,
 }: UserModalProps) {
   const router = useRouter();
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, []);
 
   // Initialize form data with defaults or user data in edit mode
   const [formData, setFormData] = useState(() => {
@@ -235,180 +226,155 @@ export function UserModal({
     }
   };
 
-  // Render modal using portal to ensure proper z-index stacking
-  return createPortal(
-    // Modal backdrop overlay
-    <div
-      role="dialog"
-      aria-modal="true"
-      tabIndex={-1}
-      className="fixed inset-0 z-50 grid place-items-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={() => onClose(false)}
-      onKeyUp={(event) => {
-        // Only close if Escape is pressed and the backdrop itself has focus
-        if (event.key === "Escape" && event.target === event.currentTarget) {
-          onClose(false);
-        }
-      }}
+  return (
+    <CustomModal
+      isOpen={true}
+      onClose={() => onClose(false)}
+      title={mode === "add" ? "Dodaj nowego użytkownika" : "Edytuj użytkownika"}
+      size="md"
     >
-      {/* Modal content container */}
-      <div
-        role="document"
-        className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-8 m-4 max-h-[90vh] overflow-y-auto border-2 border-blue-600"
-        onClick={(event) => event.stopPropagation()}
-        onKeyDown={(event) => {
-          event.stopPropagation();
-        }}
-      >
-        {/* Modal title */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {mode === "add" ? "Dodaj nowego użytkownika" : "Edytuj użytkownika"}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              label="Imię *"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
-              required
-            />
-            <FormInput
-              label="Nazwisko *"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Email field - auto-generated in add mode, editable in edit mode */}
-          {mode === "add" ? (
-            <div>
-              <div className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </div>
-              <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-700">
-                {formData.email || "@flow.com"}
-              </div>
-            </div>
-          ) : (
-            <FormInput
-              label="Email *"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          )}
-
-          {/* Passwords row: password + confirm password */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              label={mode === "add" ? "Hasło *" : "Nowe hasło"}
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required={mode === "add"}
-            />
-            <FormInput
-              label={
-                mode === "add" ? "Potwierdź hasło *" : "Potwierdź nowe hasło"
-              }
-              name="confirm_password"
-              type="password"
-              value={formData.confirm_password}
-              onChange={handleChange}
-              required={mode === "add"}
-            />
-          </div>
-
-          {/* Role and employment type fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <CustomSelect
-              label="Rola *"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              options={availableRoles.map((r) => r.name)}
-              required
-            />
-            <CustomSelect
-              label="Typ zatrudnienia *"
-              name="employment_type_id"
-              value={formData.employment_type_id}
-              onChange={handleChange}
-              options={availableEmploymentTypes.map((et) => ({
-                label: `${et.name} (${et.abbreviation})`,
-                value: et.id,
-              }))}
-              required
-            />
-          </div>
-
-          {/* Supervisor field */}
-          <CustomSelect
-            label="Przełożony"
-            name="supervisor_id"
-            value={formData.supervisor_id}
-            onChange={handleChange}
-            options={[
-              { label: "Brak", value: "" },
-              ...supervisors.map((s) => ({
-                label: `${[s.firstName, s.lastName].filter(Boolean).join(" ") || s.email} (${s.email})`,
-                value: s.id,
-              })),
-            ]}
-          />
-
-          {/* Position field */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Name fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
-            label="Stanowisko *"
-            name="position"
-            value={formData.position}
+            label="Imię *"
+            name="first_name"
+            value={formData.first_name}
             onChange={handleChange}
             required
           />
+          <FormInput
+            label="Nazwisko *"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-          {/* Salary and vacation fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              label="Stawka"
-              name="salary_rate"
-              type="number"
-              value={formData.salary_rate}
-              onChange={handleChange}
-            />
-            <FormInput
-              label="Dni urlopu *"
-              name="vacation_days_total"
-              type="number"
-              value={formData.vacation_days_total}
-              onChange={handleChange}
-              required
-            />
+        {/* Email field - auto-generated in add mode, editable in edit mode */}
+        {mode === "add" ? (
+          <div>
+            <div className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </div>
+            <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-700">
+              {formData.email || "@flow.com"}
+            </div>
           </div>
+        ) : (
+          <FormInput
+            label="Email *"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        )}
 
-          {/* Action buttons */}
-          <div className="flex justify-end gap-4 pt-6">
-            <Button
-              type="button"
-              onClick={() => onClose(false)}
-              variant="secondary"
-            >
-              Anuluj
-            </Button>
-            <Button type="submit" variant="primary">
-              {mode === "add" ? "Dodaj użytkownika" : "Zapisz zmiany"}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>,
-    document.body,
+        {/* Passwords row: password + confirm password */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label={mode === "add" ? "Hasło *" : "Nowe hasło"}
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required={mode === "add"}
+          />
+          <FormInput
+            label={
+              mode === "add" ? "Potwierdź hasło *" : "Potwierdź nowe hasło"
+            }
+            name="confirm_password"
+            type="password"
+            value={formData.confirm_password}
+            onChange={handleChange}
+            required={mode === "add"}
+          />
+        </div>
+
+        {/* Role and employment type fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomSelect
+            label="Rola *"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            options={availableRoles.map((r) => r.name)}
+            required
+          />
+          <CustomSelect
+            label="Typ zatrudnienia *"
+            name="employment_type_id"
+            value={formData.employment_type_id}
+            onChange={handleChange}
+            options={availableEmploymentTypes.map((et) => ({
+              label: `${et.name} (${et.abbreviation})`,
+              value: et.id,
+            }))}
+            required
+          />
+        </div>
+
+        {/* Supervisor field */}
+        <CustomSelect
+          label="Przełożony"
+          name="supervisor_id"
+          value={formData.supervisor_id}
+          onChange={handleChange}
+          options={[
+            { label: "Brak", value: "" },
+            ...supervisors.map((s) => ({
+              label: `${[s.firstName, s.lastName].filter(Boolean).join(" ") || s.email} (${s.email})`,
+              value: s.id,
+            })),
+          ]}
+        />
+
+        {/* Position field */}
+        <FormInput
+          label="Stanowisko *"
+          name="position"
+          value={formData.position}
+          onChange={handleChange}
+          required
+        />
+
+        {/* Salary and vacation fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label="Stawka"
+            name="salary_rate"
+            type="number"
+            value={formData.salary_rate}
+            onChange={handleChange}
+          />
+          <FormInput
+            label="Dni urlopu *"
+            name="vacation_days_total"
+            type="number"
+            value={formData.vacation_days_total}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex justify-end gap-4 pt-6">
+          <Button
+            type="button"
+            onClick={() => onClose(false)}
+            variant="secondary"
+          >
+            Anuluj
+          </Button>
+          <Button type="submit" variant="primary">
+            {mode === "add" ? "Dodaj użytkownika" : "Zapisz zmiany"}
+          </Button>
+        </div>
+      </form>
+    </CustomModal>
   );
 }

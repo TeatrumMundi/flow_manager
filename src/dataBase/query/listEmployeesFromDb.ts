@@ -1,5 +1,5 @@
+import { eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { eq, sql } from "drizzle-orm";
 import {
   employmentTypes,
   userProfiles,
