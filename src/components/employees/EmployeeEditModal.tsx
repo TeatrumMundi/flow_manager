@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -25,8 +24,6 @@ export function EmployeeEditModal({
   availableEmploymentTypes,
   supervisors,
 }: EmployeeEditModalProps) {
-  const router = useRouter();
-
   // Find employment type ID by name
   const employmentTypeId =
     availableEmploymentTypes.find((et) => et.name === employee.employmentType)
@@ -106,7 +103,6 @@ export function EmployeeEditModal({
     });
 
     onClose(true);
-    router.refresh();
   };
 
   return (

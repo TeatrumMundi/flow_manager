@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
@@ -33,20 +34,40 @@ export function EmployeeView({
   availableEmploymentTypes,
   supervisors,
 }: EmployeeViewProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [employeesRawData, setEmployeesRawData] =
+    useState<EmployeeListItem[]>(employeesData);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
     initialEmployees[0] || null,
   );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Update local state when props change (after router.refresh())
+  useEffect(() => {
+    setEmployees(initialEmployees);
+    setEmployeesRawData(employeesData);
+
+    // Update selected employee with fresh data
+    if (selectedEmployee) {
+      const updatedSelected = initialEmployees.find(
+        (e) => e.id === selectedEmployee.id,
+      );
+      if (updatedSelected) {
+        setSelectedEmployee(updatedSelected);
+      }
+    }
+  }, [initialEmployees, employeesData, selectedEmployee]);
+
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) {
-      return initialEmployees;
+      return employees;
     }
-    return initialEmployees.filter((employee) =>
+    return employees.filter((employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [initialEmployees, searchTerm]);
+  }, [employees, searchTerm]);
 
   if (
     selectedEmployee &&
@@ -116,13 +137,13 @@ export function EmployeeView({
       {isEditModalOpen && selectedEmployee && (
         <EmployeeEditModal
           employee={
-            employeesData.find((e) => e.id === selectedEmployee.id) ||
-            employeesData[0]
+            employeesRawData.find((e) => e.id === selectedEmployee.id) ||
+            employeesRawData[0]
           }
           onClose={(shouldRefresh) => {
             setIsEditModalOpen(false);
             if (shouldRefresh) {
-              window.location.reload();
+              router.refresh();
             }
           }}
           availableEmploymentTypes={availableEmploymentTypes}
