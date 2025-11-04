@@ -49,28 +49,33 @@ export default async function ProjectsPage() {
   const projects = mockProjects;
 
   const availableStatuses = Array.from(
-    new Set(projects.map((p) => p.status).filter(Boolean)),
+      new Set(projects.map((p) => p.status).filter(Boolean)),
+  );
+
+  const availableManagers = Array.from(
+      new Set(projects.map((p) => p.manager).filter(Boolean)),
   );
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
-      <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
-        <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/profile/me"
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <FaArrowLeft className="mr-2" />
-            Powrót do pulpitu
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-800">Projekty</h1>
-        </div>
+      <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
+        <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-8">
+            <Link
+                href="/profile/me"
+                className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <FaArrowLeft className="mr-2" />
+              Powrót do pulpitu
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-800">Projekty</h1>
+          </div>
 
-        <ProjectsView
-          initialProjects={projects}
-          availableStatuses={availableStatuses}
-        />
-      </main>
-    </div>
+          <ProjectsView
+              initialProjects={projects}
+              availableStatuses={availableStatuses}
+              availableManagers={availableManagers}
+          />
+        </main>
+      </div>
   );
 }
