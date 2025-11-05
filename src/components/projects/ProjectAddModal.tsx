@@ -61,6 +61,7 @@ export function ProjectAddModal({
           startDate: formData.startDate || null,
           endDate: formData.endDate || null,
           isArchived: formData.status === "Zarchiwizowany",
+          managerName: formData.manager || null,
         }),
       });
 

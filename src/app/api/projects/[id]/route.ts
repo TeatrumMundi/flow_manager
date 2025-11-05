@@ -3,13 +3,14 @@ import { deleteProjectFromDb } from "@/dataBase/query/projects/deleteProjectFrom
 import { updateProjectInDb } from "@/dataBase/query/projects/updateProjectInDb";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export async function PUT(request: Request, { params }: RouteParams) {
+export async function PUT(request: Request, context: RouteParams) {
   try {
+    const params = await context.params;
     const projectId = Number(params.id);
 
     // Validate ID
@@ -109,8 +110,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(_request: Request, { params }: RouteParams) {
+export async function DELETE(_request: Request, context: RouteParams) {
   try {
+    const params = await context.params;
     const projectId = Number(params.id);
 
     // Validate ID
