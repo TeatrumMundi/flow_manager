@@ -163,18 +163,28 @@ export function EmployeeView({
                   <h2 className="text-2xl font-bold text-gray-800">
                     {selectedEmployee.name}
                   </h2>
-                  <p className="text-gray-600 text-sm">{selectedEmployee.email}</p>
+                  <p className="text-gray-600 text-sm">
+                    {selectedEmployee.email}
+                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div className="space-y-2">
                   <div className="flex items-start">
-                    <span className="font-semibold text-gray-700 min-w-[120px]">Stanowisko:</span>
-                    <span className="text-gray-800">{selectedEmployee.position}</span>
+                    <span className="font-semibold text-gray-700 min-w-[120px]">
+                      Stanowisko:
+                    </span>
+                    <span className="text-gray-800">
+                      {selectedEmployee.position}
+                    </span>
                   </div>
                   <div className="flex items-start">
-                    <span className="font-semibold text-gray-700 min-w-[120px]">Przełożony:</span>
-                    <span className="text-gray-800">{selectedEmployee.supervisor}</span>
+                    <span className="font-semibold text-gray-700 min-w-[120px]">
+                      Przełożony:
+                    </span>
+                    <span className="text-gray-800">
+                      {selectedEmployee.supervisor}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -188,7 +198,9 @@ export function EmployeeView({
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Stawka wynagrodzenia</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    Stawka wynagrodzenia
+                  </p>
                   <p className="text-lg font-semibold text-gray-800">
                     {selectedEmployee.salaryRate}
                   </p>
@@ -214,7 +226,7 @@ export function EmployeeView({
                 <span className="w-1 h-6 bg-blue-500 mr-3 rounded"></span>
                 Historia projektów i zadań
               </h3>
-              
+
               {/* Projekty - każdy osobna kafelka */}
               {selectedEmployee.history.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3">
