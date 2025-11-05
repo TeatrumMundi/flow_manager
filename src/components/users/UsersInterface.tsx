@@ -225,7 +225,7 @@ export function UsersInterface({
 
         <div className="flex gap-4 flex-1">
           {/* Search input */}
-          <div className="relative flex-grow">
+          <div className="relative grow">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
             <CustomInput
               type="text"

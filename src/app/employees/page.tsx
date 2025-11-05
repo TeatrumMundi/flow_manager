@@ -20,6 +20,7 @@ export default async function EmployeesPage() {
     name:
       `${employee.firstName || ""} ${employee.lastName || ""}`.trim() ||
       employee.email,
+    email: employee.email,
     position: employee.position || employee.roleName || "Brak stanowiska",
     supervisor:
       employee.supervisorFirstName && employee.supervisorLastName
@@ -30,7 +31,7 @@ export default async function EmployeesPage() {
       : "Nie określono",
     vacationDays: employee.vacationDaysTotal || 0,
     contractType: employee.employmentType || "Nie określono",
-    history: [], // Historia projektów - do implementacji w przyszłości
+    history: [],
   }));
 
   return (

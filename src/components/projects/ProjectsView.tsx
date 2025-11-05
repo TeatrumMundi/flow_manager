@@ -82,7 +82,7 @@ export function ProjectsView({
         </Button>
 
         {/* Search input */}
-        <div className="relative flex-grow w-full">
+        <div className="relative grow w-full">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
           <CustomInput
             type="text"
