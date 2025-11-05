@@ -13,7 +13,7 @@ interface Project {
   id: number;
   name: string;
   status: string;
-  manager: string;
+  manager?: string;
   progress: number;
   budget: number;
 }

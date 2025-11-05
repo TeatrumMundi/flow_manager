@@ -135,6 +135,7 @@ export const projects = pgTable("projects", {
   name: varchar({ length: 255 }),
   description: text(),
   budget: numeric({ precision: 12, scale: 2 }),
+  progress: integer().default(0),
   startDate: date("start_date"),
   endDate: date("end_date"),
   isArchived: boolean("is_archived").default(false),

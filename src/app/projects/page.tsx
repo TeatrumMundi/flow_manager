@@ -1,59 +1,47 @@
 ﻿import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 import { ProjectsView } from "@/components/projects/ProjectsView";
-
-const mockProjects = [
-  {
-    id: 1,
-    name: "Website Redesign",
-    status: "Aktywny",
-    manager: "Piotr Wiśniewski",
-    progress: 75,
-    budget: 15000,
-  },
-  {
-    id: 2,
-    name: "System implementation",
-    status: "Zakończony",
-    manager: "Anna Nowak",
-    progress: 100,
-    budget: 50000,
-  },
-  {
-    id: 3,
-    name: "Development",
-    status: "W toku",
-    manager: "Jan Kowalski",
-    progress: 40,
-    budget: 25000,
-  },
-  {
-    id: 4,
-    name: "HR Revamp",
-    status: "Aktywny",
-    manager: "Marek Lewandowski",
-    progress: 60,
-    budget: 10000,
-  },
-  {
-    id: 5,
-    name: "Mobile App",
-    status: "Zarchiwizowany",
-    manager: "Katarzyna Wójcik",
-    progress: 100,
-    budget: 75000,
-  },
-];
+import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
 
 export default async function ProjectsPage() {
-  const projects = mockProjects;
+  // Fetch projects from database
+  const projectsData = await listProjectsFromDb({ isArchived: false });
 
-  const availableStatuses = Array.from(
-    new Set(projects.map((p) => p.status).filter(Boolean)),
-  );
+  // Transform projects to display format
+  const projects = projectsData.map((project) => {
+    const managerName =
+      project.managerFirstName && project.managerLastName
+        ? `${project.managerFirstName} ${project.managerLastName}`
+        : undefined;
 
+    return {
+      id: project.id,
+      name: project.name || "Unnamed Project",
+      description: project.description,
+      status: project.isArchived ? "Zarchiwizowany" : "Aktywny",
+      manager: managerName,
+      progress: project.progress || 0,
+      budget: project.budget ? Number(project.budget) : 0,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt,
+    };
+  });
+
+  const availableStatuses = ["Aktywny", "Zarchiwizowany"];
+
+  // Get unique managers from projects
   const availableManagers = Array.from(
-    new Set(projects.map((p) => p.manager).filter(Boolean)),
+    new Set(
+      projectsData
+        .map((project) =>
+          project.managerFirstName && project.managerLastName
+            ? `${project.managerFirstName} ${project.managerLastName}`
+            : null,
+        )
+        .filter((manager): manager is string => manager !== null),
+    ),
   );
 
   return (
@@ -72,6 +60,7 @@ export default async function ProjectsPage() {
 
         <ProjectsView
           initialProjects={projects}
+          projectsData={projectsData}
           availableStatuses={availableStatuses}
           availableManagers={availableManagers}
         />

@@ -18,20 +18,38 @@ import { ProjectStatusBadge } from "./ProjectStatusBadge";
 interface Project {
   id: number;
   name: string;
+  description?: string | null;
   status: string;
-  manager: string;
+  manager?: string;
   progress: number;
   budget: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 interface ProjectsViewProps {
   initialProjects: Project[];
+  projectsData: Array<{
+    id: number;
+    name: string | null;
+    description: string | null;
+    budget: string | null;
+    progress: number | null;
+    startDate: string | null;
+    endDate: string | null;
+    isArchived: boolean | null;
+    createdAt: string | null;
+    updatedAt: string | null;
+  }>;
   availableStatuses: string[];
   availableManagers: string[];
 }
 
 export function ProjectsView({
   initialProjects,
+  projectsData,
   availableStatuses,
   availableManagers,
 }: ProjectsViewProps) {
@@ -39,28 +57,29 @@ export function ProjectsView({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
+  const [projects, setProjects] = useState(initialProjects);
   const [filteredProjects, setFilteredProjects] = useState(initialProjects);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
-    let projects = initialProjects;
+    let filteredList = projects;
 
     if (selectedStatus !== "Wszystkie") {
-      projects = projects.filter((p) => p.status === selectedStatus);
+      filteredList = filteredList.filter((p) => p.status === selectedStatus);
     }
 
     if (searchTerm) {
-      projects = projects.filter(
+      filteredList = filteredList.filter(
         (p) =>
           p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.manager.toLowerCase().includes(searchTerm.toLowerCase()),
+          (p.manager && p.manager.toLowerCase().includes(searchTerm.toLowerCase())),
       );
     }
 
-    setFilteredProjects(projects);
-  }, [searchTerm, selectedStatus, initialProjects]);
+    setFilteredProjects(filteredList);
+  }, [searchTerm, selectedStatus, projects]);
 
   const handleOpenEditModal = (project: Project) => {
     setEditingProject(project);
@@ -157,8 +176,13 @@ export function ProjectsView({
               key: "manager",
               header: "Kierownik",
               width: "w-48",
-              className: "p-4 text-gray-700 truncate",
+              render: (project) => (
+                <span className="text-gray-700">
+                  {project.manager || "Nie przypisano"}
+                </span>
+              ),
               headerClassName: "p-4",
+              className: "p-4",
             },
             {
               key: "progress",
