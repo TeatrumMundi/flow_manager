@@ -58,7 +58,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
           : body.endDate === ""
             ? null
             : String(body.endDate),
-      isArchived: body.isArchived !== undefined ? body.isArchived === true : undefined,
+      isArchived:
+        body.isArchived !== undefined ? body.isArchived === true : undefined,
     });
 
     return NextResponse.json(
@@ -108,7 +109,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: Request, { params }: RouteParams) {
+export async function DELETE(_request: Request, { params }: RouteParams) {
   try {
     const projectId = Number(params.id);
 

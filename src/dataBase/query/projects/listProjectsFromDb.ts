@@ -1,6 +1,11 @@
 import type { SQL } from "drizzle-orm";
 import { and, eq, gte, ilike, lte, sql } from "drizzle-orm";
-import { projectAssignments, projects, userProfiles, users } from "@/dataBase/schema";
+import {
+  projectAssignments,
+  projects,
+  userProfiles,
+  users,
+} from "@/dataBase/schema";
 import { database } from "@/library/db";
 
 export interface ProjectListFilters {

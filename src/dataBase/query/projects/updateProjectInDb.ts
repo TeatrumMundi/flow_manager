@@ -80,7 +80,10 @@ export async function updateProjectInDb(
 
   // Update progress with validation
   if (input.progress !== undefined) {
-    if (input.progress !== null && (input.progress < 0 || input.progress > 100)) {
+    if (
+      input.progress !== null &&
+      (input.progress < 0 || input.progress > 100)
+    ) {
       throw new Error("Project progress must be between 0 and 100");
     }
     updateData.progress = input.progress;

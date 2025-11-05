@@ -11,9 +11,9 @@ import {
   type TableAction,
   type TableColumn,
 } from "@/components/common/CustomTable";
+import { ProgressBar } from "./ProgressBar";
 import { ProjectAddModal } from "./ProjectAddModal";
 import { ProjectEditModal } from "./ProjectEditModal";
-import { ProgressBar } from "./ProgressBar";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 
 interface Project {
@@ -50,7 +50,6 @@ interface ProjectsViewProps {
 
 export function ProjectsView({
   initialProjects,
-  projectsData,
   availableStatuses,
   availableManagers,
 }: ProjectsViewProps) {
@@ -58,7 +57,7 @@ export function ProjectsView({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
-  const [projects, setProjects] = useState(initialProjects);
+  const [projects, _setProjects] = useState(initialProjects);
   const [filteredProjects, setFilteredProjects] = useState(initialProjects);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -76,11 +75,7 @@ export function ProjectsView({
       filteredList = filteredList.filter(
         (p) =>
           p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (p.manager && p.manager.toLowerCase().includes(searchTerm.toLowerCase())),
-      projects = projects.filter(
-          (p) =>
-              p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              p.manager.toLowerCase().includes(searchTerm.toLowerCase()),
+          p.manager?.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
@@ -113,63 +108,63 @@ export function ProjectsView({
   };
 
   return (
-      <>
-        {isEditModalOpen && editingProject && (
-            <ProjectEditModal
-                project={editingProject}
-                onClose={handleCloseEditModal}
-                availableStatuses={availableStatuses}
-                availableManagers={availableManagers}
-            />
-        )}
+    <>
+      {isEditModalOpen && editingProject && (
+        <ProjectEditModal
+          project={editingProject}
+          onClose={handleCloseEditModal}
+          availableStatuses={availableStatuses}
+          availableManagers={availableManagers}
+        />
+      )}
 
-        {isAddModalOpen && (
-            <ProjectAddModal
-                onClose={handleCloseAddModal}
-                availableStatuses={availableStatuses}
-                availableManagers={availableManagers}
-            />
-        )}
+      {isAddModalOpen && (
+        <ProjectAddModal
+          onClose={handleCloseAddModal}
+          availableStatuses={availableStatuses}
+          availableManagers={availableManagers}
+        />
+      )}
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
-          <Button
-              variant="primary"
-              onClick={handleOpenAddModal}
-              className="w-full md:w-auto"
-          >
-            <FaPlus />
-            <span>Dodaj projekt</span>
-          </Button>
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
+        <Button
+          variant="primary"
+          onClick={handleOpenAddModal}
+          className="w-full md:w-auto"
+        >
+          <FaPlus />
+          <span>Dodaj projekt</span>
+        </Button>
 
-          <div className="relative grow w-full">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-            <CustomInput
-                type="text"
-                name="searchProjects"
-                placeholder="Szukaj po nazwie lub kierowniku..."
-                className="pl-10"
-                hideLabel
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <CustomSelect
-              name="statusFilter"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              hideLabel
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-50"
-              placeholder="Wszystkie statusy"
-              options={[
-                { label: "Wszystkie statusy", value: "Wszystkie" },
-                ...availableStatuses.map((status) => ({
-                  label: status,
-                  value: status,
-                })),
-              ]}
+        <div className="relative grow w-full">
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+          <CustomInput
+            type="text"
+            name="searchProjects"
+            placeholder="Szukaj po nazwie lub kierowniku..."
+            className="pl-10"
+            hideLabel
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+
+        <CustomSelect
+          name="statusFilter"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          hideLabel
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-50"
+          placeholder="Wszystkie statusy"
+          options={[
+            { label: "Wszystkie statusy", value: "Wszystkie" },
+            ...availableStatuses.map((status) => ({
+              label: status,
+              value: status,
+            })),
+          ]}
+        />
+      </div>
 
       <DataTable
         data={filteredProjects}
@@ -222,37 +217,37 @@ export function ProjectsView({
                 <span className="text-gray-700">
                   {formatCurrency(project.budget)}
                 </span>
-                  ),
-                  headerClassName: "p-4",
-                  className: "p-4",
-                },
-              ] as TableColumn<Project>[]
-            }
-            actions={
-              [
-                {
-                  icon: <FaInfo size={16} />,
-                  label: "Szczegóły",
-                  onClick: (project) => {
-                    router.push(`/projects/${project.id}`);
-                  },
-                  variant: "yellow",
-                },
-                {
-                  icon: <FaEdit size={16} />,
-                  label: "Edytuj",
-                  onClick: (project) => handleOpenEditModal(project),
-                  variant: "blue",
-                },
-                {
-                  icon: <FaTrash size={16} />,
-                  label: "Usuń",
-                  onClick: () => alert("Usuwanie projektu (do implementacji)"),
-                  variant: "red",
-                },
-              ] as TableAction<Project>[]
-            }
-        />
-      </>
+              ),
+              headerClassName: "p-4",
+              className: "p-4",
+            },
+          ] as TableColumn<Project>[]
+        }
+        actions={
+          [
+            {
+              icon: <FaInfo size={16} />,
+              label: "Szczegóły",
+              onClick: (project) => {
+                router.push(`/projects/${project.id}`);
+              },
+              variant: "yellow",
+            },
+            {
+              icon: <FaEdit size={16} />,
+              label: "Edytuj",
+              onClick: (project) => handleOpenEditModal(project),
+              variant: "blue",
+            },
+            {
+              icon: <FaTrash size={16} />,
+              label: "Usuń",
+              onClick: () => alert("Usuwanie projektu (do implementacji)"),
+              variant: "red",
+            },
+          ] as TableAction<Project>[]
+        }
+      />
+    </>
   );
 }
