@@ -169,7 +169,7 @@ export function CustomSelect({
           {selectedOption && value !== "" ? selectedOption.label : placeholder}
         </span>
         <svg
-          className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

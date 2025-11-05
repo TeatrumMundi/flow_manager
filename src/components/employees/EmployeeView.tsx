@@ -13,6 +13,7 @@ import type { EmploymentType } from "@/types/EmploymentType";
 interface Employee {
   id: number;
   name: string;
+  email: string;
   position: string;
   supervisor: string;
   salaryRate: string;
@@ -151,70 +152,98 @@ export function EmployeeView({
         />
       )}
 
-      <div className="md:col-span-2 bg-white/20 p-6 rounded-lg shadow-inner">
+      <div className="md:col-span-2">
         {selectedEmployee ? (
-          <div>
-            <div className="flex flex-col md:flex-row items-center mb-6 text-center md:text-left">
-              <FaUserCircle className="text-gray-400 text-6xl md:mr-6 mb-4 md:mb-0" />
-              <div>
-                <h2 className="text-3xl font-bold text-gray-800">
-                  {selectedEmployee.name}
-                </h2>
-                <div className="mt-2 text-lg text-gray-600 space-x-4">
-                  <span>
-                    <strong>Stanowisko:</strong> {selectedEmployee.position}
-                  </span>
-                  <span>
-                    <strong>Przełożony:</strong> {selectedEmployee.supervisor}
-                  </span>
+          <div className="space-y-4">
+            {/* Podstawowe informacje - kafelka */}
+            <div className="bg-white/40 backdrop-blur-sm p-6 rounded-lg shadow-md border border-white/50">
+              <div className="flex items-center mb-4">
+                <FaUserCircle className="text-blue-500 text-5xl mr-4" />
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    {selectedEmployee.name}
+                  </h2>
+                  <p className="text-gray-600 text-sm">{selectedEmployee.email}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-700 min-w-[120px]">Stanowisko:</span>
+                    <span className="text-gray-800">{selectedEmployee.position}</span>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-700 min-w-[120px]">Przełożony:</span>
+                    <span className="text-gray-800">{selectedEmployee.supervisor}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                  Informacje o zatrudnieniu
-                </h3>
-                <div className="space-y-2 text-gray-800">
-                  <p>
-                    <strong>Stawka wynagrodzenia:</strong>{" "}
+            {/* Informacje o zatrudnieniu - kafelka */}
+            <div className="bg-white/40 backdrop-blur-sm p-6 rounded-lg shadow-md border border-white/50">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <span className="w-1 h-6 bg-blue-500 mr-3 rounded"></span>
+                Informacje o zatrudnieniu
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Stawka wynagrodzenia</p>
+                  <p className="text-lg font-semibold text-gray-800">
                     {selectedEmployee.salaryRate}
                   </p>
-                  <p>
-                    <strong>Liczba dni urlopowych:</strong>{" "}
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Dni urlopowe</p>
+                  <p className="text-lg font-semibold text-gray-800">
                     {selectedEmployee.vacationDays}
                   </p>
-                  <p>
-                    <strong>Rodzaj umowy:</strong>{" "}
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Rodzaj umowy</p>
+                  <p className="text-lg font-semibold text-gray-800">
                     {selectedEmployee.contractType}
                   </p>
                 </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                  Historia projektów i zadań{" "}
-                  <span className="text-sm font-normal text-gray-500">
-                    (opcjonalnie)
-                  </span>
-                </h3>
-                {selectedEmployee.history.length > 0 ? (
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    {selectedEmployee.history.map((item) => (
-                      <li key={`${selectedEmployee.id}-${item}`}>{item}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500 italic">Brak historii.</p>
-                )}
-              </div>
+            </div>
+
+            {/* Historia projektów - nagłówek */}
+            <div className="bg-white/40 backdrop-blur-sm p-6 rounded-lg shadow-md border border-white/50">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <span className="w-1 h-6 bg-blue-500 mr-3 rounded"></span>
+                Historia projektów i zadań
+              </h3>
+              
+              {/* Projekty - każdy osobna kafelka */}
+              {selectedEmployee.history.length > 0 ? (
+                <div className="grid grid-cols-1 gap-3">
+                  {selectedEmployee.history.map((item, index) => (
+                    <div
+                      key={`${selectedEmployee.id}-${item}-${index}`}
+                      className="bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200 hover:shadow-md transition-shadow"
+                    >
+                      <p className="text-gray-800">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-gray-50 p-8 rounded-lg text-center">
+                  <p className="text-gray-500 italic">
+                    Brak przypisanych projektów
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-lg">
-              Wybierz pracownika z listy, aby zobaczyć szczegóły.
-            </p>
+          <div className="bg-white/40 backdrop-blur-sm p-12 rounded-lg shadow-md border border-white/50 flex items-center justify-center h-full min-h-[400px]">
+            <div className="text-center">
+              <FaUserCircle className="text-gray-300 text-8xl mx-auto mb-4" />
+              <p className="text-gray-500 text-lg">
+                Wybierz pracownika z listy, aby zobaczyć szczegóły.
+              </p>
+            </div>
           </div>
         )}
       </div>
