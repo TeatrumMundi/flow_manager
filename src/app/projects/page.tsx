@@ -3,6 +3,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { ProjectsView } from "@/components/projects/ProjectsView";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 
 export default async function ProjectsPage() {
   const projectsData = await listProjectsFromDb({ isArchived: false });
@@ -31,29 +32,17 @@ export default async function ProjectsPage() {
 
   const availableStatuses = ["Aktywny", "Zarchiwizowany"];
 
-  const availableManagers = Array.from(
-    new Set(
-      projectsData
-        .map((project) =>
-          project.managerFirstName && project.managerLastName
-            ? `${project.managerFirstName} ${project.managerLastName}`
-            : null,
-        )
-        .filter((manager): manager is string => manager !== null),
-    ),
-  );
+  // Get all users as potential managers
+  const availableManagers = allUsers
+    .filter((user) => user.firstName && user.lastName)
+    .map((user) => `${user.firstName} ${user.lastName}`)
+    .sort();
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/profile/me"
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <FaArrowLeft className="mr-2" />
-            Powrót do pulpitu
-          </Link>
+          <BackToDashboardButton />
           <h1 className="text-3xl font-bold text-gray-800">Projekty</h1>
         </div>
 

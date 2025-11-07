@@ -150,6 +150,7 @@ export function ProjectAddModal({
             name="manager"
             value={formData.manager}
             onChange={handleChange}
+            searchable
             options={[
               { label: "Nie przypisano", value: "" },
               ...availableManagers.map((manager) => ({

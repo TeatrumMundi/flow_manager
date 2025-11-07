@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { FaArrowLeft } from "react-icons/fa";
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { EmployeeView } from "@/components/employees/EmployeeView";
 import { listEmployeesFromDb } from "@/dataBase/query/listEmployeesFromDb";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
@@ -38,13 +37,7 @@ export default async function EmployeesPage() {
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-6xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/profile/me"
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <FaArrowLeft className="mr-2" />
-            Powrót do pulpitu
-          </Link>
+          <BackToDashboardButton />
           <h1 className="text-3xl font-bold text-gray-800">Pracownicy</h1>
         </div>
 

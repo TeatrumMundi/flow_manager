@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { CustomInput } from "./CustomInput";
 
 export type SelectOption =
   | string
@@ -20,6 +21,7 @@ export interface CustomSelectProps {
   className?: string;
   hideLabel?: boolean;
   placeholder?: string;
+  searchable?: boolean;
 }
 
 export function CustomSelect({
@@ -32,6 +34,7 @@ export function CustomSelect({
   className,
   hideLabel = false,
   placeholder = "Wybierz...",
+  searchable = false,
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,18 +43,18 @@ export function CustomSelect({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Normalize options to consistent format
-  const normalizedOptions = options.map((opt) =>
-    typeof opt === "string" ? { label: opt, value: opt } : opt,
+  const normalizedOptions = options.map((option) =>
+    typeof option === "string" ? { label: option, value: option } : option,
   );
 
   // Filter options based on search term
-  const filteredOptions = normalizedOptions.filter((opt) =>
-    opt.label.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredOptions = normalizedOptions.filter((option) =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Get selected option
   const selectedOption = normalizedOptions.find(
-    (opt) => String(opt.value) === String(value),
+    (option) => String(option.value) === String(value),
   );
 
   // Close dropdown when clicking outside
@@ -78,34 +81,42 @@ export function CustomSelect({
   }, [isOpen]);
 
   // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isOpen) {
-      if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
-        e.preventDefault();
+      if (
+        event.key === "Enter" ||
+        event.key === " " ||
+        event.key === "ArrowDown"
+      ) {
+        event.preventDefault();
         setIsOpen(true);
       }
       return;
     }
 
-    switch (e.key) {
+    switch (event.key) {
       case "ArrowDown":
-        e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < filteredOptions.length - 1 ? prev + 1 : prev,
+        event.preventDefault();
+        setHighlightedIndex((previousIndex) =>
+          previousIndex < filteredOptions.length - 1
+            ? previousIndex + 1
+            : previousIndex,
         );
         break;
       case "ArrowUp":
-        e.preventDefault();
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        event.preventDefault();
+        setHighlightedIndex((previousIndex) =>
+          previousIndex > 0 ? previousIndex - 1 : previousIndex,
+        );
         break;
       case "Enter":
-        e.preventDefault();
+        event.preventDefault();
         if (filteredOptions[highlightedIndex]) {
           handleSelectOption(filteredOptions[highlightedIndex].value);
         }
         break;
       case "Escape":
-        e.preventDefault();
+        event.preventDefault();
         setIsOpen(false);
         setSearchTerm("");
         break;
@@ -141,9 +152,9 @@ export function CustomSelect({
         className="sr-only"
         tabIndex={-1}
       >
-        {normalizedOptions.map((opt) => (
-          <option key={String(opt.value)} value={opt.value}>
-            {opt.label}
+        {normalizedOptions.map((option) => (
+          <option key={String(option.value)} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>
@@ -189,24 +200,47 @@ export function CustomSelect({
       {/* Dropdown menu */}
       {isOpen && (
         <div className="absolute z-50 w-full bg-white border-x border-b border-gray-300 rounded-b-lg shadow-lg overflow-hidden">
+          {/* Search input (only if searchable) */}
+          {searchable && (
+            <div className="p-2 border-b border-gray-200">
+              <CustomInput
+                type="text"
+                name="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Szukaj..."
+                hideLabel
+                className="text-sm"
+                autoFocus
+              />
+            </div>
+          )}
+
           {/* Options list */}
           <div className="overflow-y-auto max-h-60">
             <ul className="py-1">
-              {normalizedOptions.map((option, index) => (
-                <li key={String(option.value)}>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectOption(option.value)}
-                    className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors cursor-pointer ${
-                      String(option.value) === String(value)
-                        ? "bg-blue-100 text-blue-800 font-medium"
-                        : "text-gray-800"
-                    } ${index === highlightedIndex ? "bg-blue-50" : ""}`}
-                  >
-                    {option.label}
-                  </button>
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option, index) => (
+                  <li key={String(option.value)}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectOption(option.value)}
+                      className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors cursor-pointer ${
+                        String(option.value) === String(value)
+                          ? "bg-blue-100 text-blue-800 font-medium"
+                          : "text-gray-800"
+                      } ${index === highlightedIndex ? "bg-blue-50" : ""}`}
+                    >
+                      {option.label}
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-2 text-gray-500 text-sm">
+                  Nie znaleziono opcji
                 </li>
-              ))}
+              )}
             </ul>
           </div>
         </div>

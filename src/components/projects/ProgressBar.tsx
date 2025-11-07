@@ -10,13 +10,24 @@ export function ProgressBar({ progress }: ProgressBarProps) {
   };
 
   return (
-    <div className="w-full bg-gray-200 rounded-full h-4">
+    <div className="w-full bg-gray-200 rounded-full h-4 relative">
       <div
-        className={`h-4 rounded-full ${getProgressColor()} flex items-center justify-center`}
+        className={`h-4 rounded-sm ${getProgressColor()} ${progress >= 20 ? "flex items-center justify-center" : ""}`}
         style={{ width: `${progress}%` }}
       >
-        <span className="text-xs font-medium text-white px-2">{progress}%</span>
+        {progress >= 20 && (
+          <span className="text-xs font-medium text-white px-2">
+            {progress}%
+          </span>
+        )}
       </div>
+      {progress < 20 && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs font-medium text-black px-2">
+            {progress}%
+          </span>
+        </div>
+      )}
     </div>
   );
 }

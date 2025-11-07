@@ -7,6 +7,7 @@ import { listUserRolesFromDb } from "@/dataBase/query/listUserRolesFromDb";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 
 export default async function UsersPage() {
   // Fetch users from database
@@ -22,13 +23,7 @@ export default async function UsersPage() {
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-6xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/profile/me"
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <FaArrowLeft className="mr-2" />
-            Powrót do pulpitu
-          </Link>
+          <BackToDashboardButton />
           <h1 className="text-3xl font-bold text-gray-800">
             Zarządzanie Użytkownikami
           </h1>

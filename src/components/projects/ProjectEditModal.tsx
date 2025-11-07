@@ -88,6 +88,7 @@ export function ProjectEditModal({
             name="manager"
             value={formData.manager}
             onChange={handleChange}
+            searchable
             options={availableManagers}
             required
           />

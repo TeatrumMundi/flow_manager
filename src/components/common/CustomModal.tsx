@@ -71,7 +71,7 @@ export function CustomModal({
       {/* Modal content container */}
       <div
         role="document"
-        className={`bg-white rounded-2xl shadow-lg w-full ${sizeClasses[size]} p-8 m-4 max-h-[90vh] overflow-y-auto border-2 border-blue-600`}
+        className={`bg-white rounded-2xl shadow-lg w-full ${sizeClasses[size]} p-8 m-4 max-h-[90vh] border-2 border-blue-600`}
       >
         {/* Modal header */}
         <div className="flex items-center justify-between mb-6">
