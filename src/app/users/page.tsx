@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { FaArrowLeft } from "react-icons/fa";
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { UsersInterface } from "@/components/users/UsersInterface";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
 import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
@@ -7,7 +6,6 @@ import { listUserRolesFromDb } from "@/dataBase/query/listUserRolesFromDb";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
-import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 
 export default async function UsersPage() {
   // Fetch users from database
