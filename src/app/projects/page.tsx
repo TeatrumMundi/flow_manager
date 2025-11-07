@@ -1,4 +1,5 @@
 ﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
+import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ProjectsView } from "@/components/projects/ProjectsView";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
@@ -41,7 +42,7 @@ export default async function ProjectsPage() {
       <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
           <BackToDashboardButton />
-          <h1 className="text-3xl font-bold text-gray-800">Projekty</h1>
+          <SectionTitleTile title="Projekty" />
         </div>
 
         <ProjectsView

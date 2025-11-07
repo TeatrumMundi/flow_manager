@@ -1,4 +1,5 @@
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
+import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { UsersInterface } from "@/components/users/UsersInterface";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
 import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
@@ -22,9 +23,7 @@ export default async function UsersPage() {
       <main className="w-full max-w-6xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
           <BackToDashboardButton />
-          <h1 className="text-3xl font-bold text-gray-800">
-            Zarządzanie Użytkownikami
-          </h1>
+          <SectionTitleTile title="Użytkownicy" />
         </div>
 
         <UsersInterface

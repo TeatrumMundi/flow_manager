@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { FaArrowLeft, FaUserPlus } from "react-icons/fa";
+import { FaUserPlus } from "react-icons/fa";
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { Button } from "@/components/common/CustomButton";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
@@ -65,14 +66,9 @@ export function ProjectDetailsView({
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          <FaArrowLeft className="mr-2" />
+        <BackToDashboardButton className="" onClick={onBack}>
           Powrót do projektów
-        </button>
+        </BackToDashboardButton>
         <h1 className="text-3xl font-bold text-gray-800">
           Szczegóły projektu: {project.name}
         </h1>
