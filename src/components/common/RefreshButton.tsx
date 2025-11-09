@@ -26,7 +26,7 @@ export function RefreshButton({
       className={className}
     >
       <IoMdRefresh size={20} className={isRefreshing ? "animate-spin" : ""} />
-      {children ? children : "Odśwież"}
+      {children ?? "Odśwież"}
     </Button>
   );
 }
