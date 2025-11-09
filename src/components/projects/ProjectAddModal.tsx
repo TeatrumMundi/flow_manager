@@ -13,12 +13,14 @@ interface ProjectAddModalProps {
   onClose: () => void;
   availableStatuses: string[];
   availableManagers: string[];
+  onProjectChange?: () => void;
 }
 
 export function ProjectAddModal({
   onClose,
   availableStatuses,
   availableManagers,
+  onProjectChange,
 }: ProjectAddModalProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +82,7 @@ export function ProjectAddModal({
         error: (err) => `Błąd: ${err.message}`,
       });
 
+      if (onProjectChange) onProjectChange();
       onClose();
       router.refresh();
     } catch (error) {

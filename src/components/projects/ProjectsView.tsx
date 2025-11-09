@@ -10,45 +10,17 @@ import {
   type TableAction,
   type TableColumn,
 } from "@/components/common/CustomTable";
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import { RefreshButton } from "@/components/common/RefreshButton";
+import type { ProjectListItem } from "@/dataBase/query/projects/listProjectsFromDb";
+import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
+import { useRefreshList } from "@/hooks/useRefreshList";
+import type { Project, ProjectsViewProps } from "@/types/ProjectsTypes";
+import { mapProjectData } from "@/utils/mapProjectData";
 import { ProgressBar } from "./ProgressBar";
 import { ProjectAddModal } from "./ProjectAddModal";
 import { ProjectDetailsView } from "./ProjectDetailsView";
 import { ProjectEditModal } from "./ProjectEditModal";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
-
-interface Project {
-  id: number;
-  name: string;
-  description?: string | null;
-  status: string;
-  manager?: string;
-  progress: number;
-  budget: number;
-  startDate?: string | null;
-  endDate?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-
-interface ProjectsViewProps {
-  initialProjects: Project[];
-  projectsData: Array<{
-    id: number;
-    name: string | null;
-    description: string | null;
-    budget: string | null;
-    progress: number | null;
-    startDate: string | null;
-    endDate: string | null;
-    isArchived: boolean | null;
-    createdAt: string | null;
-    updatedAt: string | null;
-  }>;
-  availableStatuses: string[];
-  availableManagers: string[];
-  allUsers: UserListItem[];
-}
 
 export function ProjectsView({
   initialProjects,
@@ -58,8 +30,29 @@ export function ProjectsView({
 }: ProjectsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
-  const [projects, _setProjects] = useState(initialProjects);
+  const [projects, setProjects] = useState(initialProjects);
   const [filteredProjects, setFilteredProjects] = useState(initialProjects);
+  const { isRefreshing, refreshList, refreshListWithToast } = useRefreshList<
+    ProjectListItem[],
+    Project[]
+  >({
+    apiUrl: "/api/projects",
+    mapResponseData: (data) => mapProjectData(data),
+  });
+
+  // Manual refresh handler
+  const handleRefreshProjects = async () => {
+    const data = await refreshListWithToast();
+    if (data) setProjects(data);
+  };
+
+  // Silent refresh for modal actions
+  const handleSilentRefreshProjects = async () => {
+    const data = await refreshList();
+    if (data) setProjects(data);
+  };
+
+  const { deleteProject } = useDeleteProject();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -128,6 +121,7 @@ export function ProjectsView({
           onClose={handleCloseEditModal}
           availableStatuses={availableStatuses}
           availableManagers={availableManagers}
+          onProjectChange={handleSilentRefreshProjects}
         />
       )}
 
@@ -136,6 +130,7 @@ export function ProjectsView({
           onClose={handleCloseAddModal}
           availableStatuses={availableStatuses}
           availableManagers={availableManagers}
+          onProjectChange={handleSilentRefreshProjects}
         />
       )}
 
@@ -148,6 +143,12 @@ export function ProjectsView({
           <FaPlus />
           <span>Dodaj projekt</span>
         </Button>
+
+        <RefreshButton
+          onClick={handleRefreshProjects}
+          isRefreshing={isRefreshing}
+          title="Odśwież listę projektów"
+        />
 
         <div className="relative grow w-full">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
@@ -255,7 +256,10 @@ export function ProjectsView({
             {
               icon: <FaTrash size={16} />,
               label: "Usuń",
-              onClick: () => alert("Usuwanie projektu (do implementacji)"),
+              onClick: async (project) => {
+                await deleteProject(project);
+                await handleSilentRefreshProjects();
+              },
               variant: "red",
             },
           ] as TableAction<Project>[]

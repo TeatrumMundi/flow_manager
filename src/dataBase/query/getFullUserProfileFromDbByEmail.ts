@@ -7,8 +7,8 @@ import {
   userRoles,
   users,
 } from "@/dataBase/schema";
-import { database } from "@/library/db";
 import type { FullUserProfile } from "@/types/interfaces";
+import { database } from "@/utils/db";
 
 async function getFullUserProfileFromDbByEmail(
   email: string,

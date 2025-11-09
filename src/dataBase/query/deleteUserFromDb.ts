@@ -5,7 +5,7 @@ import {
   userProfiles,
   users,
 } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 /**
  * Deletes a user and all related records from the database.

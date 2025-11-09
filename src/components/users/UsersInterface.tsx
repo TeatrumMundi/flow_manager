@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
-import { IoMdRefresh } from "react-icons/io";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
@@ -11,12 +10,13 @@ import {
   type TableAction,
   type TableColumn,
 } from "@/components/common/CustomTable";
+import { RefreshButton } from "@/components/common/RefreshButton";
 import { UserModal } from "@/components/users/UserModal";
 import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import { useRefreshList } from "@/hooks/useRefreshList";
 import { useBulkDeleteUsers } from "@/hooks/users/useBulkDeleteUsers";
 import { useDeleteUser } from "@/hooks/users/useDeleteUser";
-import { useRefreshUsers } from "@/hooks/users/useRefreshUsers";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 
@@ -35,8 +35,11 @@ export function UsersInterface({
 }: UsersTableProps) {
   const { deleteUser } = useDeleteUser();
   const { bulkDeleteUsers } = useBulkDeleteUsers();
-  const { isRefreshing, refreshUsersList, refreshUsersWithToast } =
-    useRefreshUsers();
+  const {
+    isRefreshing,
+    refreshList: refreshUsersList,
+    refreshListWithToast: refreshUsersWithToast,
+  } = useRefreshList<UserListItem[], UserListItem[]>({ apiUrl: "/api/users" });
 
   // Users state management
   const [users, setUsers] = useState(initialUsers);
@@ -209,18 +212,11 @@ export function UsersInterface({
           </Button>
 
           {/* Refresh button */}
-          <Button
-            variant="success"
+          <RefreshButton
             onClick={handleRefreshUsers}
-            disabled={isRefreshing}
+            isRefreshing={isRefreshing}
             title="Odśwież listę użytkowników"
-          >
-            <IoMdRefresh
-              size={20}
-              className={isRefreshing ? "animate-spin" : ""}
-            />{" "}
-            Odśwież
-          </Button>
+          />
         </div>
 
         <div className="flex gap-4 flex-1">

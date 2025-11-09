@@ -6,7 +6,7 @@ import {
   userProfiles,
   users,
 } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 export interface ProjectListFilters {
   name?: string;

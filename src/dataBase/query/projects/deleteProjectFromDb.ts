@@ -7,7 +7,7 @@ import {
   tasks,
   workLogs,
 } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 /**
  * Deletes a project and all related records from the database.

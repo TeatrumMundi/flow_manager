@@ -23,6 +23,7 @@ interface ProjectEditModalProps {
   onClose: () => void;
   availableStatuses: string[];
   availableManagers: string[];
+  onProjectChange?: () => void;
 }
 
 export function ProjectEditModal({
@@ -30,6 +31,7 @@ export function ProjectEditModal({
   onClose,
   availableStatuses,
   availableManagers,
+  onProjectChange,
 }: ProjectEditModalProps) {
   const router = useRouter();
 
@@ -62,6 +64,7 @@ export function ProjectEditModal({
       error: "Błąd podczas aktualizacji.",
     });
 
+    if (onProjectChange) onProjectChange();
     onClose();
     router.refresh();
   };
