@@ -67,7 +67,9 @@ export async function POST(request: Request) {
     const projectPayload = {
       name,
       description:
-        body.description === undefined || body.description === null || body.description === ""
+        body.description === undefined ||
+        body.description === null ||
+        body.description === ""
           ? null
           : body.description,
       budget:
@@ -75,15 +77,21 @@ export async function POST(request: Request) {
           ? null
           : body.budget,
       progress:
-        body.progress === undefined || body.progress === null || body.progress === ""
+        body.progress === undefined ||
+        body.progress === null ||
+        body.progress === ""
           ? null
           : Number(body.progress),
       startDate:
-        body.startDate === undefined || body.startDate === null || body.startDate === ""
+        body.startDate === undefined ||
+        body.startDate === null ||
+        body.startDate === ""
           ? null
           : body.startDate,
       endDate:
-        body.endDate === undefined || body.endDate === null || body.endDate === ""
+        body.endDate === undefined ||
+        body.endDate === null ||
+        body.endDate === ""
           ? null
           : body.endDate,
       isArchived: body.isArchived === true,
