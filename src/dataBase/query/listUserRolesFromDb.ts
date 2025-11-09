@@ -1,5 +1,5 @@
 import { userRoles } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 export async function listUserRolesFromDb() {
   return await database.select().from(userRoles);

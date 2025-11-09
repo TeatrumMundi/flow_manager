@@ -1,5 +1,5 @@
 import { projects } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 interface CreateProjectInput {
   name: string;

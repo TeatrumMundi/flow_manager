@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { userProfiles, users } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 /**
  * Finds a user ID by their full name (firstName + lastName).

@@ -1,6 +1,6 @@
 import { eq, inArray } from "drizzle-orm";
 import { userProfiles, users } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 export interface SupervisorListItem {
   id: number;

@@ -13,12 +13,14 @@ interface ProjectAddModalProps {
   onClose: () => void;
   availableStatuses: string[];
   availableManagers: string[];
+  onProjectChange?: () => void;
 }
 
 export function ProjectAddModal({
   onClose,
   availableStatuses,
   availableManagers,
+  onProjectChange,
 }: ProjectAddModalProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,8 +60,8 @@ export function ProjectAddModal({
           description: formData.description.trim() || null,
           progress: formData.progress ? Number(formData.progress) : 0,
           budget: formData.budget ? formData.budget : null,
-          startDate: formData.startDate || null,
-          endDate: formData.endDate || null,
+          startDate: formData.startDate?.trim() || null,
+          endDate: formData.endDate?.trim() || null,
           isArchived: formData.status === "Zarchiwizowany",
           managerName: formData.manager || null,
         }),
@@ -80,6 +82,7 @@ export function ProjectAddModal({
         error: (err) => `Błąd: ${err.message}`,
       });
 
+      if (onProjectChange) onProjectChange();
       onClose();
       router.refresh();
     } catch (error) {

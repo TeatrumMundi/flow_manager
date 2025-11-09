@@ -6,8 +6,8 @@ import {
   userRoles,
   users,
 } from "@/dataBase/schema";
-import { database } from "@/library/db";
-import { normalizeEmail } from "@/library/email";
+import { database } from "@/utils/db";
+import { normalizeEmail } from "@/utils/email";
 
 interface CreateUserInput {
   email: string;

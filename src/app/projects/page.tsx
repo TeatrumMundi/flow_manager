@@ -3,33 +3,20 @@ import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ProjectsView } from "@/components/projects/ProjectsView";
 import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
+import { mapProjectData } from "@/utils/mapProjectData";
 
 export default async function ProjectsPage() {
   const projectsData = await listProjectsFromDb({ isArchived: false });
   const allUsers = await listUsersFromDb();
 
-  const projects = projectsData.map((project) => {
-    const managerName =
-      project.managerFirstName && project.managerLastName
-        ? `${project.managerFirstName} ${project.managerLastName}`
-        : undefined;
+  const projects = mapProjectData(projectsData);
 
-    return {
-      id: project.id,
-      name: project.name || "Unnamed Project",
-      description: project.description,
-      status: project.isArchived ? "Zarchiwizowany" : "Aktywny",
-      manager: managerName,
-      progress: project.progress || 0,
-      budget: project.budget ? Number(project.budget) : 0,
-      startDate: project.startDate,
-      endDate: project.endDate,
-      createdAt: project.createdAt,
-      updatedAt: project.updatedAt,
-    };
-  });
-
-  const availableStatuses = ["Aktywny", "Zarchiwizowany"];
+  const availableStatuses = [
+    "Aktywny",
+    "Zarchiwizowany",
+    "Wstrzymany",
+    "Zakończony",
+  ];
 
   // Get all users as potential managers
   const availableManagers = allUsers

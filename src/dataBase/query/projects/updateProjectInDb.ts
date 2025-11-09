@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { projects } from "@/dataBase/schema";
-import { database } from "@/library/db";
+import { database } from "@/utils/db";
 
 interface UpdateProjectInput {
   projectId: number;
