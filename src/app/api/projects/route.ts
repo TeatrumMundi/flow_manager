@@ -64,31 +64,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create the project
-    const result = await createProjectInDb({
+    const projectPayload = {
       name,
       description:
-        body.description === undefined || body.description === ""
+        body.description === undefined || body.description === null || body.description === ""
           ? null
-          : String(body.description),
+          : body.description,
       budget:
-        body.budget === undefined || body.budget === ""
+        body.budget === undefined || body.budget === null || body.budget === ""
           ? null
-          : String(body.budget),
+          : body.budget,
       progress:
-        body.progress === undefined || body.progress === ""
+        body.progress === undefined || body.progress === null || body.progress === ""
           ? null
           : Number(body.progress),
       startDate:
-        body.startDate === undefined || body.startDate === ""
+        body.startDate === undefined || body.startDate === null || body.startDate === ""
           ? null
-          : String(body.startDate),
+          : body.startDate,
       endDate:
-        body.endDate === undefined || body.endDate === ""
+        body.endDate === undefined || body.endDate === null || body.endDate === ""
           ? null
-          : String(body.endDate),
+          : body.endDate,
       isArchived: body.isArchived === true,
-    });
+    };
+
+    // Create the project
+    const result = await createProjectInDb(projectPayload);
 
     // Assign manager if provided
     if (body.managerName && typeof body.managerName === "string") {
