@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
+import { DataTable } from "@/components/common/CustomTable";
 import { EmployeeEditModal } from "@/components/employees/EmployeeEditModal";
+import type { EmployeeProjectAssignmentListItem } from "@/dataBase/query/employees/listEmployeeProjectsAssignments";
 import type { EmployeeListItem } from "@/dataBase/query/employees/listEmployeesFromDb";
 import type { SupervisorListItem } from "@/dataBase/query/users/listSupervisorsFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
@@ -25,6 +27,7 @@ interface Employee {
 interface EmployeeViewProps {
   initialEmployees: Employee[];
   employeesData: EmployeeListItem[];
+  employeeProjectsMap: Map<number, EmployeeProjectAssignmentListItem[]>;
   availableEmploymentTypes: EmploymentType[];
   supervisors: SupervisorListItem[];
 }
@@ -32,6 +35,7 @@ interface EmployeeViewProps {
 export function EmployeeView({
   initialEmployees,
   employeesData,
+  employeeProjectsMap,
   availableEmploymentTypes,
   supervisors,
 }: EmployeeViewProps) {
@@ -224,28 +228,70 @@ export function EmployeeView({
             <div className="bg-white/40 backdrop-blur-sm p-6 rounded-lg shadow-md border border-white/50">
               <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <span className="w-1 h-6 bg-blue-500 mr-3 rounded"></span>
-                Historia projektów i zadań
+                Historia projektów
               </h3>
 
-              {/* Projekty - każdy osobna kafelka */}
-              {selectedEmployee.history.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3">
-                  {selectedEmployee.history.map((item, index) => (
-                    <div
-                      key={`${selectedEmployee.id}-${item}-${index}`}
-                      className="bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200 hover:shadow-md transition-shadow"
-                    >
-                      <p className="text-gray-800">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-gray-50 p-8 rounded-lg text-center">
-                  <p className="text-gray-500 italic">
-                    Brak przypisanych projektów
-                  </p>
-                </div>
-              )}
+              {/* Tabela projektów */}
+              <DataTable<EmployeeProjectAssignmentListItem>
+                data={employeeProjectsMap.get(selectedEmployee.id) || []}
+                columns={[
+                  {
+                    key: "projectName",
+                    header: "Nazwa projektu",
+                    render: (item) => (
+                      <span className="font-medium text-gray-800">
+                        {item.projectName || "Bez nazwy"}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "roleOnProject",
+                    header: "Rola",
+                    render: (item) => (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm">
+                        {item.roleOnProject || "Brak roli"}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "projectStatus",
+                    header: "Status",
+                    render: (item) => (
+                      <span className="text-gray-700">
+                        {item.projectStatus || "Brak statusu"}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "projectProgress",
+                    header: "Postęp",
+                    align: "center",
+                    render: (item) => (
+                      <span className="font-semibold text-gray-800">
+                        {item.projectProgress !== null
+                          ? `${item.projectProgress}%`
+                          : "0%"}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "assignedAt",
+                    header: "Data przypisania",
+                    render: (item) => (
+                      <span className="text-gray-800">
+                        {item.assignedAt
+                          ? new Date(item.assignedAt).toLocaleDateString(
+                              "pl-PL",
+                            )
+                          : "Brak daty"}
+                      </span>
+                    ),
+                  },
+                ]}
+                keyExtractor={(item) => item.assignmentId}
+                emptyMessage="Brak przypisanych projektów"
+                className="mt-4"
+              />
             </div>
           </div>
         ) : (

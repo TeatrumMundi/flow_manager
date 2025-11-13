@@ -1,6 +1,7 @@
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { EmployeeView } from "@/components/employees/EmployeeView";
+import { listEmployeeProjectsAssignments } from "@/dataBase/query/employees/listEmployeeProjectsAssignments";
 import { listEmployeesFromDb } from "@/dataBase/query/employees/listEmployeesFromDb";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/employees/listEmploymentTypesFromDb";
 import { listSupervisorsFromDb } from "@/dataBase/query/users/listSupervisorsFromDb";
@@ -17,6 +18,13 @@ export default async function EmployeesPage() {
   const supervisors = await listSupervisorsFromDb();
   // Fetch employment types
   const employmentTypes: EmploymentType[] = await listEmploymentTypesFromDb();
+
+  // Fetch projects for all employees
+  const employeeProjectsMap = new Map();
+  for (const employee of employeesData) {
+    const projects = await listEmployeeProjectsAssignments(employee.id);
+    employeeProjectsMap.set(employee.id, projects);
+  }
 
   // Transform employees to display format
   const employees = employeesData.map((employee) => ({
@@ -49,6 +57,7 @@ export default async function EmployeesPage() {
         <EmployeeView
           initialEmployees={employees}
           employeesData={employeesData}
+          employeeProjectsMap={employeeProjectsMap}
           availableEmploymentTypes={employmentTypes}
           supervisors={supervisors}
         />
