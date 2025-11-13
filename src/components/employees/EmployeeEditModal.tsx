@@ -31,13 +31,17 @@ export function EmployeeEditModal({
     availableEmploymentTypes[0]?.id ||
     "";
 
+  console.log("Editing employee:", employee.vacationDaysTotal);
+
   // Initialize form data with employee data
   const [formData, setFormData] = useState({
     position: employee.position || "",
     salary_rate: employee.salaryRate || "",
-    vacation_days_total: employee.vacationDaysTotal
-      ? String(employee.vacationDaysTotal)
-      : "26",
+    vacation_days_total:
+      employee.vacationDaysTotal !== null &&
+      employee.vacationDaysTotal !== undefined
+        ? String(employee.vacationDaysTotal)
+        : "26",
     employment_type_id: String(employmentTypeId),
     supervisor_id: employee.supervisorId ? String(employee.supervisorId) : "",
   });

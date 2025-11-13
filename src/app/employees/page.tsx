@@ -6,6 +6,10 @@ import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesF
 import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 
+// Turn off static rendering and caching for this page
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function EmployeesPage() {
   // Fetch employees from database with supervisor information
   const employeesData = await listEmployeesFromDb();
