@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { deleteUserFromDb } from "@/dataBase/query/deleteUserFromDb";
-import { updateUserInDb } from "@/dataBase/query/updateUserInDb";
+import { deleteUserFromDb } from "@/dataBase/query/users/deleteUserFromDb";
+import { updateUserInDb } from "@/dataBase/query/users/updateUserInDb";
 
 export async function PUT(
   request: NextRequest,

@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import getUserCredentialsFromDB from "@/dataBase/query/users/getUserCredentialsFromDB";
 import { users } from "@/dataBase/schema";
 import { database } from "@/utils/db";
-import getUserCredentialsFromDB from "./getUserCredentialsFromDB";
 
 async function getUserFromDb(inputEmail: string, inputPassword: string) {
   // Find user by email first

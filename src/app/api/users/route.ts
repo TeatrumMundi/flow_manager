@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createUserInDb } from "@/dataBase/query/createUserInDb";
-import { deleteMultipleUsersFromDb } from "@/dataBase/query/deleteUserFromDb";
-import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
+import { createUserInDb } from "@/dataBase/query/users/createUserInDb";
+import { deleteMultipleUsersFromDb } from "@/dataBase/query/users/deleteUserFromDb";
+import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 
 export async function GET(request: Request) {
   try {

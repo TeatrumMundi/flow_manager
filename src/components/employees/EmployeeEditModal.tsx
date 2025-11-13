@@ -7,8 +7,8 @@ import { Button } from "@/components/common/CustomButton";
 import { FormInput } from "@/components/common/CustomInput";
 import { CustomModal } from "@/components/common/CustomModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
-import type { EmployeeListItem } from "@/dataBase/query/listEmployeesFromDb";
-import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
+import type { EmployeeListItem } from "@/dataBase/query/employees/listEmployeesFromDb";
+import type { SupervisorListItem } from "@/dataBase/query/users/listSupervisorsFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 
 interface EmployeeEditModalProps {

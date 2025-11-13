@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { UserProfile } from "@/components/userProfile/UserProfile";
-import getFullUserProfileFromDbByEmail from "@/dataBase/query/getFullUserProfileFromDbByEmail";
+import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 
 export default async function UserDashboard() {
   const session = await auth();

@@ -1,9 +1,9 @@
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { EmployeeView } from "@/components/employees/EmployeeView";
-import { listEmployeesFromDb } from "@/dataBase/query/listEmployeesFromDb";
-import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
-import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
+import { listEmployeesFromDb } from "@/dataBase/query/employees/listEmployeesFromDb";
+import { listEmploymentTypesFromDb } from "@/dataBase/query/employees/listEmploymentTypesFromDb";
+import { listSupervisorsFromDb } from "@/dataBase/query/users/listSupervisorsFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 
 // Turn off static rendering and caching for this page

@@ -1,4 +1,4 @@
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 
 export interface Project {
   id: number;

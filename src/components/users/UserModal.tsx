@@ -8,8 +8,8 @@ import { Button } from "@/components/common/CustomButton";
 import { FormInput } from "@/components/common/CustomInput";
 import { CustomModal } from "@/components/common/CustomModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
-import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { SupervisorListItem } from "@/dataBase/query/users/listSupervisorsFromDb";
+import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 

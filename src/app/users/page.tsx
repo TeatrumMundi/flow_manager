@@ -1,10 +1,10 @@
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { UsersInterface } from "@/components/users/UsersInterface";
-import { listEmploymentTypesFromDb } from "@/dataBase/query/listEmploymentTypesFromDb";
-import { listSupervisorsFromDb } from "@/dataBase/query/listSupervisorsFromDb";
-import { listUserRolesFromDb } from "@/dataBase/query/listUserRolesFromDb";
-import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
+import { listEmploymentTypesFromDb } from "@/dataBase/query/employees/listEmploymentTypesFromDb";
+import { listSupervisorsFromDb } from "@/dataBase/query/users/listSupervisorsFromDb";
+import { listUserRolesFromDb } from "@/dataBase/query/users/listUserRolesFromDb";
+import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 

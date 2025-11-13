@@ -12,8 +12,8 @@ import {
 } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
 import { UserModal } from "@/components/users/UserModal";
-import type { SupervisorListItem } from "@/dataBase/query/listSupervisorsFromDb";
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { SupervisorListItem } from "@/dataBase/query/users/listSupervisorsFromDb";
+import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 import { useRefreshList } from "@/hooks/useRefreshList";
 import { useBulkDeleteUsers } from "@/hooks/users/useBulkDeleteUsers";
 import { useDeleteUser } from "@/hooks/users/useDeleteUser";

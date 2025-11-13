@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 
 export function useDeleteUser() {
   const router = useRouter();

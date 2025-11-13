@@ -1,8 +1,8 @@
 ﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ProjectsView } from "@/components/projects/ProjectsView";
-import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
+import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 import { mapProjectData } from "@/utils/mapProjectData";
 
 // Turn off static rendering and caching for this page

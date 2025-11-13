@@ -7,8 +7,8 @@ import { BackToDashboardButton } from "@/components/common/BackToDashboardButton
 import { Button } from "@/components/common/CustomButton";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
-import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
 import type { ProjectAssignmentListItem } from "@/dataBase/query/projects/listProjectAssignmentsFromDb";
+import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 import { ProgressBar } from "./ProgressBar";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 
