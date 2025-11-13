@@ -31,6 +31,8 @@ export async function getUserIdByFullNameFromDb(
   const firstName = nameParts[0];
   const lastName = nameParts.slice(1).join(" ");
 
+  const { sql } = await import("drizzle-orm");
+
   const [result] = await database
     .select({
       userId: users.id,
@@ -39,8 +41,8 @@ export async function getUserIdByFullNameFromDb(
     .innerJoin(userProfiles, eq(users.id, userProfiles.userId))
     .where(
       and(
-        eq(userProfiles.firstName, firstName),
-        eq(userProfiles.lastName, lastName),
+        sql`LOWER(${userProfiles.firstName}) = LOWER(${firstName})`,
+        sql`LOWER(${userProfiles.lastName}) = LOWER(${lastName})`,
       ),
     )
     .limit(1);

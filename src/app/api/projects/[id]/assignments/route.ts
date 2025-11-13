@@ -73,20 +73,35 @@ export async function POST(request: Request, context: RouteParams) {
       );
     }
 
-    const assignment = await assignUserToProjectInDb({
-      userId: Number(body.userId),
-      projectId,
-      roleOnProject: String(body.roleOnProject),
-    });
+    try {
+      const assignment = await assignUserToProjectInDb({
+        userId: Number(body.userId),
+        projectId,
+        roleOnProject: String(body.roleOnProject),
+      });
 
-    return NextResponse.json(
-      {
-        ok: true,
-        data: assignment,
-        message: "User successfully assigned to project",
-      },
-      { status: 201 },
-    );
+      return NextResponse.json(
+        {
+          ok: true,
+          data: assignment,
+          message: "User successfully assigned to project",
+        },
+        { status: 201 },
+      );
+    } catch (assignError: unknown) {
+      const errorMessage =
+        assignError instanceof Error
+          ? assignError.message
+          : "Failed to assign user to project";
+
+      return NextResponse.json(
+        {
+          ok: false,
+          error: errorMessage,
+        },
+        { status: 400 },
+      );
+    }
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -94,7 +109,7 @@ export async function POST(request: Request, context: RouteParams) {
         error:
           error instanceof Error
             ? error.message
-            : "Failed to assign user to project",
+            : "Failed to process assignment request",
       },
       { status: 500 },
     );

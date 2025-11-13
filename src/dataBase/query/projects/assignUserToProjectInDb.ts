@@ -39,12 +39,44 @@ export async function assignUserToProjectInDb(
     throw new Error("roleOnProject is required");
   }
 
+  const trimmedRole = roleOnProject.trim();
+
+  // If assigning as Manager, check if there's already a manager and remove them
+  // Note: neon-http driver doesn't support transactions, so we do this in sequence
+  if (trimmedRole === "Manager") {
+    const { and } = await import("drizzle-orm");
+
+    // Find existing manager
+    const existingManagers = await database
+      .select()
+      .from(projectAssignments)
+      .where(
+        and(
+          eq(projectAssignments.projectId, projectId),
+          eq(projectAssignments.roleOnProject, "Manager"),
+        ),
+      );
+
+    // Remove existing managers (there should only be one, but let's be safe)
+    if (existingManagers.length > 0) {
+      await database
+        .delete(projectAssignments)
+        .where(
+          and(
+            eq(projectAssignments.projectId, projectId),
+            eq(projectAssignments.roleOnProject, "Manager"),
+          ),
+        );
+    }
+  }
+
+  // Insert the new assignment
   const [assignment] = await database
     .insert(projectAssignments)
     .values({
       userId,
       projectId,
-      roleOnProject: roleOnProject.trim(),
+      roleOnProject: trimmedRole,
     })
     .returning();
 

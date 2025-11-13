@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { getUserIdByFullNameFromDb } from "@/dataBase/query/getUserIdByNameFromDb";
-import { assignUserToProjectInDb } from "@/dataBase/query/projects/assignUserToProjectInDb";
 import { createProjectInDb } from "@/dataBase/query/projects/createProjectInDb";
 import { deleteMultipleProjectsFromDb } from "@/dataBase/query/projects/deleteProjectFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
@@ -103,27 +101,6 @@ export async function POST(request: Request) {
 
     // Create the project
     const result = await createProjectInDb(projectPayload);
-
-    // Assign manager if provided
-    if (body.managerName && typeof body.managerName === "string") {
-      const managerName = body.managerName.trim();
-      if (managerName && managerName !== "Nie przypisano") {
-        const managerId = await getUserIdByFullNameFromDb(managerName);
-
-        if (managerId) {
-          try {
-            await assignUserToProjectInDb({
-              userId: managerId,
-              projectId: result.project.id,
-              roleOnProject: "Manager",
-            });
-          } catch (assignError) {
-            console.error("Failed to assign manager:", assignError);
-            // Continue without failing the project creation
-          }
-        }
-      }
-    }
 
     return NextResponse.json({ ok: true, data: result }, { status: 201 });
   } catch (error: unknown) {

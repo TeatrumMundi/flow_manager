@@ -25,7 +25,6 @@ interface ProjectEditModalProps {
   project: Project;
   onClose: () => void;
   availableStatuses: string[];
-  availableManagers: string[];
   onProjectChange?: () => void;
 }
 
@@ -33,7 +32,6 @@ export function ProjectEditModal({
   project,
   onClose,
   availableStatuses,
-  availableManagers,
   onProjectChange,
 }: ProjectEditModalProps) {
   const router = useRouter();
@@ -42,7 +40,6 @@ export function ProjectEditModal({
     name: project.name || "",
     description: project.description || "",
     status: project.status || availableStatuses[0] || "",
-    manager: project.manager || "",
     progress: project.progress?.toString() || "0",
     budget: project.budget?.toString() || "",
     startDate: project.startDate || "",
@@ -123,33 +120,17 @@ export function ProjectEditModal({
           onChange={handleChange}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <CustomSelect
-            label="Kierownik projektu"
-            name="manager"
-            value={formData.manager}
-            onChange={handleChange}
-            searchable
-            options={[
-              { label: "Nie przypisano", value: "" },
-              ...availableManagers.map((manager) => ({
-                label: manager,
-                value: manager,
-              })),
-            ]}
-          />
-          <CustomSelect
-            label="Status *"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            options={availableStatuses.map((status) => ({
-              label: status,
-              value: status,
-            }))}
-            required
-          />
-        </div>
+        <CustomSelect
+          label="Status *"
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          options={availableStatuses.map((status) => ({
+            label: status,
+            value: status,
+          }))}
+          required
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CustomInput

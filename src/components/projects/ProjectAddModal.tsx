@@ -12,14 +12,12 @@ import { CustomSelect } from "@/components/common/CustomSelect";
 interface ProjectAddModalProps {
   onClose: () => void;
   availableStatuses: string[];
-  availableManagers: string[];
   onProjectChange?: () => void;
 }
 
 export function ProjectAddModal({
   onClose,
   availableStatuses,
-  availableManagers,
   onProjectChange,
 }: ProjectAddModalProps) {
   const router = useRouter();
@@ -29,7 +27,6 @@ export function ProjectAddModal({
     name: "",
     description: "",
     status: availableStatuses[0] || "Aktywny",
-    manager: "",
     progress: "0",
     budget: "",
     startDate: "",
@@ -64,7 +61,6 @@ export function ProjectAddModal({
           startDate: formData.startDate?.trim() || null,
           endDate: formData.endDate?.trim() || null,
           isArchived: formData.status === "Zarchiwizowany",
-          managerName: formData.manager || null,
         }),
       });
 
@@ -139,31 +135,15 @@ export function ProjectAddModal({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <CustomInput
-            label="Budżet (PLN)"
-            name="budget"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.budget}
-            onChange={handleChange}
-          />
-          <CustomSelect
-            label="Kierownik projektu"
-            name="manager"
-            value={formData.manager}
-            onChange={handleChange}
-            searchable
-            options={[
-              { label: "Nie przypisano", value: "" },
-              ...availableManagers.map((manager) => ({
-                label: manager,
-                value: manager,
-              })),
-            ]}
-          />
-        </div>
+        <CustomInput
+          label="Budżet (PLN)"
+          name="budget"
+          type="number"
+          step="0.01"
+          min="0"
+          value={formData.budget}
+          onChange={handleChange}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CustomInput

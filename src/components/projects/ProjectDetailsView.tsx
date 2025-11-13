@@ -13,8 +13,8 @@ import { ProgressBar } from "./ProgressBar";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
 
 const PROJECT_ROLES = [
-  "Manager",
   "Developer",
+  "Manager",
   "Designer",
   "Tester",
   "Analyst",
@@ -84,6 +84,12 @@ export function ProjectDetailsView({
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedRole, setSelectedRole] = useState(PROJECT_ROLES[0]);
+
+  // Get manager from assignments
+  const projectManager = assignments.find((a) => a.roleOnProject === "Manager");
+  const managerName = projectManager
+    ? `${projectManager.firstName} ${projectManager.lastName}`
+    : null;
 
   // Fetch project assignments
   useEffect(() => {
@@ -276,6 +282,11 @@ export function ProjectDetailsView({
                               )
                             }
                             className="py-1 px-3"
+                            title={
+                              assignment.roleOnProject === "Manager"
+                                ? "Usuń managera projektu"
+                                : "Usuń z projektu"
+                            }
                           >
                             <FaTrash size={14} />
                           </Button>
@@ -290,6 +301,13 @@ export function ProjectDetailsView({
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">
                     Przypisz nowego użytkownika
                   </h3>
+                  {selectedRole === "Manager" && projectManager && (
+                    <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                      <strong>Uwaga:</strong> Przypisanie nowego Managera
+                      automatycznie usunie obecnego managera (
+                      {projectManager.firstName} {projectManager.lastName}).
+                    </div>
+                  )}
                   <div className="flex gap-3 items-end">
                     <div className="flex-1">
                       <CustomSelect
@@ -359,12 +377,12 @@ export function ProjectDetailsView({
                   }).format(project.budget)}
                 </p>
               </div>
-              {project.manager && (
+              {managerName && (
                 <div>
                   <p className="text-sm text-gray-500 mb-1">
                     Kierownik projektu
                   </p>
-                  <p className="text-gray-800 font-medium">{project.manager}</p>
+                  <p className="text-gray-800 font-medium">{managerName}</p>
                 </div>
               )}
             </div>

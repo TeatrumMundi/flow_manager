@@ -25,7 +25,6 @@ import { ProjectStatusBadge } from "./ProjectStatusBadge";
 export function ProjectsView({
   initialProjects,
   availableStatuses,
-  availableManagers,
   allUsers,
 }: ProjectsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,12 +102,17 @@ export function ProjectsView({
     }).format(value);
   };
 
+  const handleBackFromDetails = async () => {
+    setSelectedProject(null);
+    await handleSilentRefreshProjects();
+  };
+
   if (selectedProject) {
     return (
       <ProjectDetailsView
         project={selectedProject}
         allUsers={allUsers}
-        onBack={() => setSelectedProject(null)}
+        onBack={handleBackFromDetails}
       />
     );
   }
@@ -120,7 +124,6 @@ export function ProjectsView({
           project={editingProject}
           onClose={handleCloseEditModal}
           availableStatuses={availableStatuses}
-          availableManagers={availableManagers}
           onProjectChange={handleSilentRefreshProjects}
         />
       )}
@@ -129,7 +132,6 @@ export function ProjectsView({
         <ProjectAddModal
           onClose={handleCloseAddModal}
           availableStatuses={availableStatuses}
-          availableManagers={availableManagers}
           onProjectChange={handleSilentRefreshProjects}
         />
       )}

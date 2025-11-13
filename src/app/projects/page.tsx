@@ -22,12 +22,6 @@ export default async function ProjectsPage() {
     "Zakończony",
   ];
 
-  // Get all users as potential managers
-  const availableManagers = allUsers
-    .filter((user) => user.firstName && user.lastName)
-    .map((user) => `${user.firstName} ${user.lastName}`)
-    .sort();
-
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
@@ -40,7 +34,6 @@ export default async function ProjectsPage() {
           initialProjects={projects}
           projectsData={projectsData}
           availableStatuses={availableStatuses}
-          availableManagers={availableManagers}
           allUsers={allUsers}
         />
       </main>

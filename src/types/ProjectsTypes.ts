@@ -29,6 +29,5 @@ export interface ProjectsViewProps {
     updatedAt: string | null;
   }>;
   availableStatuses: string[];
-  availableManagers: string[];
   allUsers: UserListItem[];
 }
