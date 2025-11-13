@@ -35,6 +35,12 @@ export async function PUT(request: Request, context: RouteParams) {
           : body.description === ""
             ? null
             : String(body.description),
+      status:
+        body.status === undefined
+          ? undefined
+          : body.status === ""
+            ? null
+            : String(body.status),
       budget:
         body.budget === undefined
           ? undefined

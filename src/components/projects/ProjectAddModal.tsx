@@ -58,6 +58,7 @@ export function ProjectAddModal({
         body: JSON.stringify({
           name: formData.name.trim(),
           description: formData.description.trim() || null,
+          status: formData.status || null,
           progress: formData.progress ? Number(formData.progress) : 0,
           budget: formData.budget ? formData.budget : null,
           startDate: formData.startDate?.trim() || null,

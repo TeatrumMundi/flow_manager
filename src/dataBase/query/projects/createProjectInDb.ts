@@ -4,6 +4,7 @@ import { database } from "@/utils/db";
 interface CreateProjectInput {
   name: string;
   description?: string | null;
+  status?: string | null;
   budget?: string | null;
   progress?: number | null;
   startDate?: string | null;
@@ -21,6 +22,7 @@ interface CreateProjectResult {
  * @param input - Project creation data
  * @param input.name - Project name (required)
  * @param input.description - Optional project description
+ * @param input.status - Optional project status
  * @param input.budget - Optional budget as string (will be stored as numeric)
  * @param input.progress - Optional progress percentage (0-100, defaults to 0)
  * @param input.startDate - Optional start date (YYYY-MM-DD format)
@@ -61,6 +63,7 @@ export async function createProjectInDb(
     .values({
       name: input.name.trim(),
       description: input.description || null,
+      status: input.status || null,
       budget: input.budget || null,
       progress: input.progress ?? 0,
       startDate: input.startDate || null,

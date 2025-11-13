@@ -72,6 +72,12 @@ export async function POST(request: Request) {
         body.description === ""
           ? null
           : body.description,
+      status:
+        body.status === undefined ||
+        body.status === null ||
+        body.status === ""
+          ? null
+          : body.status,
       budget:
         body.budget === undefined || body.budget === null || body.budget === ""
           ? null

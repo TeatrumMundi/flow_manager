@@ -134,6 +134,7 @@ export const projects = pgTable("projects", {
   id: serial().primaryKey().notNull(),
   name: varchar({ length: 255 }),
   description: text(),
+  status: varchar({ length: 50 }),
   budget: numeric({ precision: 12, scale: 2 }),
   progress: integer().default(0),
   startDate: date("start_date"),

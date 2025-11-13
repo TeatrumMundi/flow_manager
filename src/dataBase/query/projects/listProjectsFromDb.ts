@@ -25,6 +25,7 @@ export interface ProjectListItem {
   id: number;
   name: string | null;
   description: string | null;
+  status: string | null;
   budget: string | null;
   progress: number | null;
   startDate: string | null;
@@ -134,6 +135,7 @@ export async function listProjectsFromDb(
       id: projects.id,
       name: projects.name,
       description: projects.description,
+      status: projects.status,
       budget: projects.budget,
       progress: projects.progress,
       startDate: projects.startDate,

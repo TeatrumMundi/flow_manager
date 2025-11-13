@@ -6,6 +6,7 @@ interface UpdateProjectInput {
   projectId: number;
   name?: string;
   description?: string | null;
+  status?: string | null;
   budget?: string | null;
   progress?: number | null;
   startDate?: string | null;
@@ -24,6 +25,7 @@ interface UpdateProjectResult {
  * @param input.projectId - ID of the project to update
  * @param input.name - Optional new project name
  * @param input.description - Optional new description
+ * @param input.status - Optional new status
  * @param input.budget - Optional new budget as string
  * @param input.progress - Optional new progress (0-100)
  * @param input.startDate - Optional new start date (YYYY-MM-DD)
@@ -71,6 +73,11 @@ export async function updateProjectInDb(
   // Update description
   if (input.description !== undefined) {
     updateData.description = input.description;
+  }
+
+  // Update status
+  if (input.status !== undefined) {
+    updateData.status = input.status;
   }
 
   // Update budget

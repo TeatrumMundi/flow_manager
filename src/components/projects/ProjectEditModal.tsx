@@ -12,10 +12,13 @@ import { CustomSelect } from "@/components/common/CustomSelect";
 interface Project {
   id: number;
   name: string;
+  description?: string | null;
   status: string;
   manager?: string;
   progress: number;
   budget: number;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 interface ProjectEditModalProps {
@@ -37,10 +40,13 @@ export function ProjectEditModal({
 
   const [formData, setFormData] = useState({
     name: project.name || "",
+    description: project.description || "",
     status: project.status || availableStatuses[0] || "",
-    manager: project.manager || availableManagers[0] || "",
+    manager: project.manager || "",
     progress: project.progress?.toString() || "0",
     budget: project.budget?.toString() || "",
+    startDate: project.startDate || "",
+    endDate: project.endDate || "",
   });
 
   const handleChange = (
@@ -53,20 +59,45 @@ export function ProjectEditModal({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const savePromise = new Promise((resolve) => {
-      console.log("Zapisywanie zmian:", formData);
-      setTimeout(resolve, 1000);
-    });
+    const savePromise = async () => {
+      const response = await fetch(`/api/projects/${project.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          description: formData.description.trim() || null,
+          status: formData.status || null,
+          progress: formData.progress ? Number(formData.progress) : 0,
+          budget: formData.budget ? formData.budget : null,
+          startDate: formData.startDate?.trim() || null,
+          endDate: formData.endDate?.trim() || null,
+          isArchived: formData.status === "Zarchiwizowany",
+        }),
+      });
 
-    await toast.promise(savePromise, {
-      loading: `Aktualizowanie projektu: ${formData.name}...`,
-      success: `Zaktualizowano projekt: ${formData.name}!`,
-      error: "Błąd podczas aktualizacji.",
-    });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update project");
+      }
 
-    if (onProjectChange) onProjectChange();
-    onClose();
-    router.refresh();
+      return response.json();
+    };
+
+    try {
+      await toast.promise(savePromise(), {
+        loading: `Aktualizowanie projektu: ${formData.name ?? "Nieznany projekt"}...`,
+        success: `Zaktualizowano projekt: ${formData.name ?? "Nieznany projekt"}!`,
+        error: (err) => `Błąd: ${err.message}`,
+      });
+
+      if (onProjectChange) onProjectChange();
+      onClose();
+      router.refresh();
+    } catch (error) {
+      console.error("Error updating project:", error);
+    }
   };
 
   return (
@@ -85,22 +116,37 @@ export function ProjectEditModal({
           required
         />
 
+        <CustomInput
+          label="Opis projektu"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CustomSelect
-            label="Kierownik projektu *"
+            label="Kierownik projektu"
             name="manager"
             value={formData.manager}
             onChange={handleChange}
             searchable
-            options={availableManagers}
-            required
+            options={[
+              { label: "Nie przypisano", value: "" },
+              ...availableManagers.map((manager) => ({
+                label: manager,
+                value: manager,
+              })),
+            ]}
           />
           <CustomSelect
             label="Status *"
             name="status"
             value={formData.status}
             onChange={handleChange}
-            options={availableStatuses}
+            options={availableStatuses.map((status) => ({
+              label: status,
+              value: status,
+            }))}
             required
           />
         </div>
@@ -110,14 +156,35 @@ export function ProjectEditModal({
             label="Postęp (%)"
             name="progress"
             type="number"
+            min="0"
+            max="100"
             value={formData.progress}
             onChange={handleChange}
           />
           <CustomInput
-            label="Budżet"
+            label="Budżet (PLN)"
             name="budget"
             type="number"
+            step="0.01"
+            min="0"
             value={formData.budget}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomInput
+            label="Data rozpoczęcia"
+            name="startDate"
+            type="date"
+            value={formData.startDate}
+            onChange={handleChange}
+          />
+          <CustomInput
+            label="Data zakończenia"
+            name="endDate"
+            type="date"
+            value={formData.endDate}
             onChange={handleChange}
           />
         </div>

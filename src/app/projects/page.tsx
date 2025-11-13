@@ -5,6 +5,10 @@ import { listUsersFromDb } from "@/dataBase/query/listUsersFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
 import { mapProjectData } from "@/utils/mapProjectData";
 
+// Turn off static rendering and caching for this page
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ProjectsPage() {
   const projectsData = await listProjectsFromDb({ isArchived: false });
   const allUsers = await listUsersFromDb();

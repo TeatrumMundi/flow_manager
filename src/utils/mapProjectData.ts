@@ -12,7 +12,7 @@ export function mapProjectData(projectsData: ProjectListItem[]): Project[] {
       id: project.id,
       name: project.name || "Unnamed Project",
       description: project.description,
-      status: project.isArchived ? "Zarchiwizowany" : "Aktywny",
+      status: project.status || (project.isArchived ? "Zarchiwizowany" : "Aktywny"),
       manager: managerName,
       progress: project.progress || 0,
       budget: project.budget ? Number(project.budget) : 0,
