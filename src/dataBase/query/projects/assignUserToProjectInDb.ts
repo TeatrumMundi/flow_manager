@@ -67,11 +67,14 @@ export async function removeUserFromProjectInDb(
   userId: number,
   projectId: number,
 ): Promise<void> {
+  const { and } = await import("drizzle-orm");
   await database
     .delete(projectAssignments)
     .where(
-      eq(projectAssignments.userId, userId) &&
+      and(
+        eq(projectAssignments.userId, userId),
         eq(projectAssignments.projectId, projectId),
+      ),
     );
 }
 
@@ -97,12 +100,15 @@ export async function updateUserRoleOnProjectInDb(
     throw new Error("newRole is required");
   }
 
+  const { and } = await import("drizzle-orm");
   const [updated] = await database
     .update(projectAssignments)
     .set({ roleOnProject: newRole.trim() })
     .where(
-      eq(projectAssignments.userId, userId) &&
+      and(
+        eq(projectAssignments.userId, userId),
         eq(projectAssignments.projectId, projectId),
+      ),
     )
     .returning();
 

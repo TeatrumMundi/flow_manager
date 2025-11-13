@@ -1,11 +1,26 @@
 ﻿"use client";
 
-import Link from "next/link";
-import { FaUserPlus } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { Button } from "@/components/common/CustomButton";
+import { CustomSelect } from "@/components/common/CustomSelect";
+import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import type { UserListItem } from "@/dataBase/query/listUsersFromDb";
+import type { ProjectAssignmentListItem } from "@/dataBase/query/projects/listProjectAssignmentsFromDb";
+import { ProgressBar } from "./ProgressBar";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
+
+const PROJECT_ROLES = [
+  "Manager",
+  "Developer",
+  "Designer",
+  "Tester",
+  "Analyst",
+  "DevOps",
+  "Other",
+];
 
 interface Project {
   id: number;
@@ -63,19 +78,124 @@ export function ProjectDetailsView({
   allUsers,
   onBack,
 }: ProjectDetailsViewProps) {
+  const [assignments, setAssignments] = useState<ProjectAssignmentListItem[]>(
+    [],
+  );
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedRole, setSelectedRole] = useState(PROJECT_ROLES[0]);
+
+  // Fetch project assignments
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        const response = await fetch(`/api/projects/${project.id}/assignments`);
+        const data = await response.json();
+        if (data.ok) {
+          setAssignments(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch assignments:", error);
+      } finally {
+        setIsLoadingAssignments(false);
+      }
+    };
+
+    fetchAssignments();
+  }, [project.id]);
+
+  const handleRefreshAssignments = async () => {
+    try {
+      const response = await fetch(`/api/projects/${project.id}/assignments`);
+      const data = await response.json();
+      if (data.ok) {
+        setAssignments(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to refresh assignments:", error);
+    }
+  };
+
+  // Get available users (not already assigned)
+  const availableUsers = allUsers.filter(
+    (user) => !assignments.some((a) => a.userId === user.id),
+  );
+
+  const handleAssignUser = async () => {
+    if (!selectedUserId) {
+      toast.error("Wybierz użytkownika");
+      return;
+    }
+
+    const assignPromise = async () => {
+      const response = await fetch(`/api/projects/${project.id}/assignments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: Number(selectedUserId),
+          roleOnProject: selectedRole,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to assign user");
+      }
+
+      return data;
+    };
+
+    await toast.promise(assignPromise(), {
+      loading: "Przypisywanie użytkownika...",
+      success: "Użytkownik został przypisany!",
+      error: (err) => `Błąd: ${err.message}`,
+    });
+
+    await handleRefreshAssignments();
+    setSelectedUserId("");
+    setSelectedRole(PROJECT_ROLES[0]);
+  };
+
+  const handleRemoveUser = async (userId: number, userName: string) => {
+    const removePromise = async () => {
+      const response = await fetch(`/api/projects/${project.id}/assignments`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to remove user");
+      }
+
+      return data;
+    };
+
+    await toast.promise(removePromise(), {
+      loading: `Usuwanie ${userName}...`,
+      success: `${userName} został usunięty z projektu`,
+      error: (err) => `Błąd: ${err.message}`,
+    });
+
+    await handleRefreshAssignments();
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <BackToDashboardButton className="" onClick={onBack}>
           Powrót do projektów
         </BackToDashboardButton>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Szczegóły projektu: {project.name}
-        </h1>
+        <SectionTitleTile
+          title={`Szczegóły projektu: ${project.name}`}
+          className="bg-purple-50 border-purple-500 text-purple-700 hover:bg-purple-100 hover:text-purple-900"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          {/* Tasks tile - displays list of project tasks with assigned workers */}
           <div className="bg-white/50 rounded-lg shadow p-6">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Zadania
@@ -113,68 +233,193 @@ export function ProjectDetailsView({
             </div>
           </div>
 
+          {/* Assigned employees tile - shows workers assigned to the project */}
           <div className="bg-white/50 rounded-lg shadow p-6">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Przypisani pracownicy
+              Przypisani pracownicy ({assignments.length})
             </h2>
-            <div className="max-h-60 overflow-y-auto pr-2">
-              <ul className="space-y-2">
-                {allUsers.slice(0, 5).map((user) => (
-                  <li
-                    key={user.id}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <span className="font-medium text-gray-800">
-                        {user.firstName} {user.lastName}
-                      </span>
-                      <span className="text-sm text-gray-500 ml-2">
-                        ({user.email})
-                      </span>
+            {isLoadingAssignments ? (
+              <p className="text-gray-500 py-4">Ładowanie...</p>
+            ) : (
+              <div className="space-y-4">
+                {assignments.length === 0 ? (
+                  <p className="text-gray-500 py-2">
+                    Brak przypisanych pracowników do tego projektu
+                  </p>
+                ) : (
+                  <div className="max-h-60 overflow-y-auto pr-2">
+                    <ul className="space-y-2">
+                      {assignments.map((assignment) => (
+                        <li
+                          key={assignment.assignmentId}
+                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div>
+                            <span className="font-medium text-gray-800">
+                              {assignment.firstName} {assignment.lastName}
+                            </span>
+                            <span className="text-sm text-gray-500 ml-2">
+                              ({assignment.email})
+                            </span>
+                            {assignment.roleOnProject && (
+                              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
+                                {assignment.roleOnProject}
+                              </span>
+                            )}
+                          </div>
+                          <Button
+                            variant="danger"
+                            onClick={() =>
+                              handleRemoveUser(
+                                assignment.userId,
+                                `${assignment.firstName} ${assignment.lastName}`,
+                              )
+                            }
+                            className="py-1 px-3"
+                          >
+                            <FaTrash size={14} />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Separator */}
+                <div className="border-t border-gray-300 pt-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    Przypisz nowego użytkownika
+                  </h3>
+                  <div className="flex gap-3 items-end">
+                    <div className="flex-1">
+                      <CustomSelect
+                        label="Użytkownik"
+                        name="userId"
+                        value={selectedUserId}
+                        onChange={(e) => setSelectedUserId(e.target.value)}
+                        searchable
+                        options={[
+                          { label: "Wybierz użytkownika", value: "" },
+                          ...availableUsers.map((user) => ({
+                            label:
+                              `${user.firstName || ""} ${user.lastName || ""} (${user.email})`.trim(),
+                            value: user.id,
+                          })),
+                        ]}
+                      />
                     </div>
-                    <Button variant="secondary" className="py-1 px-3 text-sm">
-                      Zarządzaj
+                    <div className="w-48">
+                      <CustomSelect
+                        label="Rola"
+                        name="role"
+                        value={selectedRole}
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                        options={PROJECT_ROLES.map((role) => ({
+                          label: role,
+                          value: role,
+                        }))}
+                      />
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={handleAssignUser}
+                      disabled={!selectedUserId}
+                    >
+                      <FaPlus className="mr-2" />
+                      Przypisz
                     </Button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button variant="primary" className="mt-4">
-              <FaUserPlus className="mr-2" />
-              Zarządzaj przypisaniem
-            </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white/50 rounded-lg shadow p-6 text-center">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Koszt projektu
-            </h3>
-            <p className="text-sm text-gray-500 mb-3">(Czas pracy + wydatki)</p>
-            <p className="text-4xl font-bold text-gray-800">$90 000</p>
-          </div>
-          <div className="bg-white/50 rounded-lg shadow p-6 text-center">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Rentowność projektu
-            </h3>
-            <p className="text-4xl font-bold text-gray-800">23 %</p>
-            <p className="text-sm text-gray-500 mt-3">Pole do uzupełnienia</p>
-          </div>
+          {/* Basic information tile - displays project status, progress, budget and manager */}
           <div className="bg-white/50 rounded-lg shadow p-6">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">
-              Załączniki
+              Informacje podstawowe
             </h3>
-            <div className="space-y-2">
-              <Link href="#" className="text-blue-600 hover:underline block">
-                Brief
-              </Link>
-              <Link href="#" className="text-blue-600 hover:underline block">
-                Dokumentacja
-              </Link>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Status</p>
+                <ProjectStatusBadge status={project.status} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Postęp</p>
+                <ProgressBar progress={project.progress} />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Budżet</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {new Intl.NumberFormat("pl-PL", {
+                    style: "currency",
+                    currency: "PLN",
+                  }).format(project.budget)}
+                </p>
+              </div>
+              {project.manager && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">
+                    Kierownik projektu
+                  </p>
+                  <p className="text-gray-800 font-medium">{project.manager}</p>
+                </div>
+              )}
             </div>
-            <p className="text-sm text-gray-500 mt-3">Pole do uzupełnienia</p>
           </div>
+
+          {/* Project description tile - shows detailed project description */}
+          {project.description && (
+            <div className="bg-white/50 rounded-lg shadow p-6">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">
+                Opis projektu
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                {project.description}
+              </p>
+            </div>
+          )}
+
+          {/* Timeline tile - displays project start and end dates */}
+          {(project.startDate || project.endDate) && (
+            <div className="bg-white/50 rounded-lg shadow p-6">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">
+                Terminy
+              </h3>
+              <div className="space-y-3">
+                {project.startDate && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">
+                      Data rozpoczęcia
+                    </p>
+                    <p className="text-gray-800 font-medium">
+                      {new Date(project.startDate).toLocaleDateString("pl-PL", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                )}
+                {project.endDate && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">
+                      Data zakończenia
+                    </p>
+                    <p className="text-gray-800 font-medium">
+                      {new Date(project.endDate).toLocaleDateString("pl-PL", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
