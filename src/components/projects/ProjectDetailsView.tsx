@@ -273,15 +273,15 @@ export function ProjectDetailsView({
                               </span>
                             )}
                           </div>
-                          <Button
-                            variant="danger"
+                          <button
+                            type="button"
                             onClick={() =>
                               handleRemoveUser(
                                 assignment.userId,
                                 `${assignment.firstName} ${assignment.lastName}`,
                               )
                             }
-                            className="py-1 px-3"
+                            className="p-2 rounded-md transition-colors cursor-pointer border bg-red-100 hover:bg-red-200 text-red-600 border-red-200"
                             title={
                               assignment.roleOnProject === "Manager"
                                 ? "Usuń managera projektu"
@@ -289,7 +289,7 @@ export function ProjectDetailsView({
                             }
                           >
                             <FaTrash size={14} />
-                          </Button>
+                          </button>
                         </li>
                       ))}
                     </ul>
