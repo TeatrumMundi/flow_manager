@@ -94,9 +94,9 @@ export function EmployeeEditModal({
     })();
 
     await toast.promise(updatePromise, {
-      loading: `Aktualizowanie danych pracownika: ${employee.firstName} ${employee.lastName}...`,
+      loading: `Aktualizowanie danych pracownika: ${employee.firstName ?? ""} ${employee.lastName ?? ""}...`,
       success: () => {
-        return `Zaktualizowano dane pracownika ${employee.firstName} ${employee.lastName}`;
+        return `Zaktualizowano dane pracownika ${employee.firstName ?? ""} ${employee.lastName ?? ""}`;
       },
       error: (error: Error) =>
         error?.message || "Błąd podczas aktualizacji danych pracownika",

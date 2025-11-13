@@ -208,6 +208,7 @@ export const vacations = pgTable(
     userId: integer("user_id"),
     startDate: date("start_date"),
     endDate: date("end_date"),
+    type: varchar({ length: 10 }),
     status: varchar({ length: 50 }),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
