@@ -196,9 +196,12 @@ export function ProjectsView({
             {
               key: "status",
               header: "Status",
-              width: "w-32",
+              width: "w-40",
               render: (project) => (
-                <ProjectStatusBadge status={project.status} />
+                <ProjectStatusBadge
+                  status={project.status}
+                  className="min-w-[150px]"
+                />
               ),
               headerClassName: "p-4",
               className: "p-4",

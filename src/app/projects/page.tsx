@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ProjectsPage() {
-  const projectsData = await listProjectsFromDb({ isArchived: false });
+  const projectsData = await listProjectsFromDb();
   const allUsers = await listUsersFromDb();
 
   const projects = mapProjectData(projectsData);
