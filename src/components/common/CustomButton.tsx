@@ -12,7 +12,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses =
-    "flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer whitespace-nowrap";
+    "flex items-center justify-center gap-2 px-4 py-2 rounded-sm transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer whitespace-nowrap";
 
   const variantClasses = {
     primary:

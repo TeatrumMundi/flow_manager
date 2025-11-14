@@ -6,7 +6,6 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { Button } from "@/components/common/CustomButton";
 import { CustomSelect } from "@/components/common/CustomSelect";
-import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import type { ProjectAssignmentListItem } from "@/dataBase/query/projects/listProjectAssignmentsFromDb";
 import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 import { ProgressBar } from "./ProgressBar";
@@ -189,90 +188,63 @@ export function ProjectDetailsView({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <BackToDashboardButton className="" onClick={onBack}>
-          Powrót do projektów
-        </BackToDashboardButton>
-        <SectionTitleTile
-          title={`Szczegóły projektu: ${project.name}`}
-          className="bg-purple-50 border-purple-500 text-purple-700 hover:bg-purple-100 hover:text-purple-900"
-        />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <BackToDashboardButton className="" onClick={onBack}>
+            Powrót
+          </BackToDashboardButton>
+          <div>
+            <p className="text-sm text-slate-500">Projekt</p>
+            <h1 className="text-2xl font-bold text-slate-800">
+              {project.name}
+            </h1>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-slate-600">Status:</p>
+          <ProjectStatusBadge status={project.status} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Tasks tile - displays list of project tasks with assigned workers */}
-          <div className="bg-white/50 rounded-lg shadow p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Zadania
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="border-b-2 border-gray-200">
-                  <tr>
-                    <th className="p-3 font-semibold text-gray-600">Nazwa</th>
-                    <th className="p-3 font-semibold text-gray-600">
-                      Przypisany pracownik
-                    </th>
-                    <th className="p-3 font-semibold text-gray-600">Status</th>
-                    <th className="p-3 font-semibold text-gray-600">Godziny</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockTasks.map((task) => (
-                    <tr
-                      key={task.id}
-                      className="border-t border-gray-200 hover:bg-gray-50/50"
-                    >
-                      <td className="p-3 text-gray-800 font-medium">
-                        {task.name}
-                      </td>
-                      <td className="p-3 text-gray-700">{task.worker}</td>
-                      <td className="p-3">
-                        <ProjectStatusBadge status={task.status} />
-                      </td>
-                      <td className="p-3 text-gray-700">{task.hours}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Assigned employees tile */}
+          <div className="bg-white rounded-xl border border-slate-200">
+            <div className="p-6 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-800">
+                Przypisani pracownicy ({assignments.length})
+              </h2>
             </div>
-          </div>
-
-          {/* Assigned employees tile - shows workers assigned to the project */}
-          <div className="bg-white/50 rounded-lg shadow p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Przypisani pracownicy ({assignments.length})
-            </h2>
             {isLoadingAssignments ? (
-              <p className="text-gray-500 py-4">Ładowanie...</p>
+              <p className="text-slate-500 p-6">Ładowanie...</p>
             ) : (
-              <div className="space-y-4">
-                {assignments.length === 0 ? (
-                  <p className="text-gray-500 py-2">
-                    Brak przypisanych pracowników do tego projektu
-                  </p>
-                ) : (
-                  <div className="max-h-60 overflow-y-auto pr-2">
-                    <ul className="space-y-2">
-                      {assignments.map((assignment) => (
-                        <li
-                          key={assignment.assignmentId}
-                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                        >
-                          <div>
-                            <span className="font-medium text-gray-800">
-                              {assignment.firstName} {assignment.lastName}
-                            </span>
-                            <span className="text-sm text-gray-500 ml-2">
-                              ({assignment.email})
-                            </span>
-                            {assignment.roleOnProject && (
-                              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                                {assignment.roleOnProject}
-                              </span>
-                            )}
+              <div>
+                {assignments.length > 0 && (
+                  <ul className="divide-y divide-slate-200">
+                    {assignments.map((assignment) => (
+                      <li
+                        key={assignment.assignmentId}
+                        className="flex justify-between items-center p-4 hover:bg-slate-50/50"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500 shrink-0">
+                            {assignment.firstName?.[0]}
+                            {assignment.lastName?.[0]}
                           </div>
+                          <div>
+                            <p className="font-semibold text-slate-800">
+                              {assignment.firstName} {assignment.lastName}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                              {assignment.email}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
+                            {assignment.roleOnProject}
+                          </span>
                           <button
                             type="button"
                             onClick={() =>
@@ -281,35 +253,38 @@ export function ProjectDetailsView({
                                 `${assignment.firstName} ${assignment.lastName}`,
                               )
                             }
-                            className="p-2 rounded-md transition-colors cursor-pointer border bg-red-100 hover:bg-red-200 text-red-600 border-red-200"
+                            className={
+                              "p-2 rounded-md transition-colors cursor-pointer border bg-red-100 hover:bg-red-200 text-red-600 border-red-200 h-9 w-9 flex items-center justify-center"
+                            }
                             title={
                               assignment.roleOnProject === "Manager"
                                 ? "Usuń managera projektu"
                                 : "Usuń z projektu"
                             }
                           >
-                            <FaTrash size={14} />
+                            <FaTrash size={16} className="w-4 h-4" />
                           </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 )}
-
-                {/* Separator */}
-                <div className="border-t border-gray-300 pt-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                {/* Add new user form */}
+                <div className="p-6 bg-slate-50/70 rounded-b-xl">
+                  <h3 className="text-base font-semibold text-slate-700 mb-3">
                     Przypisz nowego użytkownika
                   </h3>
                   {selectedRole === "Manager" && projectManager && (
-                    <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                      <strong>Uwaga:</strong> Przypisanie nowego Managera
-                      automatycznie usunie obecnego managera (
-                      {projectManager.firstName} {projectManager.lastName}).
+                    <div className="mb-3 p-3 bg-yellow-100 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                      <p>
+                        <strong>Uwaga:</strong> Przypisanie nowego Managera
+                        automatycznie usunie obecnego (
+                        {projectManager.firstName} {projectManager.lastName}).
+                      </p>
                     </div>
                   )}
-                  <div className="flex gap-3 items-end">
-                    <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row gap-3 items-end">
+                    <div className="w-full sm:flex-1">
                       <CustomSelect
                         label="Użytkownik"
                         name="userId"
@@ -317,16 +292,17 @@ export function ProjectDetailsView({
                         onChange={(e) => setSelectedUserId(e.target.value)}
                         searchable
                         options={[
-                          { label: "Wybierz użytkownika", value: "" },
+                          { label: "Wybierz użytkownika...", value: "" },
                           ...availableUsers.map((user) => ({
-                            label:
-                              `${user.firstName || ""} ${user.lastName || ""} (${user.email})`.trim(),
+                            label: `${user.firstName || ""} ${
+                              user.lastName || ""
+                            } (${user.email})`.trim(),
                             value: user.id,
                           })),
                         ]}
                       />
                     </div>
-                    <div className="w-48">
+                    <div className="w-full sm:w-48">
                       <CustomSelect
                         label="Rola"
                         name="role"
@@ -342,102 +318,155 @@ export function ProjectDetailsView({
                       variant="primary"
                       onClick={handleAssignUser}
                       disabled={!selectedUserId}
+                      className="w-full sm:w-auto"
                     >
-                      <FaPlus className="mr-2" />
-                      Przypisz
+                      <FaPlus />
+                      <span>Przypisz</span>
                     </Button>
                   </div>
                 </div>
               </div>
             )}
           </div>
+
+          {/* Tasks tile */}
+          <div className="bg-white rounded-xl border border-slate-200">
+            <div className="p-6 border-b border-slate-200">
+              <h2 className="text-lg font-semibold text-slate-800">
+                Zadania w projekcie
+              </h2>
+            </div>
+            <div className="overflow-x-auto p-2">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-slate-200">
+                    <th className="p-4 font-semibold text-slate-600 text-sm">
+                      Nazwa
+                    </th>
+                    <th className="p-4 font-semibold text-slate-600 text-sm">
+                      Pracownik
+                    </th>
+                    <th className="p-4 font-semibold text-slate-600 text-sm">
+                      Status
+                    </th>
+                    <th className="p-4 font-semibold text-slate-600 text-sm text-right">
+                      Godziny
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockTasks.map((task) => (
+                    <tr
+                      key={task.id}
+                      className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50"
+                    >
+                      <td className="p-4 text-slate-800 font-medium">
+                        {task.name}
+                      </td>
+                      <td className="p-4 text-slate-600">{task.worker}</td>
+                      <td className="p-4">
+                        <ProjectStatusBadge status={task.status} />
+                      </td>
+                      <td className="p-4 text-slate-600 text-right font-mono">
+                        {task.hours}h
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
-        <div className="lg:col-span-1 space-y-6">
-          {/* Basic information tile - displays project status, progress, budget and manager */}
-          <div className="bg-white/50 rounded-lg shadow p-6">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">
-              Informacje podstawowe
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Status</p>
-                <ProjectStatusBadge status={project.status} />
+        {/* Right Column */}
+        <div className="lg:col-span-1 space-y-8">
+          {/* Details tile */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-6">
+            <h2 className="text-lg font-semibold text-slate-800">
+              Szczegóły projektu
+            </h2>
+
+            {/* Progress */}
+            <div>
+              <div className="flex justify-between items-baseline mb-1">
+                <p className="text-sm font-medium text-slate-500">Postęp</p>
+                <p className="text-sm font-bold text-blue-600">
+                  {project.progress}%
+                </p>
               </div>
+              <ProgressBar progress={project.progress} />
+            </div>
+
+            <dl className="space-y-4">
+              {managerName && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-500 mb-1">
+                    Kierownik projektu
+                  </dt>
+                  <dd className="text-slate-800 font-semibold">
+                    {managerName}
+                  </dd>
+                </div>
+              )}
               <div>
-                <p className="text-sm text-gray-500 mb-1">Postęp</p>
-                <ProgressBar progress={project.progress} />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Budżet</p>
-                <p className="text-2xl font-bold text-gray-800">
+                <dt className="text-sm font-medium text-slate-500 mb-1">
+                  Budżet
+                </dt>
+                <dd className="text-xl font-bold text-slate-800">
                   {new Intl.NumberFormat("pl-PL", {
                     style: "currency",
                     currency: "PLN",
+                    minimumFractionDigits: 0,
                   }).format(project.budget)}
+                </dd>
+              </div>
+            </dl>
+
+            {/* Timeline */}
+            {(project.startDate || project.endDate) && (
+              <div className="border-t border-slate-200 pt-6">
+                <h3 className="text-base font-semibold text-slate-800 mb-4">
+                  Terminy
+                </h3>
+                <dl className="grid grid-cols-2 gap-4">
+                  {project.startDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-slate-500 mb-1">
+                        Data rozpoczęcia
+                      </dt>
+                      <dd className="text-slate-800 font-semibold">
+                        {new Date(project.startDate).toLocaleDateString(
+                          "pl-PL",
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                  {project.endDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-slate-500 mb-1">
+                        Data zakończenia
+                      </dt>
+                      <dd className="text-slate-800 font-semibold">
+                        {new Date(project.endDate).toLocaleDateString("pl-PL")}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            )}
+
+            {/* Description */}
+            {project.description && (
+              <div className="border-t border-slate-200 pt-6">
+                <h3 className="text-base font-semibold text-slate-800 mb-4">
+                  Opis
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  {project.description}
                 </p>
               </div>
-              {managerName && (
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">
-                    Kierownik projektu
-                  </p>
-                  <p className="text-gray-800 font-medium">{managerName}</p>
-                </div>
-              )}
-            </div>
+            )}
           </div>
-
-          {/* Project description tile - shows detailed project description */}
-          {project.description && (
-            <div className="bg-white/50 rounded-lg shadow p-6">
-              <h3 className="text-xl font-semibold text-gray-700 mb-4">
-                Opis projektu
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                {project.description}
-              </p>
-            </div>
-          )}
-
-          {/* Timeline tile - displays project start and end dates */}
-          {(project.startDate || project.endDate) && (
-            <div className="bg-white/50 rounded-lg shadow p-6">
-              <h3 className="text-xl font-semibold text-gray-700 mb-4">
-                Terminy
-              </h3>
-              <div className="space-y-3">
-                {project.startDate && (
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">
-                      Data rozpoczęcia
-                    </p>
-                    <p className="text-gray-800 font-medium">
-                      {new Date(project.startDate).toLocaleDateString("pl-PL", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-                )}
-                {project.endDate && (
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">
-                      Data zakończenia
-                    </p>
-                    <p className="text-gray-800 font-medium">
-                      {new Date(project.endDate).toLocaleDateString("pl-PL", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
