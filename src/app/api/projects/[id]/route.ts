@@ -32,37 +32,37 @@ export async function PUT(request: Request, context: RouteParams) {
       description:
         body.description === undefined
           ? undefined
-          : body.description === ""
+          : body.description === "" || body.description === null
             ? null
             : String(body.description),
       status:
         body.status === undefined
           ? undefined
-          : body.status === ""
+          : body.status === "" || body.status === null
             ? null
             : String(body.status),
       budget:
         body.budget === undefined
           ? undefined
-          : body.budget === ""
+          : body.budget === "" || body.budget === null
             ? null
             : String(body.budget),
       progress:
         body.progress === undefined
           ? undefined
-          : body.progress === ""
+          : body.progress === "" || body.progress === null
             ? null
             : Number(body.progress),
       startDate:
         body.startDate === undefined
           ? undefined
-          : body.startDate === ""
+          : body.startDate === "" || body.startDate === null
             ? null
             : String(body.startDate),
       endDate:
         body.endDate === undefined
           ? undefined
-          : body.endDate === ""
+          : body.endDate === "" || body.endDate === null
             ? null
             : String(body.endDate),
       isArchived:
