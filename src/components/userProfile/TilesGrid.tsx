@@ -40,7 +40,7 @@ const menuTiles: menuTile[] = [
   {
     icon: <FaCalendarCheck size={40} className="text-blue-500" />,
     label: "Urlopy",
-    href: "#",
+    href: "/vacations",
     accessibleByRoles: [
       "Administrator",
       "Zarząd",
@@ -86,21 +86,21 @@ export function TilesGrid() {
   const userRole = userProfile?.role?.name || "Użytkownik";
 
   const accessibleTiles = menuTiles.filter(
-    (tile) => tile.accessibleByRoles?.includes(userRole) ?? false,
+      (tile) => tile.accessibleByRoles?.includes(userRole) ?? false,
   );
 
   return (
-    <div className="flex flex-1 items-start justify-center w-full">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-        {accessibleTiles.map((tile) => (
-          <Tile
-            key={tile.label}
-            icon={tile.icon}
-            label={tile.label}
-            href={tile.href}
-          />
-        ))}
+      <div className="flex flex-1 items-start justify-center w-full">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {accessibleTiles.map((tile) => (
+              <Tile
+                  key={tile.label}
+                  icon={tile.icon}
+                  label={tile.label}
+                  href={tile.href}
+              />
+          ))}
+        </div>
       </div>
-    </div>
   );
 }
