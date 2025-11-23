@@ -202,6 +202,18 @@ export const workLogs = pgTable(
   ],
 );
 
+export const vacationTypes = pgTable("vacation_types", {
+  id: serial().primaryKey().notNull(),
+  name: varchar({ length: 50 }).notNull(),
+  description: text(),
+});
+
+export const vacationStatuses = pgTable("vacation_statuses", {
+  id: serial().primaryKey().notNull(),
+  name: varchar({ length: 50 }).notNull(),
+  description: text(),
+});
+
 export const vacations = pgTable(
   "vacations",
   {
@@ -209,8 +221,8 @@ export const vacations = pgTable(
     userId: integer("user_id"),
     startDate: date("start_date"),
     endDate: date("end_date"),
-    type: varchar({ length: 10 }),
-    status: varchar({ length: 50 }),
+    typeId: integer("type_id"),
+    statusId: integer("status_id"),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
   },
@@ -219,6 +231,16 @@ export const vacations = pgTable(
       columns: [table.userId],
       foreignColumns: [users.id],
       name: "vacations_user_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.typeId],
+      foreignColumns: [vacationTypes.id],
+      name: "vacations_type_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.statusId],
+      foreignColumns: [vacationStatuses.id],
+      name: "vacations_status_id_fkey",
     }),
   ],
 );

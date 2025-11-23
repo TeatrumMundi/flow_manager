@@ -12,7 +12,8 @@
     "db:createUser": "tsx scripts/createUser.ts",
     "db:createTestUsers": "tsx scripts/createTestUsers.ts",
     "db:deleteUser": "tsx scripts/deleteUser.ts",
-    "db:readDbURL": "tsx scripts/readDbURL.ts"
+    "db:readDbURL": "tsx scripts/readDbURL.ts",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

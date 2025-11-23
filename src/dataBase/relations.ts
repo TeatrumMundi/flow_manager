@@ -10,7 +10,9 @@ import {
   userProfiles,
   userRoles,
   users,
+  vacationStatuses,
   vacations,
+  vacationTypes,
   workLogs,
 } from "@/dataBase/schema";
 
@@ -117,6 +119,14 @@ export const vacationsRelations = relations(vacations, ({ one }) => ({
   user: one(users, {
     fields: [vacations.userId],
     references: [users.id],
+  }),
+  type: one(vacationTypes, {
+    fields: [vacations.typeId],
+    references: [vacationTypes.id],
+  }),
+  status: one(vacationStatuses, {
+    fields: [vacations.statusId],
+    references: [vacationStatuses.id],
   }),
 }));
 
