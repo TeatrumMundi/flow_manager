@@ -58,7 +58,7 @@ const menuTiles: menuTile[] = [
   {
     icon: <FaDollarSign size={40} className="text-blue-500" />,
     label: "Wydatki",
-    href: "#",
+    href: "/expenses",
     accessibleByRoles: ["Administrator", "Zarząd", "Księgowość"],
   },
   {
