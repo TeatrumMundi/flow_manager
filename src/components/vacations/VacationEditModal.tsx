@@ -11,112 +11,111 @@ import { CustomSelect } from "@/components/common/CustomSelect";
 import type { Vacation } from "./VacationsView";
 
 interface VacationEditModalProps {
-    vacation: Vacation;
-    onClose: () => void;
-    availableEmployees: { label: string; value: number | string }[];
-    availableTypes: string[];
-    availableStatuses: string[];
+  vacation: Vacation;
+  onClose: () => void;
+  availableEmployees: { label: string; value: number | string }[];
+  availableTypes: string[];
+  availableStatuses: string[];
 }
 
 export function VacationEditModal({
-                                      vacation,
-                                      onClose,
-                                      availableEmployees,
-                                      availableTypes,
-                                      availableStatuses,
-                                  }: VacationEditModalProps) {
-    const router = useRouter();
+  vacation,
+  onClose,
+  availableTypes,
+  availableStatuses,
+}: VacationEditModalProps) {
+  const router = useRouter();
 
-    const [formData, setFormData] = useState({
-        employeeName: vacation.employeeName || "",
-        vacationType: vacation.vacationType || availableTypes[0] || "",
-        startDate: vacation.startDate || "",
-        endDate: vacation.endDate || "",
-        status: vacation.status || availableStatuses[0] || "",
+  const [formData, setFormData] = useState({
+    employeeName: vacation.employeeName || "",
+    vacationType: vacation.vacationType || availableTypes[0] || "",
+    startDate: vacation.startDate || "",
+    endDate: vacation.endDate || "",
+    status: vacation.status || availableStatuses[0] || "",
+  });
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const savePromise = new Promise((resolve) => {
+      console.log("Zapisywanie zmian:", formData);
+      setTimeout(resolve, 1000);
     });
 
-    const handleChange = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    ) => {
-        const { name, value } = event.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+    await toast.promise(savePromise, {
+      loading: "Zapisywanie zmian...",
+      success: "Zmiany zostały zapisane!",
+      error: "Błąd podczas zapisywania zmian.",
+    });
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        const savePromise = new Promise((resolve) => {
-            console.log("Zapisywanie zmian:", formData);
-            setTimeout(resolve, 1000);
-        });
+    onClose();
+    router.refresh();
+  };
 
-        await toast.promise(savePromise, {
-            loading: "Zapisywanie zmian...",
-            success: "Zmiany zostały zapisane!",
-            error: "Błąd podczas zapisywania zmian.",
-        });
-
-        onClose();
-        router.refresh();
-    };
-
-    return (
-        <CustomModal
-            isOpen={true}
-            onClose={onClose}
-            title="Edytuj wniosek urlopowy"
-            size="md"
-        >
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <CustomInput
-                    label="Pracownik"
-                    name="employeeName"
-                    value={formData.employeeName}
-                    onChange={handleChange}
-                    disabled
-                />
-                <CustomSelect
-                    label="Typ nieobecności *"
-                    name="vacationType"
-                    value={formData.vacationType}
-                    onChange={handleChange}
-                    options={availableTypes}
-                    required
-                />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <CustomInput
-                        label="Data rozpoczęcia *"
-                        name="startDate"
-                        type="date"
-                        value={formData.startDate}
-                        onChange={handleChange}
-                        required
-                    />
-                    <CustomInput
-                        label="Data zakończenia *"
-                        name="endDate"
-                        type="date"
-                        value={formData.endDate}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <CustomSelect
-                    label="Status *"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    options={availableStatuses}
-                    required
-                />
-                <div className="flex justify-end gap-4 pt-6">
-                    <Button type="button" onClick={onClose} variant="secondary">
-                        Anuluj
-                    </Button>
-                    <Button type="submit" variant="primary">
-                        Zapisz zmiany
-                    </Button>
-                </div>
-            </form>
-        </CustomModal>
-    );
+  return (
+    <CustomModal
+      isOpen={true}
+      onClose={onClose}
+      title="Edytuj wniosek urlopowy"
+      size="md"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <CustomInput
+          label="Pracownik"
+          name="employeeName"
+          value={formData.employeeName}
+          onChange={handleChange}
+          disabled
+        />
+        <CustomSelect
+          label="Typ nieobecności *"
+          name="vacationType"
+          value={formData.vacationType}
+          onChange={handleChange}
+          options={availableTypes}
+          required
+        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomInput
+            label="Data rozpoczęcia *"
+            name="startDate"
+            type="date"
+            value={formData.startDate}
+            onChange={handleChange}
+            required
+          />
+          <CustomInput
+            label="Data zakończenia *"
+            name="endDate"
+            type="date"
+            value={formData.endDate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <CustomSelect
+          label="Status *"
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          options={availableStatuses}
+          required
+        />
+        <div className="flex justify-end gap-4 pt-6">
+          <Button type="button" onClick={onClose} variant="secondary">
+            Anuluj
+          </Button>
+          <Button type="submit" variant="primary">
+            Zapisz zmiany
+          </Button>
+        </div>
+      </form>
+    </CustomModal>
+  );
 }

@@ -17,9 +17,9 @@ export function ExpenseStatusBadge({ status }: ExpenseStatusBadgeProps) {
   };
 
   return (
-      <span
-          className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusClasses()}`}
-      >
+    <span
+      className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusClasses()}`}
+    >
       {status}
     </span>
   );

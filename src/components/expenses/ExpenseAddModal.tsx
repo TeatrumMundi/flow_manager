@@ -16,10 +16,10 @@ interface ExpenseAddModalProps {
 }
 
 export function ExpenseAddModal({
-                                  onClose,
-                                  availableCategories,
-                                  availableProjects,
-                                }: ExpenseAddModalProps) {
+  onClose,
+  availableCategories,
+  availableProjects,
+}: ExpenseAddModalProps) {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -31,7 +31,7 @@ export function ExpenseAddModal({
   });
 
   const handleChange = (
-      event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -55,69 +55,69 @@ export function ExpenseAddModal({
   };
 
   return (
-      <CustomModal
-          isOpen={true}
-          onClose={onClose}
-          title="Dodaj nowy wydatek"
-          size="md"
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <CustomInput
-              label="Nazwa wydatku *"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
+    <CustomModal
+      isOpen={true}
+      onClose={onClose}
+      title="Dodaj nowy wydatek"
+      size="md"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <CustomInput
+          label="Nazwa wydatku *"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomSelect
+            label="Kategoria *"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            options={availableCategories}
+            required
           />
+          <CustomSelect
+            label="Projekt *"
+            name="projectName"
+            value={formData.projectName}
+            onChange={handleChange}
+            options={availableProjects}
+            required
+          />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <CustomSelect
-                label="Kategoria *"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                options={availableCategories}
-                required
-            />
-            <CustomSelect
-                label="Projekt *"
-                name="projectName"
-                value={formData.projectName}
-                onChange={handleChange}
-                options={availableProjects}
-                required
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomInput
+            label="Kwota (PLN) *"
+            name="amount"
+            type="number"
+            step="0.01"
+            value={formData.amount}
+            onChange={handleChange}
+            required
+          />
+          <CustomInput
+            label="Data *"
+            name="date"
+            type="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <CustomInput
-                label="Kwota (PLN) *"
-                name="amount"
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={handleChange}
-                required
-            />
-            <CustomInput
-                label="Data *"
-                name="date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-            />
-          </div>
-
-          <div className="flex justify-end gap-4 pt-6">
-            <Button type="button" onClick={onClose} variant="secondary">
-              Anuluj
-            </Button>
-            <Button type="submit" variant="primary">
-              Dodaj wydatek
-            </Button>
-          </div>
-        </form>
-      </CustomModal>
+        <div className="flex justify-end gap-4 pt-6">
+          <Button type="button" onClick={onClose} variant="secondary">
+            Anuluj
+          </Button>
+          <Button type="submit" variant="primary">
+            Dodaj wydatek
+          </Button>
+        </div>
+      </form>
+    </CustomModal>
   );
 }

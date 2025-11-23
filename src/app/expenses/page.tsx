@@ -69,19 +69,19 @@ const availableProjects = [
 
 export default async function ExpensesPage() {
   return (
-      <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
-        <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
-          <div className="flex items-center justify-between mb-8">
-            <BackToDashboardButton />
-            <SectionTitleTile title="Wydatki" />
-          </div>
+    <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
+      <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
+        <div className="flex items-center justify-between mb-8">
+          <BackToDashboardButton />
+          <SectionTitleTile title="Wydatki" />
+        </div>
 
-          <ExpensesView
-              initialExpenses={mockExpenses}
-              availableCategories={availableCategories}
-              availableProjects={availableProjects}
-          />
-        </main>
-      </div>
+        <ExpensesView
+          initialExpenses={mockExpenses}
+          availableCategories={availableCategories}
+          availableProjects={availableProjects}
+        />
+      </main>
+    </div>
   );
 }

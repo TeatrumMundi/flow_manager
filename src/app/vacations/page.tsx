@@ -51,25 +51,33 @@ const mockEmployees = [
 
 export default async function VacationsPage() {
   const vacations = mockVacations;
-  const employees = mockEmployees.map(emp => ({ label: emp.name, value: emp.id }));
-  const availableTypes = ["Urlop wypoczynkowy", "Urlop na żądanie", "L4", "Delegacja"];
+  const employees = mockEmployees.map((emp) => ({
+    label: emp.name,
+    value: emp.id,
+  }));
+  const availableTypes = [
+    "Urlop wypoczynkowy",
+    "Urlop na żądanie",
+    "L4",
+    "Delegacja",
+  ];
   const availableStatuses = ["Oczekujący", "Zaakceptowany", "Odrzucony"];
 
   return (
-      <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
-        <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
-          <div className="flex items-center justify-between mb-8">
-            <BackToDashboardButton />
-            <SectionTitleTile title="Urlopy" />
-          </div>
+    <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
+      <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
+        <div className="flex items-center justify-between mb-8">
+          <BackToDashboardButton />
+          <SectionTitleTile title="Urlopy" />
+        </div>
 
-          <VacationsView
-              initialVacations={vacations}
-              availableEmployees={employees}
-              availableTypes={availableTypes}
-              availableStatuses={availableStatuses}
-          />
-        </main>
-      </div>
+        <VacationsView
+          initialVacations={vacations}
+          availableEmployees={employees}
+          availableTypes={availableTypes}
+          availableStatuses={availableStatuses}
+        />
+      </main>
+    </div>
   );
 }
