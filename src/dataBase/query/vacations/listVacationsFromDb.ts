@@ -1,12 +1,12 @@
-import { database } from "@/utils/db";
+import { desc, eq, sql } from "drizzle-orm";
 import {
-  vacations,
-  users,
   userProfiles,
-  vacationTypes,
+  users,
   vacationStatuses,
+  vacations,
+  vacationTypes,
 } from "@/dataBase/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { database } from "@/utils/db";
 
 export const listVacationsFromDb = async () => {
   return await database
