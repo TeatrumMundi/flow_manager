@@ -10,7 +10,7 @@ import { CustomModal } from "@/components/common/CustomModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
 
 interface VacationAddModalProps {
-  onClose: () => void;
+  onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: number | string }[];
   availableTypes: string[];
 }
@@ -38,19 +38,33 @@ export function VacationAddModal({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const savePromise = new Promise((resolve) => {
-      console.log("Składanie wniosku:", formData);
-      setTimeout(resolve, 1000);
+
+    const savePromise = fetch("/api/vacations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    }).then(async (response) => {
+      const result = await response.json();
+      if (!result.ok) {
+        throw new Error(result.error || "Failed to create vacation");
+      }
+      return result;
     });
 
-    await toast.promise(savePromise, {
-      loading: "Składanie wniosku...",
-      success: "Wniosek został złożony!",
-      error: "Błąd podczas składania wniosku.",
-    });
+    try {
+      await toast.promise(savePromise, {
+        loading: "Składanie wniosku...",
+        success: "Wniosek został złożony!",
+        error: (err) => `Błąd: ${err.message}`,
+      });
 
-    onClose();
-    router.refresh();
+      onClose(true); // Pass true to trigger refresh
+      router.refresh();
+    } catch (error) {
+      console.error("Error creating vacation:", error);
+    }
   };
 
   return (
@@ -84,6 +98,7 @@ export function VacationAddModal({
             type="date"
             value={formData.startDate}
             onChange={handleChange}
+            max={formData.endDate || undefined}
             required
           />
           <CustomInput
@@ -92,11 +107,16 @@ export function VacationAddModal({
             type="date"
             value={formData.endDate}
             onChange={handleChange}
+            min={formData.startDate || undefined}
             required
           />
         </div>
         <div className="flex justify-end gap-4 pt-6">
-          <Button type="button" onClick={onClose} variant="secondary">
+          <Button
+            type="button"
+            onClick={() => onClose(false)}
+            variant="secondary"
+          >
             Anuluj
           </Button>
           <Button type="submit" variant="primary">

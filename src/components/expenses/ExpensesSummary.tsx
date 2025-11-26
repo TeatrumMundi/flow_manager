@@ -45,7 +45,6 @@ export function ExpensesSummary({ expenses }: ExpensesSummaryProps) {
   };
 
   return (
-    // ZMIANA: Zmieniono bg-white na bg-white/50 i dodano backdrop-blur-md
     <div className="bg-white/50 backdrop-blur-md rounded-2xl shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-bold text-gray-800">

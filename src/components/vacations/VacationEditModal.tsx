@@ -12,7 +12,7 @@ import type { Vacation } from "./VacationsView";
 
 interface VacationEditModalProps {
   vacation: Vacation;
-  onClose: () => void;
+  onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: number | string }[];
   availableTypes: string[];
   availableStatuses: string[];
@@ -43,19 +43,38 @@ export function VacationEditModal({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const savePromise = new Promise((resolve) => {
-      console.log("Zapisywanie zmian:", formData);
-      setTimeout(resolve, 1000);
+
+    const savePromise = fetch(`/api/vacations/${vacation.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        vacationType: formData.vacationType,
+        status: formData.status,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+      }),
+    }).then(async (response) => {
+      const result = await response.json();
+      if (!result.ok) {
+        throw new Error(result.error || "Failed to update vacation");
+      }
+      return result;
     });
 
-    await toast.promise(savePromise, {
-      loading: "Zapisywanie zmian...",
-      success: "Zmiany zostały zapisane!",
-      error: "Błąd podczas zapisywania zmian.",
-    });
+    try {
+      await toast.promise(savePromise, {
+        loading: "Zapisywanie zmian...",
+        success: "Zmiany zostały zapisane!",
+        error: (err) => `Błąd: ${err.message}`,
+      });
 
-    onClose();
-    router.refresh();
+      onClose(true); // Pass true to trigger refresh
+      router.refresh();
+    } catch (error) {
+      console.error("Error updating vacation:", error);
+    }
   };
 
   return (
@@ -88,6 +107,7 @@ export function VacationEditModal({
             type="date"
             value={formData.startDate}
             onChange={handleChange}
+            max={formData.endDate || undefined}
             required
           />
           <CustomInput
@@ -96,6 +116,7 @@ export function VacationEditModal({
             type="date"
             value={formData.endDate}
             onChange={handleChange}
+            min={formData.startDate || undefined}
             required
           />
         </div>
@@ -108,7 +129,7 @@ export function VacationEditModal({
           required
         />
         <div className="flex justify-end gap-4 pt-6">
-          <Button type="button" onClick={onClose} variant="secondary">
+          <Button type="button" onClick={() => onClose()} variant="secondary">
             Anuluj
           </Button>
           <Button type="submit" variant="primary">

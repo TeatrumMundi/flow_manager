@@ -71,7 +71,7 @@ export function DataTable<T>({
   return (
     <>
       <div
-        className={`overflow-x-auto bg-white/50 rounded-lg shadow ${className}`}
+        className={`overflow-x-auto bg-white/50 rounded-sm shadow ${className}`}
       >
         <table className="w-full text-left" style={{ minWidth: "max-content" }}>
           {/* Column sizing */}
