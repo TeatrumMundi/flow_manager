@@ -18,7 +18,7 @@ export function VacationStatusBadge({ status }: VacationStatusBadgeProps) {
 
   return (
     <span
-      className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusClasses()}`}
+      className={`px-3 py-1 text-sm font-medium rounded-sm ${getStatusClasses()}`}
     >
       {status}
     </span>
