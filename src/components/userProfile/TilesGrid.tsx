@@ -52,7 +52,7 @@ const menuTiles: menuTile[] = [
   {
     icon: <FaChartBar size={40} className="text-blue-500" />,
     label: "Raporty",
-    href: "#",
+    href: "/reports",
     accessibleByRoles: ["Administrator", "Zarząd", "HR", "Księgowość"],
   },
   {
