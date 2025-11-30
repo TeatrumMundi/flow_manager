@@ -64,7 +64,7 @@ const menuTiles: menuTile[] = [
   {
     icon: <FaChartPie size={40} className="text-blue-500" />,
     label: "Finanse",
-    href: "#",
+    href: "/finances",
     accessibleByRoles: ["Administrator", "Zarząd", "Księgowość"],
   },
   {
