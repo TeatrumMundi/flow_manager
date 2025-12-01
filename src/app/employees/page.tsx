@@ -1,9 +1,11 @@
+import { auth } from "@/auth";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { EmployeeView } from "@/components/employees/EmployeeView";
 import { listEmployeeProjectsAssignments } from "@/dataBase/query/employees/listEmployeeProjectsAssignments";
 import { listEmployeesFromDb } from "@/dataBase/query/employees/listEmployeesFromDb";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/employees/listEmploymentTypesFromDb";
+import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { listSupervisorsFromDb } from "@/dataBase/query/users/listSupervisorsFromDb";
 import type { EmploymentType } from "@/types/EmploymentType";
 
@@ -12,6 +14,17 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function EmployeesPage() {
+  const session = await auth();
+  const userProfile = session?.user?.email
+    ? await getFullUserProfileFromDbByEmail(session.user.email)
+    : null;
+
+  // Check if user has admin privileges
+  const privilegedRoles = ["Administrator", "Zarząd", "HR", "Księgowość"];
+  const hasAdminPrivileges = userProfile?.role?.name
+    ? privilegedRoles.includes(userProfile.role.name)
+    : false;
+
   // Fetch employees from database with supervisor information
   const employeesData = await listEmployeesFromDb();
   // Fetch supervisors (roleId 1 or 2)
@@ -51,7 +64,9 @@ export default async function EmployeesPage() {
       <main className="w-full max-w-6xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
           <BackToDashboardButton />
-          <SectionTitleTile title="Pracownicy" />
+          <SectionTitleTile
+            title={hasAdminPrivileges ? "Pracownicy" : "Mój profil"}
+          />
         </div>
 
         <EmployeeView

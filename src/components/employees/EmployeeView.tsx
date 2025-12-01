@@ -10,6 +10,7 @@ import { EmployeeEditModal } from "@/components/employees/EmployeeEditModal";
 import type { EmployeeProjectAssignmentListItem } from "@/dataBase/query/employees/listEmployeeProjectsAssignments";
 import type { EmployeeListItem } from "@/dataBase/query/employees/listEmployeesFromDb";
 import type { SupervisorListItem } from "@/dataBase/query/users/listSupervisorsFromDb";
+import useUserStore from "@/store/userStore";
 import type { EmploymentType } from "@/types/EmploymentType";
 
 interface Employee {
@@ -40,6 +41,7 @@ export function EmployeeView({
   supervisors,
 }: EmployeeViewProps) {
   const router = useRouter();
+  const { userProfile } = useUserStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [employeesRawData, setEmployeesRawData] =
@@ -48,6 +50,37 @@ export function EmployeeView({
     initialEmployees[0] || null,
   );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Check if user has admin privileges
+  const hasAdminPrivileges = useMemo(() => {
+    if (!userProfile?.role?.name) return false;
+    const privilegedRoles = ["Administrator", "Zarząd", "HR", "Księgowość"];
+    return privilegedRoles.includes(userProfile.role.name);
+  }, [userProfile?.role?.name]);
+
+  // Filter employees based on role
+  const displayEmployees = useMemo(() => {
+    if (hasAdminPrivileges) {
+      return employees;
+    }
+    // Show only current user's profile
+    return employees.filter((emp) => emp.email === userProfile?.email);
+  }, [employees, hasAdminPrivileges, userProfile?.email]);
+
+  // Update selected employee when displayEmployees changes
+  useEffect(() => {
+    if (displayEmployees.length > 0) {
+      // If current selection is not in filtered list, select first employee
+      const isCurrentInList = displayEmployees.some(
+        (emp) => emp.id === selectedEmployee?.id,
+      );
+      if (!isCurrentInList) {
+        setSelectedEmployee(displayEmployees[0]);
+      }
+    } else {
+      setSelectedEmployee(null);
+    }
+  }, [displayEmployees, selectedEmployee?.id]);
 
   // Update local state when props change (after router.refresh())
   useEffect(() => {
@@ -67,12 +100,12 @@ export function EmployeeView({
 
   const filteredEmployees = useMemo(() => {
     if (!searchTerm) {
-      return employees;
+      return displayEmployees;
     }
-    return employees.filter((employee) =>
+    return displayEmployees.filter((employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [employees, searchTerm]);
+  }, [displayEmployees, searchTerm]);
 
   if (
     selectedEmployee &&
@@ -82,61 +115,65 @@ export function EmployeeView({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div className="md:col-span-1">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">
-          Lista pracowników
-        </h2>
+    <div
+      className={`grid grid-cols-1 ${hasAdminPrivileges ? "md:grid-cols-3" : ""} gap-8`}
+    >
+      {hasAdminPrivileges && (
+        <div className="md:col-span-1">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            Lista pracowników
+          </h2>
 
-        <div className="relative mb-4">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-          <CustomInput
-            type="text"
-            name="searchEmployee"
-            placeholder="Szukaj pracownika..."
-            className="pl-10"
-            hideLabel
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+          <div className="relative mb-4">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+            <CustomInput
+              type="text"
+              name="searchEmployee"
+              placeholder="Szukaj pracownika..."
+              className="pl-10"
+              hideLabel
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-        <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
-          {filteredEmployees.length > 0 ? (
-            filteredEmployees.map((employee) => (
-              <button
-                type="button"
-                key={employee.id}
-                onClick={() => setSelectedEmployee(employee)}
-                className={`w-full flex items-center p-3 rounded-lg text-left transition-colors ${
-                  selectedEmployee?.id === employee.id
-                    ? "bg-blue-100 border border-blue-300 shadow-sm"
-                    : "hover:bg-gray-50/50"
-                }`}
-              >
-                <FaUserCircle className="text-blue-500 mr-3" size={24} />
-                <span className="font-medium text-gray-800">
-                  {employee.name}
-                </span>
-              </button>
-            ))
-          ) : (
-            <p className="text-gray-500 text-center py-4">
-              Nie znaleziono pracowników.
-            </p>
-          )}
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
+            {filteredEmployees.length > 0 ? (
+              filteredEmployees.map((employee) => (
+                <button
+                  type="button"
+                  key={employee.id}
+                  onClick={() => setSelectedEmployee(employee)}
+                  className={`w-full flex items-center p-3 rounded-lg text-left transition-colors ${
+                    selectedEmployee?.id === employee.id
+                      ? "bg-blue-100 border border-blue-300 shadow-sm"
+                      : "hover:bg-gray-50/50"
+                  }`}
+                >
+                  <FaUserCircle className="text-blue-500 mr-3" size={24} />
+                  <span className="font-medium text-gray-800">
+                    {employee.name}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p className="text-gray-500 text-center py-4">
+                Nie znaleziono pracowników.
+              </p>
+            )}
+          </div>
+          <div className="mt-6">
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={() => setIsEditModalOpen(true)}
+              disabled={!selectedEmployee}
+            >
+              Edytuj dane
+            </Button>
+          </div>
         </div>
-        <div className="mt-6">
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={() => setIsEditModalOpen(true)}
-            disabled={!selectedEmployee}
-          >
-            Edytuj dane
-          </Button>
-        </div>
-      </div>
+      )}
 
       {/* Edit modal */}
       {isEditModalOpen && selectedEmployee && (

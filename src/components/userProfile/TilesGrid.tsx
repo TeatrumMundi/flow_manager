@@ -85,6 +85,10 @@ export function TilesGrid() {
   const userProfile = useUserStore((state) => state.userProfile);
   const userRole = userProfile?.role?.name || "Użytkownik";
 
+  // Check if user has admin privileges
+  const privilegedRoles = ["Administrator", "Zarząd", "HR", "Księgowość"];
+  const hasAdminPrivileges = privilegedRoles.includes(userRole);
+
   const accessibleTiles = menuTiles.filter(
     (tile) => tile.accessibleByRoles?.includes(userRole) ?? false,
   );
@@ -96,7 +100,11 @@ export function TilesGrid() {
           <Tile
             key={tile.label}
             icon={tile.icon}
-            label={tile.label}
+            label={
+              tile.href === "/employees" && !hasAdminPrivileges
+                ? "Mój profil"
+                : tile.label
+            }
             href={tile.href}
           />
         ))}
