@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { tasks, projects } from "@/dataBase/schema";
+import { projects, tasks } from "@/dataBase/schema";
 import { database } from "@/utils/db";
 
 export interface UserTaskListItem {

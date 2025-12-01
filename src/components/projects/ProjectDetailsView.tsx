@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { Button } from "@/components/common/CustomButton";
 import { CustomSelect } from "@/components/common/CustomSelect";
+import type { TableAction, TableColumn } from "@/components/common/CustomTable";
+import { DataTable } from "@/components/common/CustomTable";
 import type { ProjectAssignmentListItem } from "@/dataBase/query/projects/listProjectAssignmentsFromDb";
+import type { ProjectTaskListItem } from "@/dataBase/query/tasks/listTasksByProjectFromDb";
 import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 import { ProgressBar } from "./ProgressBar";
 import { ProjectStatusBadge } from "./ProjectStatusBadge";
+import { TaskAddModal } from "./TaskAddModal";
+import { TaskEditModal } from "./TaskEditModal";
 
 const PROJECT_ROLES = [
   "Developer",
@@ -41,37 +46,6 @@ interface ProjectDetailsViewProps {
   onBack: () => void;
 }
 
-const mockTasks = [
-  {
-    id: 1,
-    name: "Design Review",
-    worker: "Piotr Wiśniewski",
-    status: "Aktywny",
-    hours: 40,
-  },
-  {
-    id: 2,
-    name: "Backend development",
-    worker: "Jan Kowalski",
-    status: "W toku",
-    hours: 150,
-  },
-  {
-    id: 3,
-    name: "Frontend development",
-    worker: "Marek Lewandowski",
-    status: "Zakończony",
-    hours: 250,
-  },
-  {
-    id: 4,
-    name: "Final Testing",
-    worker: "Katarzyna Wójcik",
-    status: "Zakończony",
-    hours: 80,
-  },
-];
-
 export function ProjectDetailsView({
   project,
   allUsers,
@@ -80,9 +54,15 @@ export function ProjectDetailsView({
   const [assignments, setAssignments] = useState<ProjectAssignmentListItem[]>(
     [],
   );
+  const [tasks, setTasks] = useState<ProjectTaskListItem[]>([]);
   const [isLoadingAssignments, setIsLoadingAssignments] = useState(true);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedRole, setSelectedRole] = useState(PROJECT_ROLES[0]);
+  const [isTaskAddModalOpen, setIsTaskAddModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ProjectTaskListItem | null>(
+    null,
+  );
 
   // Get manager from assignments
   const projectManager = assignments.find((a) => a.roleOnProject === "Manager");
@@ -106,7 +86,22 @@ export function ProjectDetailsView({
       }
     };
 
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(`/api/projects/${project.id}/tasks`);
+        const data = await response.json();
+        if (data.ok) {
+          setTasks(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      } finally {
+        setIsLoadingTasks(false);
+      }
+    };
+
     fetchAssignments();
+    fetchTasks();
   }, [project.id]);
 
   const handleRefreshAssignments = async () => {
@@ -120,6 +115,105 @@ export function ProjectDetailsView({
       console.error("Failed to refresh assignments:", error);
     }
   };
+
+  const handleRefreshTasks = async () => {
+    try {
+      const response = await fetch(`/api/projects/${project.id}/tasks`);
+      const data = await response.json();
+      if (data.ok) {
+        setTasks(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to refresh tasks:", error);
+    }
+  };
+
+  const handleDeleteTask = async (task: ProjectTaskListItem) => {
+    const deletePromise = async () => {
+      const response = await fetch(`/api/tasks/${task.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to delete task");
+      }
+
+      return data;
+    };
+
+    await toast.promise(deletePromise(), {
+      loading: `Usuwanie zadania: ${task.title}...`,
+      success: `Zadanie usunięte!`,
+      error: (err) => `Błąd: ${err.message}`,
+    });
+
+    await handleRefreshTasks();
+  };
+
+  const handleEditTask = (task: ProjectTaskListItem) => {
+    setEditingTask(task);
+  };
+
+  // Define table columns for tasks
+  const taskColumns: TableColumn<ProjectTaskListItem>[] = [
+    {
+      key: "title",
+      header: "Nazwa",
+      render: (task) => (
+        <span className="text-slate-800 font-medium">
+          {task.title || "Bez tytułu"}
+        </span>
+      ),
+    },
+    {
+      key: "assignedToName",
+      header: "Przypisany",
+      render: (task) =>
+        task.assignedToName ? (
+          <span className="text-slate-600">{task.assignedToName}</span>
+        ) : (
+          <span className="text-slate-400 italic">Nieprzypisane</span>
+        ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      align: "center",
+      render: (task) => (
+        <ProjectStatusBadge status={task.status || "Do zrobienia"} />
+      ),
+    },
+    {
+      key: "estimatedHours",
+      header: "Szacowane godziny",
+      align: "right",
+      render: (task) =>
+        task.estimatedHours ? (
+          <span className="text-slate-600 font-mono">
+            {task.estimatedHours}h
+          </span>
+        ) : (
+          <span className="text-slate-400">-</span>
+        ),
+    },
+  ];
+
+  // Define table actions for tasks
+  const taskActions: TableAction<ProjectTaskListItem>[] = [
+    {
+      icon: <FaEdit size={16} />,
+      label: "Edytuj zadanie",
+      onClick: handleEditTask,
+      variant: "blue",
+    },
+    {
+      icon: <FaTrash size={16} />,
+      label: "Usuń zadanie",
+      onClick: handleDeleteTask,
+      variant: "red",
+    },
+  ];
 
   // Get available users (not already assigned)
   const availableUsers = allUsers.filter(
@@ -162,6 +256,20 @@ export function ProjectDetailsView({
   };
 
   const handleRemoveUser = async (userId: number, userName: string) => {
+    // Check if user is assigned to any tasks
+    const userTasks = tasks.filter((task) => task.assignedToId === userId);
+
+    if (userTasks.length > 0) {
+      const taskTitles = userTasks.map((task) => `"${task.title}"`).join(", ");
+      toast.error(
+        `Nie można usunąć ${userName} z projektu. Użytkownik jest przypisany do ${userTasks.length} zadań: ${taskTitles}. Najpierw usuń lub zmień przypisanie tych zadań.`,
+        {
+          duration: 6000,
+        },
+      );
+      return;
+    }
+
     const removePromise = async () => {
       const response = await fetch(`/api/projects/${project.id}/assignments`, {
         method: "DELETE",
@@ -208,9 +316,9 @@ export function ProjectDetailsView({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 flex flex-col">
           {/* Assigned employees tile */}
-          <div className="bg-white rounded-xl border border-slate-200">
+          <div className="bg-white rounded-xl border border-slate-200 flex-1 flex flex-col">
             <div className="p-6 border-b border-slate-200">
               <h2 className="text-lg font-semibold text-slate-800">
                 Przypisani pracownicy ({assignments.length})
@@ -219,9 +327,9 @@ export function ProjectDetailsView({
             {isLoadingAssignments ? (
               <p className="text-slate-500 p-6">Ładowanie...</p>
             ) : (
-              <div>
+              <div className="flex flex-col flex-1">
                 {assignments.length > 0 && (
-                  <ul className="divide-y divide-slate-200">
+                  <ul className="divide-y divide-slate-200 flex-1 overflow-y-auto">
                     {assignments.map((assignment) => (
                       <li
                         key={assignment.assignmentId}
@@ -270,7 +378,7 @@ export function ProjectDetailsView({
                   </ul>
                 )}
                 {/* Add new user form */}
-                <div className="p-6 bg-slate-50/70 rounded-b-xl">
+                <div className="p-6 bg-slate-50/70 rounded-b-xl mt-auto border-t border-slate-200">
                   <h3 className="text-base font-semibold text-slate-700 mb-3">
                     Przypisz nowego użytkownika
                   </h3>
@@ -328,60 +436,12 @@ export function ProjectDetailsView({
               </div>
             )}
           </div>
-
-          {/* Tasks tile */}
-          <div className="bg-white rounded-xl border border-slate-200">
-            <div className="p-6 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">
-                Zadania w projekcie
-              </h2>
-            </div>
-            <div className="overflow-x-auto p-2">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="p-4 font-semibold text-slate-600 text-sm">
-                      Nazwa
-                    </th>
-                    <th className="p-4 font-semibold text-slate-600 text-sm">
-                      Pracownik
-                    </th>
-                    <th className="p-4 font-semibold text-slate-600 text-sm">
-                      Status
-                    </th>
-                    <th className="p-4 font-semibold text-slate-600 text-sm text-right">
-                      Godziny
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockTasks.map((task) => (
-                    <tr
-                      key={task.id}
-                      className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50"
-                    >
-                      <td className="p-4 text-slate-800 font-medium">
-                        {task.name}
-                      </td>
-                      <td className="p-4 text-slate-600">{task.worker}</td>
-                      <td className="p-4">
-                        <ProjectStatusBadge status={task.status} />
-                      </td>
-                      <td className="p-4 text-slate-600 text-right font-mono">
-                        {task.hours}h
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
 
         {/* Right Column */}
-        <div className="lg:col-span-1 space-y-8">
+        <div className="lg:col-span-1 flex flex-col">
           {/* Details tile */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-6">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-6 flex-1 flex flex-col">
             <h2 className="text-lg font-semibold text-slate-800">
               Szczegóły projektu
             </h2>
@@ -469,6 +529,84 @@ export function ProjectDetailsView({
           </div>
         </div>
       </div>
+
+      {/* Tasks tile - Full width below */}
+      <div className="bg-white rounded-xl border border-slate-200 mt-8">
+        <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-slate-800">
+            Zadania w projekcie ({tasks.length})
+          </h2>
+          <Button
+            variant="primary"
+            onClick={() => setIsTaskAddModalOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <FaPlus />
+            <span>Dodaj zadanie</span>
+          </Button>
+        </div>
+        {isLoadingTasks ? (
+          <p className="text-slate-500 p-6">Ładowanie zadań...</p>
+        ) : tasks.length === 0 ? (
+          <div className="p-6 text-center">
+            <p className="text-slate-500 mb-4">Brak zadań w tym projekcie.</p>
+            <Button
+              variant="primary"
+              onClick={() => setIsTaskAddModalOpen(true)}
+              className="mx-auto"
+            >
+              <FaPlus />
+              <span>Dodaj pierwsze zadanie</span>
+            </Button>
+          </div>
+        ) : (
+          <div className="p-6">
+            <DataTable
+              data={tasks}
+              columns={taskColumns}
+              actions={taskActions}
+              keyExtractor={(task) => task.id}
+              emptyMessage="Brak zadań w tym projekcie."
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Task Add Modal */}
+      {isTaskAddModalOpen && (
+        <TaskAddModal
+          projectId={project.id}
+          onClose={(shouldRefresh) => {
+            setIsTaskAddModalOpen(false);
+            if (shouldRefresh) {
+              handleRefreshTasks();
+            }
+          }}
+          availableUsers={assignments.map((assignment) => ({
+            label:
+              `${assignment.firstName || ""} ${assignment.lastName || ""} (${assignment.email})`.trim(),
+            value: assignment.userId,
+          }))}
+        />
+      )}
+
+      {/* Task Edit Modal */}
+      {editingTask && (
+        <TaskEditModal
+          task={editingTask}
+          onClose={(shouldRefresh) => {
+            setEditingTask(null);
+            if (shouldRefresh) {
+              handleRefreshTasks();
+            }
+          }}
+          availableUsers={assignments.map((assignment) => ({
+            label:
+              `${assignment.firstName || ""} ${assignment.lastName || ""} (${assignment.email})`.trim(),
+            value: assignment.userId,
+          }))}
+        />
+      )}
     </div>
   );
 }

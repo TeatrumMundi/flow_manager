@@ -4,18 +4,19 @@
     "": {
       "name": "flow_manager",
       "dependencies": {
+        "flow_manager": ".",
         "@neondatabase/serverless": "^1.0.2",
         "bcryptjs": "^3.0.3",
         "dotenv": "^17.2.3",
         "dotenv-flow": "^4.1.0",
         "drizzle-orm": "^0.44.7",
-        "next": "^16.0.3",
+        "next": "^16.0.6",
         "next-auth": "^5.0.0-beta.30",
         "postcss": "^8.5.6",
         "react-dom": "19.1.1",
         "react-hot-toast": "^2.6.0",
         "react-icons": "^5.5.0",
-        "zustand": "^5.0.8",
+        "zustand": "^5.0.9",
       },
       "devDependencies": {
         "@biomejs/biome": "2.2.0",
@@ -27,7 +28,7 @@
         "baseline-browser-mapping": "^2.8.32",
         "drizzle-kit": "^0.31.7",
         "tailwindcss": "^4.1.17",
-        "tsx": "^4.20.6",
+        "tsx": "^4.21.0",
         "typescript": "^5.9.3",
       },
     },
@@ -272,6 +273,8 @@
     "esbuild": ["esbuild@0.25.9", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.25.9", "@esbuild/android-arm": "0.25.9", "@esbuild/android-arm64": "0.25.9", "@esbuild/android-x64": "0.25.9", "@esbuild/darwin-arm64": "0.25.9", "@esbuild/darwin-x64": "0.25.9", "@esbuild/freebsd-arm64": "0.25.9", "@esbuild/freebsd-x64": "0.25.9", "@esbuild/linux-arm": "0.25.9", "@esbuild/linux-arm64": "0.25.9", "@esbuild/linux-ia32": "0.25.9", "@esbuild/linux-loong64": "0.25.9", "@esbuild/linux-mips64el": "0.25.9", "@esbuild/linux-ppc64": "0.25.9", "@esbuild/linux-riscv64": "0.25.9", "@esbuild/linux-s390x": "0.25.9", "@esbuild/linux-x64": "0.25.9", "@esbuild/netbsd-arm64": "0.25.9", "@esbuild/netbsd-x64": "0.25.9", "@esbuild/openbsd-arm64": "0.25.9", "@esbuild/openbsd-x64": "0.25.9", "@esbuild/openharmony-arm64": "0.25.9", "@esbuild/sunos-x64": "0.25.9", "@esbuild/win32-arm64": "0.25.9", "@esbuild/win32-ia32": "0.25.9", "@esbuild/win32-x64": "0.25.9" }, "bin": "bin/esbuild" }, "sha512-CRbODhYyQx3qp7ZEwzxOk4JBqmD/seJrzPa/cGjY1VtIn5E09Oi9/dB4JwctnfZ8Q8iT7rioVv5k/FNT/uf54g=="],
 
     "esbuild-register": ["esbuild-register@3.6.0", "", { "dependencies": { "debug": "^4.3.4" }, "peerDependencies": { "esbuild": ">=0.12 <1" } }, "sha512-H2/S7Pm8a9CL1uhp9OvjwrBh5Pvx0H8qVOxNu8Wed9Y7qv56MPtq+GGM8RJpq6glYJn9Wspr8uw7l55uyinNeg=="],
+
+    "flow_manager": ["flow_manager@root:", {}],
 
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 

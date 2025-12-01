@@ -59,7 +59,7 @@ export async function createTaskInDb(
       title: input.title.trim(),
       description: input.description || null,
       assignedToId: input.assignedToId || null,
-      status: input.status || "To Do",
+      status: input.status || "Do zrobienia",
       estimatedHours: input.estimatedHours || null,
     })
     .returning();
