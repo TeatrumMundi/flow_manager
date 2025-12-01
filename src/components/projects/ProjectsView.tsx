@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
@@ -11,6 +12,7 @@ import {
   type TableColumn,
 } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
+import { StatusBadge } from "@/components/common/StatusBadge";
 import type { ProjectListItem } from "@/dataBase/query/projects/listProjectsFromDb";
 import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
 import { useRefreshList } from "@/hooks/useRefreshList";
@@ -18,15 +20,13 @@ import type { Project, ProjectsViewProps } from "@/types/ProjectsTypes";
 import { mapProjectData } from "@/utils/mapProjectData";
 import { ProgressBar } from "./ProgressBar";
 import { ProjectAddModal } from "./ProjectAddModal";
-import { ProjectDetailsView } from "./ProjectDetailsView";
 import { ProjectEditModal } from "./ProjectEditModal";
-import { ProjectStatusBadge } from "./ProjectStatusBadge";
 
 export function ProjectsView({
   initialProjects,
   availableStatuses,
-  allUsers,
 }: ProjectsViewProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
   const [projects, setProjects] = useState(initialProjects);
@@ -56,8 +56,6 @@ export function ProjectsView({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   useEffect(() => {
     let filteredList = projects;
@@ -101,21 +99,6 @@ export function ProjectsView({
       currency: "PLN",
     }).format(value);
   };
-
-  const handleBackFromDetails = async () => {
-    setSelectedProject(null);
-    await handleSilentRefreshProjects();
-  };
-
-  if (selectedProject) {
-    return (
-      <ProjectDetailsView
-        project={selectedProject}
-        allUsers={allUsers}
-        onBack={handleBackFromDetails}
-      />
-    );
-  }
 
   return (
     <>
@@ -200,8 +183,9 @@ export function ProjectsView({
               header: "Status",
               width: "w-40",
               render: (project) => (
-                <ProjectStatusBadge
+                <StatusBadge
                   status={project.status}
+                  type="project"
                   className="min-w-[150px]"
                 />
               ),
@@ -248,7 +232,7 @@ export function ProjectsView({
               icon: <FaInfo size={16} />,
               label: "Szczegóły",
               onClick: (project) => {
-                setSelectedProject(project);
+                router.push(`/projects/${encodeURIComponent(project.name)}`);
               },
               variant: "yellow",
             },

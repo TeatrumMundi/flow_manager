@@ -3,7 +3,6 @@ import {
   employmentTypes,
   financialReports,
   projectAssignments,
-  projectCosts,
   projects,
   tasks,
   userCredentials,
@@ -84,7 +83,6 @@ export const projectsRelations = relations(projects, ({ many }) => ({
   projectAssignments: many(projectAssignments),
   tasks: many(tasks),
   workLogs: many(workLogs),
-  projectCosts: many(projectCosts),
   financialReports: many(financialReports),
 }));
 
@@ -127,13 +125,6 @@ export const vacationsRelations = relations(vacations, ({ one }) => ({
   status: one(vacationStatuses, {
     fields: [vacations.statusId],
     references: [vacationStatuses.id],
-  }),
-}));
-
-export const projectCostsRelations = relations(projectCosts, ({ one }) => ({
-  project: one(projects, {
-    fields: [projectCosts.projectId],
-    references: [projects.id],
   }),
 }));
 

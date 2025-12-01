@@ -1,6 +1,8 @@
 ﻿"use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
@@ -11,67 +13,82 @@ import {
   type TableColumn,
 } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
+import { StatusBadge } from "@/components/common/StatusBadge";
 import { ExpenseAddModal } from "./ExpenseAddModal";
 import { ExpenseEditModal } from "./ExpenseEditModal";
-import { ExpenseStatusBadge } from "./ExpenseStatusBadge";
 import { ExpensesSummary } from "./ExpensesSummary";
 
 export interface Expense {
   id: number;
   name: string;
   category: string;
+  categoryId?: number | null;
   projectName: string;
+  projectId?: number | null;
   amount: number;
   date: string;
   status: string;
+  statusId?: number | null;
 }
 
 interface ExpensesViewProps {
   initialExpenses: Expense[];
-  availableCategories: string[];
-  availableProjects: string[];
+  availableCategories: { label: string; value: number }[];
+  availableStatuses: { label: string; value: number }[];
+  availableProjects: { label: string; value: number }[];
 }
 
 export function ExpensesView({
   initialExpenses,
   availableCategories,
+  availableStatuses,
   availableProjects,
 }: ExpensesViewProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Wszystkie");
   const [selectedProject, setSelectedProject] = useState("Wszystkie");
+  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [filteredExpenses, setFilteredExpenses] = useState(initialExpenses);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
+  // Update local state when props change (after router.refresh())
   useEffect(() => {
-    let expenses = initialExpenses;
+    setExpenses(initialExpenses);
+  }, [initialExpenses]);
+
+  useEffect(() => {
+    let filtered = expenses;
 
     if (selectedCategory !== "Wszystkie") {
-      expenses = expenses.filter((e) => e.category === selectedCategory);
+      filtered = filtered.filter((e) => e.category === selectedCategory);
     }
 
     if (selectedProject !== "Wszystkie") {
-      expenses = expenses.filter((e) => e.projectName === selectedProject);
+      filtered = filtered.filter((e) => e.projectName === selectedProject);
     }
 
     if (searchTerm) {
-      expenses = expenses.filter((e) =>
+      filtered = filtered.filter((e) =>
         e.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
-    setFilteredExpenses(expenses);
-  }, [searchTerm, selectedCategory, selectedProject, initialExpenses]);
+    setFilteredExpenses(filtered);
+  }, [searchTerm, selectedCategory, selectedProject, expenses]);
 
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleCloseAddModal = () => {
+  const handleCloseAddModal = (shouldRefresh?: boolean) => {
     setIsAddModalOpen(false);
+    if (shouldRefresh) {
+      router.refresh();
+    }
   };
 
   const handleOpenEditModal = (expense: Expense) => {
@@ -79,9 +96,35 @@ export function ExpensesView({
     setIsEditModalOpen(true);
   };
 
-  const handleCloseEditModal = () => {
+  const handleCloseEditModal = (shouldRefresh?: boolean) => {
     setIsEditModalOpen(false);
     setEditingExpense(null);
+    if (shouldRefresh) {
+      router.refresh();
+    }
+  };
+
+  const handleDeleteExpense = async (expense: Expense) => {
+    const deletePromise = async () => {
+      const response = await fetch(`/api/expenses/${expense.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to delete expense");
+      }
+
+      return data;
+    };
+
+    await toast.promise(deletePromise(), {
+      loading: "Usuwanie wydatku...",
+      success: "Wydatek został usunięty!",
+      error: (err) => `Błąd: ${err.message}`,
+    });
+
+    router.refresh();
   };
 
   const formatCurrency = (value: number) => {
@@ -92,11 +135,12 @@ export function ExpensesView({
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="space-y-6">
       {isAddModalOpen && (
         <ExpenseAddModal
           onClose={handleCloseAddModal}
           availableCategories={availableCategories}
+          availableStatuses={availableStatuses}
           availableProjects={availableProjects}
         />
       )}
@@ -106,6 +150,7 @@ export function ExpensesView({
           expense={editingExpense}
           onClose={handleCloseEditModal}
           availableCategories={availableCategories}
+          availableStatuses={availableStatuses}
           availableProjects={availableProjects}
         />
       )}
@@ -134,39 +179,30 @@ export function ExpensesView({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
-        <div className="flex gap-2 w-full md:w-auto">
-          <CustomSelect
-            name="categoryFilter"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            hideLabel
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
-            placeholder="Kategorie"
-            options={[
-              { label: "Wszystkie kategorie", value: "Wszystkie" },
-              ...availableCategories.map((cat) => ({
-                label: cat,
-                value: cat,
-              })),
-            ]}
-          />
-          <CustomSelect
-            name="projectFilter"
-            value={selectedProject}
-            onChange={(e) => setSelectedProject(e.target.value)}
-            hideLabel
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
-            placeholder="Projekty"
-            options={[
-              { label: "Wszystkie projekty", value: "Wszystkie" },
-              ...availableProjects.map((proj) => ({
-                label: proj,
-                value: proj,
-              })),
-            ]}
-          />
-        </div>
+        <CustomSelect
+          name="categoryFilter"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          hideLabel
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
+          placeholder="Kategorie"
+          options={[
+            { label: "Wszystkie kategorie", value: "Wszystkie" },
+            ...availableCategories,
+          ]}
+        />
+        <CustomSelect
+          name="projectFilter"
+          value={selectedProject}
+          onChange={(e) => setSelectedProject(e.target.value)}
+          hideLabel
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
+          placeholder="Projekty"
+          options={[
+            { label: "Wszystkie projekty", value: "Wszystkie" },
+            ...availableProjects,
+          ]}
+        />
       </div>
 
       {/* Tabela */}
@@ -179,40 +215,42 @@ export function ExpensesView({
             {
               key: "name",
               header: "Nazwa",
-              className: "p-4 text-gray-800 font-medium",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-800 font-medium w-50",
+              headerClassName: "p-4 w-50",
             },
             {
               key: "category",
               header: "Kategoria",
-              className: "p-4 text-gray-700",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-700 w-40",
+              headerClassName: "p-4 w-40",
             },
             {
               key: "projectName",
               header: "Projekt",
-              className: "p-4 text-gray-700",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-700 w-48",
+              headerClassName: "p-4 w-48",
             },
             {
               key: "amount",
               header: "Kwota",
-              className: "p-4 text-gray-800 font-semibold",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-800 font-semibold w-32",
+              headerClassName: "p-4 w-32",
               render: (item) => formatCurrency(item.amount),
             },
             {
               key: "date",
               header: "Data",
-              className: "p-4 text-gray-700",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-700 w-32",
+              headerClassName: "p-4 w-32",
             },
             {
               key: "status",
               header: "Status",
-              render: (item) => <ExpenseStatusBadge status={item.status} />,
-              className: "p-4",
-              headerClassName: "p-4",
+              render: (item) => (
+                <StatusBadge status={item.status} type="expense" />
+              ),
+              className: "p-4 w-32",
+              headerClassName: "p-4 w-32",
             },
           ] as TableColumn<Expense>[]
         }
@@ -227,7 +265,7 @@ export function ExpensesView({
             {
               icon: <FaTrash size={16} />,
               label: "Usuń",
-              onClick: () => alert("Usuwanie (do implementacji)"),
+              onClick: (item) => handleDeleteExpense(item),
               variant: "red",
             },
           ] as TableAction<Expense>[]

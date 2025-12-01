@@ -1,6 +1,5 @@
 ﻿"use client";
 
-import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -12,53 +11,74 @@ import type { Expense } from "./ExpenseView";
 
 interface ExpenseEditModalProps {
   expense: Expense;
-  onClose: () => void;
-  availableCategories: string[];
-  availableProjects: string[];
+  onClose: (shouldRefresh?: boolean) => void;
+  availableCategories: { label: string; value: number }[];
+  availableStatuses: { label: string; value: number }[];
+  availableProjects: { label: string; value: number }[];
 }
 
 export function ExpenseEditModal({
   expense,
   onClose,
   availableCategories,
+  availableStatuses,
   availableProjects,
 }: ExpenseEditModalProps) {
-  const router = useRouter();
-
   const [formData, setFormData] = useState({
     name: expense.name || "",
-    category: expense.category || availableCategories[0] || "",
-    projectName: expense.projectName || availableProjects[0] || "",
+    categoryId: expense.categoryId || availableCategories[0]?.value || 0,
+    projectId: expense.projectId || availableProjects[0]?.value || 0,
+    statusId: expense.statusId || availableStatuses[0]?.value || 0,
     amount: expense.amount.toString() || "",
     date: expense.date || "",
-    status: expense.status || "Oczekujący",
   });
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Convert to number for ID fields
+    if (name === "categoryId" || name === "projectId" || name === "statusId") {
+      setFormData((prev) => ({ ...prev, [name]: Number(value) }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const savePromise = new Promise((resolve) => {
-      console.log("Aktualizacja wydatku:", formData);
-      setTimeout(resolve, 1000);
-    });
 
-    await toast.promise(savePromise, {
+    const savePromise = async () => {
+      const response = await fetch(`/api/expenses/${expense.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          categoryId: formData.categoryId,
+          projectId: formData.projectId || null,
+          statusId: formData.statusId || null,
+          amount: Number.parseFloat(formData.amount),
+          date: formData.date,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to update expense");
+      }
+
+      return data;
+    };
+
+    await toast.promise(savePromise(), {
       loading: "Aktualizacja wydatku...",
       success: "Wydatek został zaktualizowany!",
-      error: "Błąd podczas aktualizacji.",
+      error: (err) => `Błąd: ${err.message}`,
     });
 
-    onClose();
-    router.refresh();
+    onClose(true);
   };
-
-  const statuses = ["Oczekujący", "Zatwierdzony", "Odrzucony"];
 
   return (
     <CustomModal
@@ -76,21 +96,28 @@ export function ExpenseEditModal({
           required
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <CustomSelect
             label="Kategoria *"
-            name="category"
-            value={formData.category}
+            name="categoryId"
+            value={formData.categoryId.toString()}
             onChange={handleChange}
             options={availableCategories}
             required
           />
           <CustomSelect
-            label="Projekt *"
-            name="projectName"
-            value={formData.projectName}
+            label="Projekt"
+            name="projectId"
+            value={formData.projectId.toString()}
             onChange={handleChange}
             options={availableProjects}
+          />
+          <CustomSelect
+            label="Status *"
+            name="statusId"
+            value={formData.statusId.toString()}
+            onChange={handleChange}
+            options={availableStatuses}
             required
           />
         </div>
@@ -115,17 +142,12 @@ export function ExpenseEditModal({
           />
         </div>
 
-        <CustomSelect
-          label="Status *"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          options={statuses}
-          required
-        />
-
         <div className="flex justify-end gap-4 pt-6">
-          <Button type="button" onClick={onClose} variant="secondary">
+          <Button
+            type="button"
+            onClick={() => onClose(false)}
+            variant="secondary"
+          >
             Anuluj
           </Button>
           <Button type="submit" variant="primary">
