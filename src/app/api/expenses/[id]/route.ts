@@ -53,24 +53,23 @@ export async function PUT(request: Request, { params }: { params: Params }) {
     const body = await request.json();
     const { name, categoryId, projectId, amount, date, statusId } = body;
 
+    const normalizedProjectId =
+      projectId !== undefined
+        ? (projectId ? Number(projectId) : null)
+        : undefined;
+    const normalizedStatusId =
+      statusId !== undefined
+        ? (statusId ? Number(statusId) : null)
+        : undefined;
+
     const result = await updateExpenseInDb({
       id: expenseId,
       name,
       categoryId: categoryId !== undefined ? Number(categoryId) : undefined,
-      projectId:
-        projectId !== undefined
-          ? projectId
-            ? Number(projectId)
-            : null
-          : undefined,
+      projectId: normalizedProjectId,
       amount: amount !== undefined ? String(amount) : undefined,
       date: date !== undefined ? date : undefined,
-      statusId:
-        statusId !== undefined
-          ? statusId
-            ? Number(statusId)
-            : null
-          : undefined,
+      statusId: normalizedStatusId,
     });
 
     return NextResponse.json({ ok: true, data: result.expense });
