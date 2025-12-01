@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import {
+  expenses,
   financialReports,
   projectAssignments,
-  projectCosts,
   projects,
   tasks,
   workLogs,
@@ -16,7 +16,7 @@ import { database } from "@/utils/db";
  * - Work logs related to project tasks
  * - Tasks assigned to the project
  * - Project assignments (user assignments to project)
- * - Project costs
+ * - Expenses related to the project
  * - Financial reports
  * - Project record
  *
@@ -57,10 +57,8 @@ export async function deleteProjectFromDb(
     .delete(projectAssignments)
     .where(eq(projectAssignments.projectId, projectId));
 
-  // 4. Delete project costs
-  await database
-    .delete(projectCosts)
-    .where(eq(projectCosts.projectId, projectId));
+  // 4. Delete expenses related to this project
+  await database.delete(expenses).where(eq(expenses.projectId, projectId));
 
   // 5. Delete financial reports
   await database

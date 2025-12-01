@@ -1,11 +1,17 @@
 import { eq } from "drizzle-orm";
-import { expenses, expenseStatuses, projects } from "@/dataBase/schema";
+import {
+  expenseCategories,
+  expenseStatuses,
+  expenses,
+  projects,
+} from "@/dataBase/schema";
 import { database } from "@/utils/db";
 
 export interface ExpenseDetailItem {
   id: number;
   name: string;
-  category: string | null;
+  categoryId: number | null;
+  categoryName: string | null;
   projectId: number | null;
   projectName: string | null;
   amount: string | null;
@@ -36,12 +42,12 @@ export async function getExpenseByIdFromDb(
   if (!expenseId) {
     throw new Error("Expense ID is required");
   }
-
   const [expense] = await database
     .select({
       id: expenses.id,
       name: expenses.name,
-      category: expenses.category,
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
       projectId: expenses.projectId,
       projectName: projects.name,
       amount: expenses.amount,
@@ -52,6 +58,7 @@ export async function getExpenseByIdFromDb(
       updatedAt: expenses.updatedAt,
     })
     .from(expenses)
+    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
     .leftJoin(projects, eq(expenses.projectId, projects.id))
     .leftJoin(expenseStatuses, eq(expenses.statusId, expenseStatuses.id))
     .where(eq(expenses.id, expenseId))

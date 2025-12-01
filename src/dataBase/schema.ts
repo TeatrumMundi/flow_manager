@@ -251,12 +251,18 @@ export const expenseStatuses = pgTable("expense_statuses", {
   description: text(),
 });
 
+export const expenseCategories = pgTable("expense_categories", {
+  id: serial().primaryKey().notNull(),
+  name: varchar({ length: 100 }).notNull(),
+  description: text(),
+});
+
 export const expenses = pgTable(
   "expenses",
   {
     id: serial().primaryKey().notNull(),
     name: varchar({ length: 255 }).notNull(),
-    category: varchar({ length: 100 }),
+    categoryId: integer("category_id"),
     projectId: integer("project_id"),
     amount: numeric({ precision: 12, scale: 2 }),
     date: date().defaultNow(),
@@ -274,6 +280,11 @@ export const expenses = pgTable(
       columns: [table.statusId],
       foreignColumns: [expenseStatuses.id],
       name: "expenses_status_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.categoryId],
+      foreignColumns: [expenseCategories.id],
+      name: "expenses_category_id_fkey",
     }),
   ],
 );

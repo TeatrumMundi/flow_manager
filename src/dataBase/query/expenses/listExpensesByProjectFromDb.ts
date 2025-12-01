@@ -1,5 +1,10 @@
 import { eq } from "drizzle-orm";
-import { expenses, expenseStatuses, projects } from "@/dataBase/schema";
+import {
+  expenseCategories,
+  expenseStatuses,
+  expenses,
+  projects,
+} from "@/dataBase/schema";
 import { database } from "@/utils/db";
 import type { ExpenseListItem } from "./listExpensesFromDb";
 
@@ -26,7 +31,8 @@ export async function listExpensesByProjectFromDb(
     .select({
       id: expenses.id,
       name: expenses.name,
-      category: expenses.category,
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
       projectId: expenses.projectId,
       projectName: projects.name,
       amount: expenses.amount,
@@ -37,6 +43,7 @@ export async function listExpensesByProjectFromDb(
       updatedAt: expenses.updatedAt,
     })
     .from(expenses)
+    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
     .leftJoin(projects, eq(expenses.projectId, projects.id))
     .leftJoin(expenseStatuses, eq(expenses.statusId, expenseStatuses.id))
     .where(eq(expenses.projectId, projectId))

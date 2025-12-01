@@ -1,15 +1,16 @@
 import type { SQL } from "drizzle-orm";
 import { and, eq, gte, ilike, lte, sql } from "drizzle-orm";
 import {
-  expenses,
+  expenseCategories,
   expenseStatuses,
+  expenses,
   projects,
 } from "@/dataBase/schema";
 import { database } from "@/utils/db";
 
 export interface ExpenseListFilters {
   name?: string;
-  category?: string;
+  categoryId?: number;
   projectId?: number;
   minAmount?: string;
   maxAmount?: string;
@@ -21,7 +22,8 @@ export interface ExpenseListFilters {
 export interface ExpenseListItem {
   id: number;
   name: string;
-  category: string | null;
+  categoryId: number | null;
+  categoryName: string | null;
   projectId: number | null;
   projectName: string | null;
   amount: string | null;
@@ -33,11 +35,9 @@ export interface ExpenseListItem {
 }
 
 /**
- * Lists all expenses from the database with optional filters.
- *
  * @param filters - Optional filters for searching expenses
  * @param filters.name - Filter by expense name (case-insensitive, partial match)
- * @param filters.category - Filter by category (case-insensitive, partial match)
+ * @param filters.categoryId - Filter by category ID
  * @param filters.projectId - Filter by project ID
  * @param filters.minAmount - Filter by minimum amount
  * @param filters.maxAmount - Filter by maximum amount
@@ -52,7 +52,7 @@ export interface ExpenseListItem {
  * const allExpenses = await listExpensesFromDb();
  *
  * // Filter by category
- * const equipmentExpenses = await listExpensesFromDb({ category: "Sprzęt" });
+ * const equipmentExpenses = await listExpensesFromDb({ categoryId: 1 });
  *
  * // Filter by project
  * const projectExpenses = await listExpensesFromDb({ projectId: 1 });
@@ -65,7 +65,7 @@ export interface ExpenseListItem {
  *
  * // Multiple filters
  * const filtered = await listExpensesFromDb({
- *   category: "Sprzęt",
+ *   categoryId: 1,
  *   statusId: 1,
  *   dateFrom: "2024-01-01"
  * });
@@ -81,8 +81,8 @@ export async function listExpensesFromDb(
     conditions.push(ilike(expenses.name, `%${filters.name}%`));
   }
 
-  if (filters?.category) {
-    conditions.push(ilike(expenses.category, `%${filters.category}%`));
+  if (filters?.categoryId !== undefined) {
+    conditions.push(eq(expenses.categoryId, filters.categoryId));
   }
 
   if (filters?.projectId !== undefined) {
@@ -113,12 +113,13 @@ export async function listExpensesFromDb(
     conditions.push(eq(expenses.statusId, filters.statusId));
   }
 
-  // Build and execute query with project and status information
+  // Build and execute query with category, project and status information
   const query = database
     .select({
       id: expenses.id,
       name: expenses.name,
-      category: expenses.category,
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
       projectId: expenses.projectId,
       projectName: projects.name,
       amount: expenses.amount,
@@ -129,6 +130,7 @@ export async function listExpensesFromDb(
       updatedAt: expenses.updatedAt,
     })
     .from(expenses)
+    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
     .leftJoin(projects, eq(expenses.projectId, projects.id))
     .leftJoin(expenseStatuses, eq(expenses.statusId, expenseStatuses.id))
     .orderBy(expenses.date);

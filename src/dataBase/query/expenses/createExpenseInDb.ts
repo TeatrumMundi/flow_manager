@@ -3,7 +3,7 @@ import { database } from "@/utils/db";
 
 interface CreateExpenseInput {
   name: string;
-  category: string;
+  categoryId: number;
   projectId?: number | null;
   amount: string;
   date?: string | null;
@@ -19,7 +19,7 @@ interface CreateExpenseResult {
  *
  * @param input - Expense creation data
  * @param input.name - Expense name (required)
- * @param input.category - Expense category (required)
+ * @param input.categoryId - Expense category ID (required)
  * @param input.projectId - Optional project ID
  * @param input.amount - Amount as string (required)
  * @param input.date - Optional date (YYYY-MM-DD format)
@@ -31,7 +31,7 @@ interface CreateExpenseResult {
  * ```ts
  * const result = await createExpenseInDb({
  *   name: "Laptop Dell XPS",
- *   category: "Sprzęt",
+ *   categoryId: 1,
  *   projectId: 1,
  *   amount: "10000.00",
  *   date: "2024-04-15",
@@ -47,7 +47,7 @@ export async function createExpenseInDb(
     throw new Error("Expense name is required");
   }
 
-  if (!input.category || input.category.trim() === "") {
+  if (!input.categoryId) {
     throw new Error("Expense category is required");
   }
 
@@ -60,7 +60,7 @@ export async function createExpenseInDb(
     .insert(expenses)
     .values({
       name: input.name.trim(),
-      category: input.category.trim(),
+      categoryId: input.categoryId,
       projectId: input.projectId || null,
       amount: input.amount,
       date: input.date || null,

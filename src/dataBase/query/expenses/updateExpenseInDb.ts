@@ -5,7 +5,7 @@ import { database } from "@/utils/db";
 interface UpdateExpenseInput {
   id: number;
   name?: string;
-  category?: string;
+  categoryId?: number;
   projectId?: number | null;
   amount?: string;
   date?: string | null;
@@ -22,7 +22,7 @@ interface UpdateExpenseResult {
  * @param input - Expense update data
  * @param input.id - Expense ID (required)
  * @param input.name - Optional new name
- * @param input.category - Optional new category
+ * @param input.categoryId - Optional new category ID
  * @param input.projectId - Optional new project ID
  * @param input.amount - Optional new amount
  * @param input.date - Optional new date
@@ -56,11 +56,11 @@ export async function updateExpenseInDb(
     updateData.name = input.name.trim();
   }
 
-  if (input.category !== undefined) {
-    if (input.category.trim() === "") {
+  if (input.categoryId !== undefined) {
+    if (!input.categoryId) {
       throw new Error("Expense category cannot be empty");
     }
-    updateData.category = input.category.trim();
+    updateData.categoryId = input.categoryId;
   }
 
   if (input.projectId !== undefined) {
