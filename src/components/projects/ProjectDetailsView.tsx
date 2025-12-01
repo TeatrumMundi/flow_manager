@@ -8,11 +8,11 @@ import { Button } from "@/components/common/CustomButton";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import type { TableAction, TableColumn } from "@/components/common/CustomTable";
 import { DataTable } from "@/components/common/CustomTable";
+import { StatusBadge } from "@/components/common/StatusBadge";
 import type { ProjectAssignmentListItem } from "@/dataBase/query/projects/listProjectAssignmentsFromDb";
 import type { ProjectTaskListItem } from "@/dataBase/query/tasks/listTasksByProjectFromDb";
 import type { UserListItem } from "@/dataBase/query/users/listUsersFromDb";
 import { ProgressBar } from "./ProgressBar";
-import { ProjectStatusBadge } from "./ProjectStatusBadge";
 import { TaskAddModal } from "./TaskAddModal";
 import { TaskEditModal } from "./TaskEditModal";
 
@@ -181,7 +181,7 @@ export function ProjectDetailsView({
       header: "Status",
       align: "center",
       render: (task) => (
-        <ProjectStatusBadge status={task.status || "Do zrobienia"} />
+        <StatusBadge status={task.status || "Do zrobienia"} type="project" />
       ),
     },
     {
@@ -312,7 +312,7 @@ export function ProjectDetailsView({
         </div>
         <div className="flex items-center gap-2">
           <p className="text-sm text-slate-600">Status:</p>
-          <ProjectStatusBadge status={project.status} />
+          <StatusBadge status={project.status} type="project" />
         </div>
       </div>
 

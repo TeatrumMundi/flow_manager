@@ -12,6 +12,7 @@ import {
   type TableColumn,
 } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
+import { StatusBadge } from "@/components/common/StatusBadge";
 import type { ProjectListItem } from "@/dataBase/query/projects/listProjectsFromDb";
 import { useDeleteProject } from "@/hooks/projects/useDeleteProject";
 import { useRefreshList } from "@/hooks/useRefreshList";
@@ -20,7 +21,6 @@ import { mapProjectData } from "@/utils/mapProjectData";
 import { ProgressBar } from "./ProgressBar";
 import { ProjectAddModal } from "./ProjectAddModal";
 import { ProjectEditModal } from "./ProjectEditModal";
-import { ProjectStatusBadge } from "./ProjectStatusBadge";
 
 export function ProjectsView({
   initialProjects,
@@ -183,8 +183,9 @@ export function ProjectsView({
               header: "Status",
               width: "w-40",
               render: (project) => (
-                <ProjectStatusBadge
+                <StatusBadge
                   status={project.status}
+                  type="project"
                   className="min-w-[150px]"
                 />
               ),

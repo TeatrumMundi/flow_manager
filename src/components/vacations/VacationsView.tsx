@@ -7,11 +7,11 @@ import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import { DataTable } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
+import { StatusBadge } from "@/components/common/StatusBadge";
 import { useRefreshList } from "@/hooks/useRefreshList";
 import { useDeleteVacation } from "@/hooks/vacations/useDeleteVacation";
 import { VacationAddModal } from "./VacationAddModal";
 import { VacationEditModal } from "./VacationEditModal";
-import { VacationStatusBadge } from "./VacationStatusBadge";
 
 export interface Vacation {
   id: number;
@@ -260,7 +260,9 @@ export function VacationsView({
           {
             key: "status",
             header: "Status",
-            render: (item) => <VacationStatusBadge status={item.status} />,
+            render: (item) => (
+              <StatusBadge status={item.status} type="vacation" />
+            ),
             className: "p-4",
             headerClassName: "p-4",
           },
