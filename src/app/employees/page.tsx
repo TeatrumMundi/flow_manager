@@ -2,12 +2,11 @@ import { auth } from "@/auth";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { EmployeeView } from "@/components/employees/EmployeeView";
-import { listEmployeeProjectsAssignments } from "@/dataBase/query/employees/listEmployeeProjectsAssignments";
+import { listAllEmployeeProjectsAssignments } from "@/dataBase/query/employees/listAllEmployeeProjectsAssignments";
 import { listEmployeesFromDb } from "@/dataBase/query/employees/listEmployeesFromDb";
 import { listEmploymentTypesFromDb } from "@/dataBase/query/employees/listEmploymentTypesFromDb";
 import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { listSupervisorsFromDb } from "@/dataBase/query/users/listSupervisorsFromDb";
-import type { EmploymentType } from "@/types/EmploymentType";
 
 // Turn off static rendering and caching for this page
 export const dynamic = "force-dynamic";
@@ -25,18 +24,22 @@ export default async function EmployeesPage() {
     ? privilegedRoles.includes(userProfile.role.name)
     : false;
 
-  // Fetch employees from database with supervisor information
-  const employeesData = await listEmployeesFromDb();
-  // Fetch supervisors (roleId 1 or 2)
-  const supervisors = await listSupervisorsFromDb();
-  // Fetch employment types
-  const employmentTypes: EmploymentType[] = await listEmploymentTypesFromDb();
+  // Fetch all data in parallel for better performance
+  const [employeesData, supervisors, employmentTypes, allProjectAssignments] =
+    await Promise.all([
+      listEmployeesFromDb(),
+      listSupervisorsFromDb(),
+      listEmploymentTypesFromDb(),
+      listAllEmployeeProjectsAssignments(),
+    ]);
 
-  // Fetch projects for all employees
+  // Group assignments by employee ID
   const employeeProjectsMap = new Map();
-  for (const employee of employeesData) {
-    const projects = await listEmployeeProjectsAssignments(employee.id);
-    employeeProjectsMap.set(employee.id, projects);
+  for (const assignment of allProjectAssignments) {
+    if (!employeeProjectsMap.has(assignment.userId)) {
+      employeeProjectsMap.set(assignment.userId, []);
+    }
+    employeeProjectsMap.get(assignment.userId).push(assignment);
   }
 
   // Transform employees to display format
