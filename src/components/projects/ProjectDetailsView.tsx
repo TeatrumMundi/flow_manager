@@ -43,7 +43,7 @@ interface Project {
 interface ProjectDetailsViewProps {
   project: Project;
   allUsers: UserListItem[];
-  onBack: () => void;
+  onBack: (() => void) | null;
 }
 
 export function ProjectDetailsView({
@@ -298,9 +298,11 @@ export function ProjectDetailsView({
     <div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <div className="flex items-center gap-4">
-          <BackToDashboardButton className="" onClick={onBack}>
-            Powrót
-          </BackToDashboardButton>
+          {onBack && (
+            <BackToDashboardButton className="" onClick={onBack}>
+              Powrót
+            </BackToDashboardButton>
+          )}
           <div>
             <p className="text-sm text-slate-500">Projekt</p>
             <h1 className="text-2xl font-bold text-slate-800">

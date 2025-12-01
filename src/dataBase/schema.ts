@@ -245,21 +245,35 @@ export const vacations = pgTable(
   ],
 );
 
-export const projectCosts = pgTable(
-  "project_costs",
+export const expenseStatuses = pgTable("expense_statuses", {
+  id: serial().primaryKey().notNull(),
+  name: varchar({ length: 50 }).notNull(),
+  description: text(),
+});
+
+export const expenses = pgTable(
+  "expenses",
   {
     id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    category: varchar({ length: 100 }),
     projectId: integer("project_id"),
-    type: varchar({ length: 100 }),
-    description: text(),
     amount: numeric({ precision: 12, scale: 2 }),
-    recordedAt: date("recorded_at").defaultNow(),
+    date: date().defaultNow(),
+    statusId: integer("status_id"),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
   },
   (table) => [
     foreignKey({
       columns: [table.projectId],
       foreignColumns: [projects.id],
-      name: "project_costs_project_id_fkey",
+      name: "expenses_project_id_fkey",
+    }),
+    foreignKey({
+      columns: [table.statusId],
+      foreignColumns: [expenseStatuses.id],
+      name: "expenses_status_id_fkey",
     }),
   ],
 );
