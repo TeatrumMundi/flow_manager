@@ -55,19 +55,19 @@ export default async function WorkTimePage() {
   }
 
   // Build user projects map - map of userId to their assigned projects
+  // Include all employees even if they have no projects (empty array)
   const userProjectsMap: Record<string, { label: string; value: string }[]> =
     {};
 
-  for (const user of usersData) {
-    if (user.id) {
-      const userProjects = await listProjectsByUserFromDb(user.id);
-      userProjectsMap[String(user.id)] = userProjects
-        .filter((project) => !project.isArchived)
-        .map((project) => ({
-          label: project.name || "Unknown",
-          value: String(project.id),
-        }));
-    }
+  for (const employee of availableEmployees) {
+    const userId = Number(employee.value);
+    const userProjects = await listProjectsByUserFromDb(userId);
+    userProjectsMap[employee.value] = userProjects
+      .filter((project) => !project.isArchived)
+      .map((project) => ({
+        label: project.name || "Unknown",
+        value: String(project.id),
+      }));
   }
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">

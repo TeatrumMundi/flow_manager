@@ -142,6 +142,14 @@ export function WorkTimeEditModal({
             value={formData.projectName}
             onChange={handleChange}
             options={filteredProjects}
+            placeholder={
+              formData.employeeName && filteredProjects.length === 0
+                ? "Pracownik nie jest przypisany do żadnego projektu"
+                : "Wybierz projekt"
+            }
+            disabled={
+              !!(formData.employeeName && filteredProjects.length === 0)
+            }
             required
           />
           <CustomSelect
@@ -150,6 +158,14 @@ export function WorkTimeEditModal({
             value={formData.taskName}
             onChange={handleChange}
             options={availableTasks}
+            placeholder={
+              formData.employeeName && filteredProjects.length === 0
+                ? "Pracownik nie ma projektów"
+                : "Wybierz zadanie"
+            }
+            disabled={
+              !!(formData.employeeName && filteredProjects.length === 0)
+            }
             required
           />
         </div>

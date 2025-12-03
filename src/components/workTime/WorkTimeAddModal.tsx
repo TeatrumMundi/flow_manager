@@ -141,7 +141,14 @@ export function WorkTimeAddModal({
             value={formData.projectName}
             onChange={handleChange}
             options={filteredProjects}
-            placeholder="Wybierz projekt"
+            placeholder={
+              formData.employeeName && filteredProjects.length === 0
+                ? "Pracownik nie jest przypisany do żadnego projektu"
+                : "Wybierz projekt"
+            }
+            disabled={
+              !!(formData.employeeName && filteredProjects.length === 0)
+            }
             required
           />
           <CustomSelect
@@ -151,9 +158,14 @@ export function WorkTimeAddModal({
             onChange={handleChange}
             options={availableTasks}
             placeholder={
-              formData.projectName
-                ? "Wybierz zadanie"
-                : "Najpierw wybierz projekt"
+              formData.employeeName && filteredProjects.length === 0
+                ? "Pracownik nie ma projektów"
+                : formData.projectName
+                  ? "Wybierz zadanie"
+                  : "Najpierw wybierz projekt"
+            }
+            disabled={
+              !!(formData.employeeName && filteredProjects.length === 0)
             }
             required
           />
