@@ -12,25 +12,25 @@ import type { WorkLog } from "./WorkTimeView";
 
 interface WorkTimeEditModalProps {
   workLog: WorkLog;
-  onClose: () => void;
+  onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: string }[];
-  availableProjects: { label: string; value: string }[];
   projectTasksMap: Record<string, { label: string; value: string }[]>;
+  userProjectsMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeEditModal({
   workLog,
   onClose,
   availableEmployees,
-  availableProjects,
   projectTasksMap,
+  userProjectsMap,
 }: WorkTimeEditModalProps) {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    employeeName: workLog.employeeName || "",
-    projectName: workLog.projectName || "",
-    taskName: workLog.taskName || "",
+    employeeName: workLog.userId ? String(workLog.userId) : "",
+    projectName: workLog.projectId ? String(workLog.projectId) : "",
+    taskName: workLog.taskId ? String(workLog.taskId) : "",
     date: workLog.date || "",
     hours: workLog.hours.toString(),
     isOvertime: workLog.isOvertime,
@@ -41,6 +41,28 @@ export function WorkTimeEditModal({
     { label: string; value: string }[]
   >([]);
 
+  const [filteredProjects, setFilteredProjects] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  // Update filtered projects when employee changes
+  useEffect(() => {
+    if (formData.employeeName && userProjectsMap[formData.employeeName]) {
+      setFilteredProjects(userProjectsMap[formData.employeeName]);
+      // Reset project and task selection if current project is not in the new list
+      const projectIds = userProjectsMap[formData.employeeName].map(
+        (p) => p.value,
+      );
+      if (formData.projectName && !projectIds.includes(formData.projectName)) {
+        setFormData((prev) => ({ ...prev, projectName: "", taskName: "" }));
+      }
+    } else {
+      setFilteredProjects([]);
+      setFormData((prev) => ({ ...prev, projectName: "", taskName: "" }));
+    }
+  }, [formData.employeeName, userProjectsMap, formData.projectName]);
+
+  // Update tasks when project changes
   useEffect(() => {
     if (formData.projectName && projectTasksMap[formData.projectName]) {
       setAvailableTasks(projectTasksMap[formData.projectName]);
@@ -62,18 +84,37 @@ export function WorkTimeEditModal({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const savePromise = new Promise((resolve) => {
-      console.log("Aktualizacja wpisu:", formData);
-      setTimeout(resolve, 1000);
-    });
 
-    await toast.promise(savePromise, {
+    const savePromise = async () => {
+      const response = await fetch(`/api/work-logs/${workLog.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: Number(formData.employeeName),
+          taskId: formData.taskName ? Number(formData.taskName) : null,
+          projectId: Number(formData.projectName),
+          date: formData.date,
+          hoursWorked: formData.hours,
+          isOvertime: formData.isOvertime,
+          note: formData.note || null,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to update work log");
+      }
+
+      return data;
+    };
+
+    await toast.promise(savePromise(), {
       loading: "Zapisywanie zmian...",
       success: "Wpis został zaktualizowany!",
-      error: "Błąd podczas zapisywania.",
+      error: (err) => `Błąd: ${err.message}`,
     });
 
-    onClose();
+    onClose(true); // Pass true to trigger refresh
     router.refresh();
   };
 
@@ -100,7 +141,7 @@ export function WorkTimeEditModal({
             name="projectName"
             value={formData.projectName}
             onChange={handleChange}
-            options={availableProjects}
+            options={filteredProjects}
             required
           />
           <CustomSelect
@@ -158,7 +199,11 @@ export function WorkTimeEditModal({
         />
 
         <div className="flex justify-end gap-4 pt-6">
-          <Button type="button" onClick={onClose} variant="secondary">
+          <Button
+            type="button"
+            onClick={() => onClose(false)}
+            variant="secondary"
+          >
             Anuluj
           </Button>
           <Button type="submit" variant="primary">

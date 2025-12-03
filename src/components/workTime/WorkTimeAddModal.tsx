@@ -10,17 +10,17 @@ import { CustomModal } from "@/components/common/CustomModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
 
 interface WorkTimeAddModalProps {
-  onClose: () => void;
+  onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: string }[];
-  availableProjects: { label: string; value: string }[];
   projectTasksMap: Record<string, { label: string; value: string }[]>;
+  userProjectsMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeAddModal({
   onClose,
   availableEmployees,
-  availableProjects,
   projectTasksMap,
+  userProjectsMap,
 }: WorkTimeAddModalProps) {
   const router = useRouter();
 
@@ -37,6 +37,27 @@ export function WorkTimeAddModal({
   const [availableTasks, setAvailableTasks] = useState<
     { label: string; value: string }[]
   >([]);
+
+  const [filteredProjects, setFilteredProjects] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  // Update filtered projects when employee changes
+  useEffect(() => {
+    if (formData.employeeName && userProjectsMap[formData.employeeName]) {
+      setFilteredProjects(userProjectsMap[formData.employeeName]);
+      // Reset project and task selection if current project is not in the new list
+      const projectIds = userProjectsMap[formData.employeeName].map(
+        (p) => p.value,
+      );
+      if (formData.projectName && !projectIds.includes(formData.projectName)) {
+        setFormData((prev) => ({ ...prev, projectName: "", taskName: "" }));
+      }
+    } else {
+      setFilteredProjects([]);
+      setFormData((prev) => ({ ...prev, projectName: "", taskName: "" }));
+    }
+  }, [formData.employeeName, userProjectsMap, formData.projectName]);
 
   // Update tasks when project changes
   useEffect(() => {
@@ -62,18 +83,37 @@ export function WorkTimeAddModal({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const savePromise = new Promise((resolve) => {
-      console.log("Dodawanie wpisu:", formData);
-      setTimeout(resolve, 1000);
-    });
 
-    await toast.promise(savePromise, {
+    const savePromise = async () => {
+      const response = await fetch("/api/work-logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: Number(formData.employeeName),
+          taskId: formData.taskName ? Number(formData.taskName) : null,
+          projectId: Number(formData.projectName),
+          date: formData.date,
+          hoursWorked: formData.hours,
+          isOvertime: formData.isOvertime,
+          note: formData.note || null,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to create work log");
+      }
+
+      return data;
+    };
+
+    await toast.promise(savePromise(), {
       loading: "Dodawanie wpisu...",
       success: "Wpis został dodany!",
-      error: "Błąd podczas dodawania.",
+      error: (err) => `Błąd: ${err.message}`,
     });
 
-    onClose();
+    onClose(true); // Pass true to trigger refresh
     router.refresh();
   };
 
@@ -100,7 +140,7 @@ export function WorkTimeAddModal({
             name="projectName"
             value={formData.projectName}
             onChange={handleChange}
-            options={availableProjects}
+            options={filteredProjects}
             placeholder="Wybierz projekt"
             required
           />
@@ -164,7 +204,11 @@ export function WorkTimeAddModal({
         />
 
         <div className="flex justify-end gap-4 pt-6">
-          <Button type="button" onClick={onClose} variant="secondary">
+          <Button
+            type="button"
+            onClick={() => onClose(false)}
+            variant="secondary"
+          >
             Anuluj
           </Button>
           <Button type="submit" variant="primary">
