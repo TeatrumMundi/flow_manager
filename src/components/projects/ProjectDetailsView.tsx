@@ -44,12 +44,15 @@ interface ProjectDetailsViewProps {
   project: Project;
   allUsers: UserListItem[];
   onBack: (() => void) | null;
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }
 
 export function ProjectDetailsView({
   project,
   allUsers,
   onBack,
+  hasFullAccess = false,
 }: ProjectDetailsViewProps) {
   const [assignments, setAssignments] = useState<ProjectAssignmentListItem[]>(
     [],
@@ -199,21 +202,23 @@ export function ProjectDetailsView({
     },
   ];
 
-  // Define table actions for tasks
-  const taskActions: TableAction<ProjectTaskListItem>[] = [
-    {
-      icon: <FaEdit size={16} />,
-      label: "Edytuj zadanie",
-      onClick: handleEditTask,
-      variant: "blue",
-    },
-    {
-      icon: <FaTrash size={16} />,
-      label: "Usuń zadanie",
-      onClick: handleDeleteTask,
-      variant: "red",
-    },
-  ];
+  // Define table actions for tasks - only for admins
+  const taskActions: TableAction<ProjectTaskListItem>[] = hasFullAccess
+    ? [
+        {
+          icon: <FaEdit size={16} />,
+          label: "Edytuj zadanie",
+          onClick: handleEditTask,
+          variant: "blue",
+        },
+        {
+          icon: <FaTrash size={16} />,
+          label: "Usuń zadanie",
+          onClick: handleDeleteTask,
+          variant: "red",
+        },
+      ]
+    : [];
 
   // Get available users (not already assigned)
   const availableUsers = allUsers.filter(
@@ -355,86 +360,90 @@ export function ProjectDetailsView({
                           <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
                             {assignment.roleOnProject}
                           </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleRemoveUser(
-                                assignment.userId,
-                                `${assignment.firstName} ${assignment.lastName}`,
-                              )
-                            }
-                            className={
-                              "p-2 rounded-md transition-colors cursor-pointer border bg-red-100 hover:bg-red-200 text-red-600 border-red-200 h-9 w-9 flex items-center justify-center"
-                            }
-                            title={
-                              assignment.roleOnProject === "Manager"
-                                ? "Usuń managera projektu"
-                                : "Usuń z projektu"
-                            }
-                          >
-                            <FaTrash size={16} className="w-4 h-4" />
-                          </button>
+                          {hasFullAccess && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleRemoveUser(
+                                  assignment.userId,
+                                  `${assignment.firstName} ${assignment.lastName}`,
+                                )
+                              }
+                              className={
+                                "p-2 rounded-md transition-colors cursor-pointer border bg-red-100 hover:bg-red-200 text-red-600 border-red-200 h-9 w-9 flex items-center justify-center"
+                              }
+                              title={
+                                assignment.roleOnProject === "Manager"
+                                  ? "Usuń managera projektu"
+                                  : "Usuń z projektu"
+                              }
+                            >
+                              <FaTrash size={16} className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </li>
                     ))}
                   </ul>
                 )}
-                {/* Add new user form */}
-                <div className="p-6 bg-slate-50/70 rounded-b-xl mt-auto border-t border-slate-200">
-                  <h3 className="text-base font-semibold text-slate-700 mb-3">
-                    Przypisz nowego użytkownika
-                  </h3>
-                  {selectedRole === "Manager" && projectManager && (
-                    <div className="mb-3 p-3 bg-yellow-100 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-                      <p>
-                        <strong>Uwaga:</strong> Przypisanie nowego Managera
-                        automatycznie usunie obecnego (
-                        {projectManager.firstName} {projectManager.lastName}).
-                      </p>
+                {/* Add new user form - only for admins */}
+                {hasFullAccess && (
+                  <div className="p-6 bg-slate-50/70 rounded-b-xl mt-auto border-t border-slate-200">
+                    <h3 className="text-base font-semibold text-slate-700 mb-3">
+                      Przypisz nowego użytkownika
+                    </h3>
+                    {selectedRole === "Manager" && projectManager && (
+                      <div className="mb-3 p-3 bg-yellow-100 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                        <p>
+                          <strong>Uwaga:</strong> Przypisanie nowego Managera
+                          automatycznie usunie obecnego (
+                          {projectManager.firstName} {projectManager.lastName}).
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex flex-col sm:flex-row gap-3 items-end">
+                      <div className="w-full sm:flex-1">
+                        <CustomSelect
+                          label="Użytkownik"
+                          name="userId"
+                          value={selectedUserId}
+                          onChange={(e) => setSelectedUserId(e.target.value)}
+                          searchable
+                          options={[
+                            { label: "Wybierz użytkownika...", value: "" },
+                            ...availableUsers.map((user) => ({
+                              label: `${user.firstName || ""} ${
+                                user.lastName || ""
+                              } (${user.email})`.trim(),
+                              value: user.id,
+                            })),
+                          ]}
+                        />
+                      </div>
+                      <div className="w-full sm:w-48">
+                        <CustomSelect
+                          label="Rola"
+                          name="role"
+                          value={selectedRole}
+                          onChange={(e) => setSelectedRole(e.target.value)}
+                          options={PROJECT_ROLES.map((role) => ({
+                            label: role,
+                            value: role,
+                          }))}
+                        />
+                      </div>
+                      <Button
+                        variant="primary"
+                        onClick={handleAssignUser}
+                        disabled={!selectedUserId}
+                        className="w-full sm:w-auto"
+                      >
+                        <FaPlus />
+                        <span>Przypisz</span>
+                      </Button>
                     </div>
-                  )}
-                  <div className="flex flex-col sm:flex-row gap-3 items-end">
-                    <div className="w-full sm:flex-1">
-                      <CustomSelect
-                        label="Użytkownik"
-                        name="userId"
-                        value={selectedUserId}
-                        onChange={(e) => setSelectedUserId(e.target.value)}
-                        searchable
-                        options={[
-                          { label: "Wybierz użytkownika...", value: "" },
-                          ...availableUsers.map((user) => ({
-                            label: `${user.firstName || ""} ${
-                              user.lastName || ""
-                            } (${user.email})`.trim(),
-                            value: user.id,
-                          })),
-                        ]}
-                      />
-                    </div>
-                    <div className="w-full sm:w-48">
-                      <CustomSelect
-                        label="Rola"
-                        name="role"
-                        value={selectedRole}
-                        onChange={(e) => setSelectedRole(e.target.value)}
-                        options={PROJECT_ROLES.map((role) => ({
-                          label: role,
-                          value: role,
-                        }))}
-                      />
-                    </div>
-                    <Button
-                      variant="primary"
-                      onClick={handleAssignUser}
-                      disabled={!selectedUserId}
-                      className="w-full sm:w-auto"
-                    >
-                      <FaPlus />
-                      <span>Przypisz</span>
-                    </Button>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
@@ -538,28 +547,32 @@ export function ProjectDetailsView({
           <h2 className="text-lg font-semibold text-slate-800">
             Zadania w projekcie ({tasks.length})
           </h2>
-          <Button
-            variant="primary"
-            onClick={() => setIsTaskAddModalOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <FaPlus />
-            <span>Dodaj zadanie</span>
-          </Button>
+          {hasFullAccess && (
+            <Button
+              variant="primary"
+              onClick={() => setIsTaskAddModalOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <FaPlus />
+              <span>Dodaj zadanie</span>
+            </Button>
+          )}
         </div>
         {isLoadingTasks ? (
           <p className="text-slate-500 p-6">Ładowanie zadań...</p>
         ) : tasks.length === 0 ? (
           <div className="p-6 text-center">
             <p className="text-slate-500 mb-4">Brak zadań w tym projekcie.</p>
-            <Button
-              variant="primary"
-              onClick={() => setIsTaskAddModalOpen(true)}
-              className="mx-auto"
-            >
-              <FaPlus />
-              <span>Dodaj pierwsze zadanie</span>
-            </Button>
+            {hasFullAccess && (
+              <Button
+                variant="primary"
+                onClick={() => setIsTaskAddModalOpen(true)}
+                className="mx-auto"
+              >
+                <FaPlus />
+                <span>Dodaj pierwsze zadanie</span>
+              </Button>
+            )}
           </div>
         ) : (
           <div className="p-6">

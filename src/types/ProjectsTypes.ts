@@ -30,4 +30,6 @@ export interface ProjectsViewProps {
   }>;
   availableStatuses: string[];
   allUsers: UserListItem[];
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }

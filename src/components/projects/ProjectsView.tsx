@@ -6,11 +6,7 @@ import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
-import {
-  DataTable,
-  type TableAction,
-  type TableColumn,
-} from "@/components/common/CustomTable";
+import { DataTable, type TableColumn } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import type { ProjectListItem } from "@/dataBase/query/projects/listProjectsFromDb";
@@ -25,6 +21,7 @@ import { ProjectEditModal } from "./ProjectEditModal";
 export function ProjectsView({
   initialProjects,
   availableStatuses,
+  hasFullAccess = false,
 }: ProjectsViewProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -120,14 +117,16 @@ export function ProjectsView({
       )}
 
       <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
-        <Button
-          variant="primary"
-          onClick={handleOpenAddModal}
-          className="w-full md:w-auto"
-        >
-          <FaPlus />
-          <span>Dodaj projekt</span>
-        </Button>
+        {hasFullAccess && (
+          <Button
+            variant="primary"
+            onClick={handleOpenAddModal}
+            className="w-full md:w-auto"
+          >
+            <FaPlus />
+            <span>Dodaj projekt</span>
+          </Button>
+        )}
 
         <RefreshButton
           onClick={handleRefreshProjects}
@@ -227,31 +226,46 @@ export function ProjectsView({
           ] as TableColumn<Project>[]
         }
         actions={
-          [
-            {
-              icon: <FaInfo size={16} />,
-              label: "Szczegóły",
-              onClick: (project) => {
-                router.push(`/projects/${encodeURIComponent(project.name)}`);
-              },
-              variant: "yellow",
-            },
-            {
-              icon: <FaEdit size={16} />,
-              label: "Edytuj",
-              onClick: (project) => handleOpenEditModal(project),
-              variant: "blue",
-            },
-            {
-              icon: <FaTrash size={16} />,
-              label: "Usuń",
-              onClick: async (project) => {
-                await deleteProject(project);
-                await handleSilentRefreshProjects();
-              },
-              variant: "red",
-            },
-          ] as TableAction<Project>[]
+          hasFullAccess
+            ? [
+                {
+                  icon: <FaInfo size={16} />,
+                  label: "Szczegóły",
+                  onClick: (project) => {
+                    router.push(
+                      `/projects/${encodeURIComponent(project.name)}`,
+                    );
+                  },
+                  variant: "yellow",
+                },
+                {
+                  icon: <FaEdit size={16} />,
+                  label: "Edytuj",
+                  onClick: (project) => handleOpenEditModal(project),
+                  variant: "blue",
+                },
+                {
+                  icon: <FaTrash size={16} />,
+                  label: "Usuń",
+                  onClick: async (project) => {
+                    await deleteProject(project);
+                    await handleSilentRefreshProjects();
+                  },
+                  variant: "red",
+                },
+              ]
+            : [
+                {
+                  icon: <FaInfo size={16} />,
+                  label: "Szczegóły",
+                  onClick: (project) => {
+                    router.push(
+                      `/projects/${encodeURIComponent(project.name)}`,
+                    );
+                  },
+                  variant: "yellow",
+                },
+              ]
         }
       />
     </>

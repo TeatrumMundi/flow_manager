@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ProjectDetailsView } from "@/components/projects/ProjectDetailsView";
 import { getProjectByNameFromDb } from "@/dataBase/query/projects/getProjectByNameFromDb";
+import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 
 // Turn off static rendering and caching for this page
@@ -17,6 +19,17 @@ type Props = {
 
 export default async function ProjectDetailsPage({ params }: Props) {
   const { projectName } = await params;
+
+  const session = await auth();
+  const userProfile = session?.user?.email
+    ? await getFullUserProfileFromDbByEmail(session.user.email)
+    : null;
+
+  // Check if user has admin/management privileges (full access)
+  const privilegedRoles = ["Administrator", "Zarząd"];
+  const hasFullAccess = userProfile?.role?.name
+    ? privilegedRoles.includes(userProfile.role.name)
+    : false;
 
   const project = await getProjectByNameFromDb(projectName);
 
@@ -51,6 +64,8 @@ export default async function ProjectDetailsPage({ params }: Props) {
           }}
           allUsers={allUsers}
           onBack={null}
+          hasFullAccess={hasFullAccess}
+          currentUserId={userProfile?.id}
         />
       </main>
     </div>
