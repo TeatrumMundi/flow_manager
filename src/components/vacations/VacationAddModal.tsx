@@ -13,17 +13,26 @@ interface VacationAddModalProps {
   onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: number | string }[];
   availableTypes: string[];
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }
 
 export function VacationAddModal({
   onClose,
   availableEmployees,
   availableTypes,
+  hasFullAccess = false,
+  currentUserId,
 }: VacationAddModalProps) {
   const router = useRouter();
 
+  // For regular users, auto-assign to themselves
+  const defaultEmployeeId = hasFullAccess
+    ? availableEmployees[0]?.value || ""
+    : currentUserId || "";
+
   const [formData, setFormData] = useState({
-    employeeId: availableEmployees[0]?.value || "",
+    employeeId: defaultEmployeeId,
     vacationType: availableTypes[0] || "",
     startDate: "",
     endDate: "",
@@ -75,14 +84,27 @@ export function VacationAddModal({
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <CustomSelect
-          label="Pracownik *"
-          name="employeeId"
-          value={formData.employeeId}
-          onChange={handleChange}
-          options={availableEmployees}
-          required
-        />
+        {hasFullAccess ? (
+          <CustomSelect
+            label="Pracownik *"
+            name="employeeId"
+            value={formData.employeeId}
+            onChange={handleChange}
+            options={availableEmployees}
+            required
+          />
+        ) : (
+          <CustomInput
+            label="Pracownik"
+            name="employeeDisplay"
+            value={
+              availableEmployees.find(
+                (e) => String(e.value) === String(formData.employeeId),
+              )?.label || "Ty"
+            }
+            disabled
+          />
+        )}
         <CustomSelect
           label="Typ nieobecności *"
           name="vacationType"

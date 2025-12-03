@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
+import type { TableAction } from "@/components/common/CustomTable";
 import { DataTable } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
 import { StatusBadge } from "@/components/common/StatusBadge";
@@ -15,6 +17,7 @@ import { VacationEditModal } from "./VacationEditModal";
 
 export interface Vacation {
   id: number;
+  visibleUserId?: number;
   employeeName: string;
   vacationType: string;
   startDate: string;
@@ -28,6 +31,8 @@ interface VacationsViewProps {
   availableEmployees: { label: string; value: number | string }[];
   availableTypes: string[];
   availableStatuses: string[];
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }
 
 export function VacationsView({
@@ -35,6 +40,8 @@ export function VacationsView({
   availableEmployees,
   availableTypes,
   availableStatuses,
+  hasFullAccess = false,
+  currentUserId,
 }: VacationsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Wszystkie");
@@ -44,7 +51,11 @@ export function VacationsView({
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingVacation, setEditingVacation] = useState<Vacation | null>(null);
+  const [vacationToDelete, setVacationToDelete] = useState<Vacation | null>(
+    null,
+  );
 
   const { isRefreshing, refreshList, refreshListWithToast } = useRefreshList<
     Vacation[]
@@ -61,18 +72,28 @@ export function VacationsView({
     }
   };
 
-  const handleDelete = async (vacation: Vacation) => {
+  const handleOpenDeleteModal = (vacation: Vacation) => {
+    setVacationToDelete(vacation);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setVacationToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!vacationToDelete) return;
     try {
-      await deleteVacation(vacation);
-      // Refresh the list after successful deletion
+      await deleteVacation(vacationToDelete);
       const refreshedData = await refreshList();
       if (refreshedData) {
         setVacations(refreshedData);
       }
     } catch (error) {
-      // Error is already handled in the hook with toast
       console.error("Failed to delete vacation:", error);
     }
+    handleCloseDeleteModal();
   };
 
   useEffect(() => {
@@ -127,6 +148,30 @@ export function VacationsView({
     }
   };
 
+  // Get actions for a specific vacation item
+  const getVacationActions = (vacation: Vacation): TableAction<Vacation>[] => {
+    const canEdit = hasFullAccess || vacation.visibleUserId === currentUserId;
+
+    if (!canEdit) {
+      return [];
+    }
+
+    return [
+      {
+        icon: <FaEdit size={16} />,
+        label: "Edytuj",
+        onClick: (item) => handleOpenEditModal(item),
+        variant: "blue",
+      },
+      {
+        icon: <FaTrash size={16} />,
+        label: "Usuń",
+        onClick: (item) => handleOpenDeleteModal(item),
+        variant: "red",
+      },
+    ];
+  };
+
   return (
     <>
       {isAddModalOpen && (
@@ -134,6 +179,8 @@ export function VacationsView({
           onClose={handleCloseAddModal}
           availableEmployees={availableEmployees}
           availableTypes={availableTypes}
+          hasFullAccess={hasFullAccess}
+          currentUserId={currentUserId}
         />
       )}
 
@@ -144,6 +191,19 @@ export function VacationsView({
           availableEmployees={availableEmployees}
           availableTypes={availableTypes}
           availableStatuses={availableStatuses}
+          hasFullAccess={hasFullAccess}
+          currentUserId={currentUserId}
+        />
+      )}
+
+      {isDeleteModalOpen && vacationToDelete && (
+        <ConfirmDeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          title="Usuń wniosek urlopowy"
+          itemName={`${vacationToDelete.employeeName} (${vacationToDelete.startDate} - ${vacationToDelete.endDate})`}
+          description="Czy na pewno chcesz usunąć ten wniosek urlopowy?"
         />
       )}
 
@@ -267,20 +327,7 @@ export function VacationsView({
             headerClassName: "p-4",
           },
         ]}
-        actions={[
-          {
-            icon: <FaEdit size={16} />,
-            label: "Edytuj",
-            onClick: (item) => handleOpenEditModal(item),
-            variant: "blue",
-          },
-          {
-            icon: <FaTrash size={16} />,
-            label: "Usuń",
-            onClick: (item) => handleDelete(item),
-            variant: "red",
-          },
-        ]}
+        getActions={getVacationActions}
       />
     </>
   );

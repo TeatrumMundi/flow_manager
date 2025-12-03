@@ -16,6 +16,8 @@ interface VacationEditModalProps {
   availableEmployees: { label: string; value: number | string }[];
   availableTypes: string[];
   availableStatuses: string[];
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }
 
 export function VacationEditModal({
@@ -23,6 +25,7 @@ export function VacationEditModal({
   onClose,
   availableTypes,
   availableStatuses,
+  hasFullAccess = false,
 }: VacationEditModalProps) {
   const router = useRouter();
 
@@ -120,14 +123,23 @@ export function VacationEditModal({
             required
           />
         </div>
-        <CustomSelect
-          label="Status *"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          options={availableStatuses}
-          required
-        />
+        {hasFullAccess ? (
+          <CustomSelect
+            label="Status *"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            options={availableStatuses}
+            required
+          />
+        ) : (
+          <CustomInput
+            label="Status"
+            name="statusDisplay"
+            value={formData.status}
+            disabled
+          />
+        )}
         <div className="flex justify-end gap-4 pt-6">
           <Button type="button" onClick={() => onClose()} variant="secondary">
             Anuluj
