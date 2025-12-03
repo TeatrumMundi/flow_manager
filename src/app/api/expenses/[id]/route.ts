@@ -55,12 +55,12 @@ export async function PUT(request: Request, { params }: { params: Params }) {
 
     const normalizedProjectId =
       projectId !== undefined
-        ? (projectId ? Number(projectId) : null)
+        ? projectId
+          ? Number(projectId)
+          : null
         : undefined;
     const normalizedStatusId =
-      statusId !== undefined
-        ? (statusId ? Number(statusId) : null)
-        : undefined;
+      statusId !== undefined ? (statusId ? Number(statusId) : null) : undefined;
 
     const result = await updateExpenseInDb({
       id: expenseId,
