@@ -1,6 +1,5 @@
 ﻿"use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
@@ -44,7 +43,6 @@ export function VacationsView({
   hasFullAccess = false,
   currentUserId,
 }: VacationsViewProps) {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Wszystkie");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");

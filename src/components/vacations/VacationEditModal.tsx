@@ -77,7 +77,8 @@ export function VacationEditModal({
     vacation.endDate,
   );
   const originalIsRegularVacation =
-    vacation.vacationType === "Wypoczynkowy" || vacation.vacationType === "Na żądanie";
+    vacation.vacationType === "Wypoczynkowy" ||
+    vacation.vacationType === "Na żądanie";
 
   // Calculate days for the new date range
   const requestedDays = calculateBusinessDays(
@@ -86,7 +87,9 @@ export function VacationEditModal({
   );
 
   // Check if this is a "Wypoczynkowy" or "Na żądanie" type (regular vacation that counts against balance)
-  const isRegularVacation = formData.vacationType === "Wypoczynkowy" || formData.vacationType === "Na żądanie";
+  const isRegularVacation =
+    formData.vacationType === "Wypoczynkowy" ||
+    formData.vacationType === "Na żądanie";
 
   // Calculate remaining days after this vacation
   // We need to account for the original vacation days if it was also regular vacation
@@ -204,14 +207,18 @@ export function VacationEditModal({
 
         {/* Vacation Days Info Card - only show for regular vacation */}
         {isRegularVacation && vacationDaysInfo && (
-          <div className={`border rounded-lg p-4 ${wouldResultInNegativeBalance ? 'bg-red-50 border-red-300' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
+          <div
+            className={`border rounded-lg p-4 ${wouldResultInNegativeBalance ? "bg-red-50 border-red-300" : "bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200"}`}
+          >
             <div className="flex items-center gap-2 mb-3">
               {wouldResultInNegativeBalance ? (
                 <FaExclamationTriangle className="text-red-600" />
               ) : (
                 <FaCalendarAlt className="text-blue-600" />
               )}
-              <span className={`font-semibold ${wouldResultInNegativeBalance ? 'text-red-800' : 'text-blue-800'}`}>
+              <span
+                className={`font-semibold ${wouldResultInNegativeBalance ? "text-red-800" : "text-blue-800"}`}
+              >
                 Dostępne dni urlopowe
               </span>
             </div>
@@ -226,12 +233,12 @@ export function VacationEditModal({
                   </div>
                   <div className="text-xs text-gray-500">dostępne</div>
                 </div>
-                
+
                 {requestedDays > 0 && (
                   <>
                     {/* Minus sign */}
                     <div className="text-2xl font-bold text-gray-400">−</div>
-                    
+
                     {/* Requested days tile */}
                     <div className="bg-white rounded-lg p-3 shadow-sm text-center min-w-[70px]">
                       <div className="text-2xl font-bold text-orange-500">
@@ -239,13 +246,17 @@ export function VacationEditModal({
                       </div>
                       <div className="text-xs text-gray-500">wybrane</div>
                     </div>
-                    
+
                     {/* Equals sign */}
                     <div className="text-2xl font-bold text-gray-400">=</div>
-                    
+
                     {/* Remaining days tile */}
-                    <div className={`rounded-lg p-3 shadow-sm text-center min-w-[70px] ${remainingAfterVacation !== null && remainingAfterVacation < 0 ? 'bg-red-100' : 'bg-green-100'}`}>
-                      <div className={`text-2xl font-bold ${remainingAfterVacation !== null && remainingAfterVacation < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    <div
+                      className={`rounded-lg p-3 shadow-sm text-center min-w-[70px] ${remainingAfterVacation !== null && remainingAfterVacation < 0 ? "bg-red-100" : "bg-green-100"}`}
+                    >
+                      <div
+                        className={`text-2xl font-bold ${remainingAfterVacation !== null && remainingAfterVacation < 0 ? "text-red-600" : "text-green-600"}`}
+                      >
                         {remainingAfterVacation}
                       </div>
                       <div className="text-xs text-gray-500">pozostanie</div>

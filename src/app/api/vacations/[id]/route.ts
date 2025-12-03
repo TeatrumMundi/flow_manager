@@ -100,7 +100,7 @@ export async function PUT(request: Request, context: RouteParams) {
 
     // Validate vacation days balance for regular vacation (Wypoczynkowy or Na żądanie)
     if (vacationType === "Wypoczynkowy" || vacationType === "Na żądanie") {
-      if (currentVacation && currentVacation.userId) {
+      if (currentVacation?.userId) {
         const vacationDaysInfo = await getVacationDaysInfoFromDb(
           currentVacation.userId,
         );
@@ -108,7 +108,8 @@ export async function PUT(request: Request, context: RouteParams) {
         if (vacationDaysInfo) {
           // Calculate original days if it was also a regular vacation
           const originalDays =
-            currentVacation.typeName === "Wypoczynkowy" || currentVacation.typeName === "Na żądanie"
+            currentVacation.typeName === "Wypoczynkowy" ||
+            currentVacation.typeName === "Na żądanie"
               ? calculateBusinessDays(
                   currentVacation.startDate || "",
                   currentVacation.endDate || "",
@@ -144,14 +145,22 @@ export async function PUT(request: Request, context: RouteParams) {
     });
 
     // Adjust vacation days balance if needed
-    if (currentVacation && currentVacation.userId) {
-      const originalWasRegular = currentVacation.typeName === "Wypoczynkowy" || currentVacation.typeName === "Na żądanie";
-      const newIsRegular = vacationType === "Wypoczynkowy" || vacationType === "Na żądanie";
+    if (currentVacation?.userId) {
+      const originalWasRegular =
+        currentVacation.typeName === "Wypoczynkowy" ||
+        currentVacation.typeName === "Na żądanie";
+      const newIsRegular =
+        vacationType === "Wypoczynkowy" || vacationType === "Na żądanie";
 
       const originalDays = originalWasRegular
-        ? calculateBusinessDays(currentVacation.startDate || "", currentVacation.endDate || "")
+        ? calculateBusinessDays(
+            currentVacation.startDate || "",
+            currentVacation.endDate || "",
+          )
         : 0;
-      const newDays = newIsRegular ? calculateBusinessDays(startDate, endDate) : 0;
+      const newDays = newIsRegular
+        ? calculateBusinessDays(startDate, endDate)
+        : 0;
 
       // Calculate the difference and update balance
       // If original was 5 days and new is 3 days: add 2 days back (+2)
@@ -227,10 +236,14 @@ export async function DELETE(_request: Request, context: RouteParams) {
     }
 
     // Restore vacation days if it was a regular vacation
-    if (vacationToDelete && vacationToDelete.userId && (vacationToDelete.typeName === "Wypoczynkowy" || vacationToDelete.typeName === "Na żądanie")) {
+    if (
+      vacationToDelete?.userId &&
+      (vacationToDelete.typeName === "Wypoczynkowy" ||
+        vacationToDelete.typeName === "Na żądanie")
+    ) {
       const daysToRestore = calculateBusinessDays(
         vacationToDelete.startDate || "",
-        vacationToDelete.endDate || ""
+        vacationToDelete.endDate || "",
       );
       if (daysToRestore > 0) {
         await updateVacationDaysInDb(vacationToDelete.userId, daysToRestore);
