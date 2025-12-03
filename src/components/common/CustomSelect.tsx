@@ -22,6 +22,7 @@ export interface CustomSelectProps {
   hideLabel?: boolean;
   placeholder?: string;
   searchable?: boolean;
+  disabled?: boolean;
 }
 
 export function CustomSelect({
@@ -35,6 +36,7 @@ export function CustomSelect({
   hideLabel = false,
   placeholder = "Wybierz...",
   searchable = false,
+  disabled = false,
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -175,6 +177,7 @@ export function CustomSelect({
         value={value}
         onChange={onChange}
         required={required}
+        disabled={disabled}
         className="sr-only"
         tabIndex={-1}
       >
@@ -188,8 +191,9 @@ export function CustomSelect({
       {/* Custom select button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
+        disabled={disabled}
         className={
           className
             ? isOpen && dropdownPosition === "bottom"
@@ -201,7 +205,9 @@ export function CustomSelect({
               ? "w-full px-3 py-2 border border-gray-300 rounded-t-lg rounded-b-none focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2 cursor-pointer"
               : isOpen && dropdownPosition === "top"
                 ? "w-full px-3 py-2 border border-gray-300 rounded-b-lg rounded-t-none focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2 cursor-pointer"
-                : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2 cursor-pointer"
+                : disabled
+                  ? "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-400 bg-gray-100 text-left flex items-center justify-between gap-2 cursor-not-allowed"
+                  : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white text-left flex items-center justify-between gap-2 cursor-pointer"
         }
       >
         <span

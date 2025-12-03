@@ -10,17 +10,17 @@ import { CustomModal } from "@/components/common/CustomModal";
 import { CustomSelect } from "@/components/common/CustomSelect";
 
 interface WorkTimeAddModalProps {
-  onClose: () => void;
+  onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: string }[];
-  availableProjects: { label: string; value: string }[];
-  projectTasksMap: Record<string, { label: string; value: string }[]>;
+  userProjectsMap: Record<string, { label: string; value: string }[]>;
+  userProjectTasksMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeAddModal({
   onClose,
   availableEmployees,
-  availableProjects,
-  projectTasksMap,
+  userProjectsMap,
+  userProjectTasksMap,
 }: WorkTimeAddModalProps) {
   const router = useRouter();
 
@@ -38,16 +38,48 @@ export function WorkTimeAddModal({
     { label: string; value: string }[]
   >([]);
 
-  // Update tasks when project changes
+  const [filteredProjects, setFilteredProjects] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  // Update filtered projects when employee changes
   useEffect(() => {
-    if (formData.projectName && projectTasksMap[formData.projectName]) {
-      setAvailableTasks(projectTasksMap[formData.projectName]);
-      // Reset task selection if it doesn't belong to the new project
-      setFormData((prev) => ({ ...prev, taskName: "" }));
+    if (formData.employeeName && userProjectsMap[formData.employeeName]) {
+      setFilteredProjects(userProjectsMap[formData.employeeName]);
+      // Reset project and task selection if current project is not in the new list
+      const projectIds = userProjectsMap[formData.employeeName].map(
+        (p) => p.value,
+      );
+      if (formData.projectName && !projectIds.includes(formData.projectName)) {
+        setFormData((prev) => ({ ...prev, projectName: "", taskName: "" }));
+      }
+    } else {
+      setFilteredProjects([]);
+      setFormData((prev) => ({ ...prev, projectName: "", taskName: "" }));
+    }
+  }, [formData.employeeName, userProjectsMap, formData.projectName]);
+
+  // Update tasks when employee or project changes
+  useEffect(() => {
+    if (formData.employeeName && formData.projectName && userProjectTasksMap) {
+      const key = `${formData.employeeName}_${formData.projectName}`;
+      const userTasks = userProjectTasksMap[key] || [];
+      setAvailableTasks(userTasks);
+      // Reset task selection if it doesn't belong to the new list
+      const taskIds = userTasks.map((t) => t.value);
+      if (formData.taskName && !taskIds.includes(formData.taskName)) {
+        setFormData((prev) => ({ ...prev, taskName: "" }));
+      }
     } else {
       setAvailableTasks([]);
+      setFormData((prev) => ({ ...prev, taskName: "" }));
     }
-  }, [formData.projectName, projectTasksMap]);
+  }, [
+    formData.employeeName,
+    formData.projectName,
+    userProjectTasksMap,
+    formData.taskName,
+  ]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -62,18 +94,37 @@ export function WorkTimeAddModal({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const savePromise = new Promise((resolve) => {
-      console.log("Dodawanie wpisu:", formData);
-      setTimeout(resolve, 1000);
-    });
 
-    await toast.promise(savePromise, {
+    const savePromise = async () => {
+      const response = await fetch("/api/work-logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: Number(formData.employeeName),
+          taskId: formData.taskName ? Number(formData.taskName) : null,
+          projectId: Number(formData.projectName),
+          date: formData.date,
+          hoursWorked: formData.hours,
+          isOvertime: formData.isOvertime,
+          note: formData.note || null,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.ok) {
+        throw new Error(data.error || "Failed to create work log");
+      }
+
+      return data;
+    };
+
+    await toast.promise(savePromise(), {
       loading: "Dodawanie wpisu...",
       success: "Wpis został dodany!",
-      error: "Błąd podczas dodawania.",
+      error: (err) => `Błąd: ${err.message}`,
     });
 
-    onClose();
+    onClose(true); // Pass true to trigger refresh
     router.refresh();
   };
 
@@ -91,6 +142,7 @@ export function WorkTimeAddModal({
           value={formData.employeeName}
           onChange={handleChange}
           options={availableEmployees}
+          searchable={true}
           required
         />
 
@@ -100,8 +152,16 @@ export function WorkTimeAddModal({
             name="projectName"
             value={formData.projectName}
             onChange={handleChange}
-            options={availableProjects}
-            placeholder="Wybierz projekt"
+            options={filteredProjects}
+            searchable={true}
+            placeholder={
+              formData.employeeName && filteredProjects.length === 0
+                ? "Pracownik nie jest przypisany do żadnego projektu"
+                : "Wybierz projekt"
+            }
+            disabled={
+              !!(formData.employeeName && filteredProjects.length === 0)
+            }
             required
           />
           <CustomSelect
@@ -110,10 +170,19 @@ export function WorkTimeAddModal({
             value={formData.taskName}
             onChange={handleChange}
             options={availableTasks}
+            searchable={true}
             placeholder={
-              formData.projectName
-                ? "Wybierz zadanie"
-                : "Najpierw wybierz projekt"
+              formData.employeeName && filteredProjects.length === 0
+                ? "Pracownik nie ma projektów"
+                : !formData.projectName
+                  ? "Najpierw wybierz projekt"
+                  : availableTasks.length === 0
+                    ? "Brak tasków przypisanych do Ciebie w tym projekcie"
+                    : "Wybierz zadanie"
+            }
+            disabled={
+              !!(formData.employeeName && filteredProjects.length === 0) ||
+              (!!formData.projectName && availableTasks.length === 0)
             }
             required
           />
@@ -164,7 +233,11 @@ export function WorkTimeAddModal({
         />
 
         <div className="flex justify-end gap-4 pt-6">
-          <Button type="button" onClick={onClose} variant="secondary">
+          <Button
+            type="button"
+            onClick={() => onClose(false)}
+            variant="secondary"
+          >
             Anuluj
           </Button>
           <Button type="submit" variant="primary">

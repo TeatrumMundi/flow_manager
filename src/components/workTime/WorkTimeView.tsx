@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
@@ -10,6 +11,8 @@ import {
   type TableColumn,
 } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
+import type { WorkLogListItem } from "@/dataBase/query/workLogs/listWorkLogsFromDb";
+import { useRefreshList } from "@/hooks/useRefreshList";
 import { OvertimeBadge } from "./OvertimeBadge";
 import { WorkTimeAddModal } from "./WorkTimeAddModal";
 import { WorkTimeEditModal } from "./WorkTimeEditModal";
@@ -23,20 +26,23 @@ export interface WorkLog {
   hours: number;
   isOvertime: boolean;
   note: string;
+  userId?: number;
+  taskId?: number;
+  projectId?: number;
 }
 
 interface WorkTimeViewProps {
   initialLogs: WorkLog[];
   availableEmployees: { label: string; value: string }[];
-  availableProjects: { label: string; value: string }[];
-  projectTasksMap: Record<string, { label: string; value: string }[]>;
+  userProjectsMap: Record<string, { label: string; value: string }[]>;
+  userProjectTasksMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeView({
   initialLogs,
   availableEmployees,
-  availableProjects,
-  projectTasksMap,
+  userProjectsMap,
+  userProjectTasksMap,
 }: WorkTimeViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -44,14 +50,44 @@ export function WorkTimeView({
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const [workLogs, setWorkLogs] = useState(initialLogs);
   const [filteredLogs, setFilteredLogs] = useState(initialLogs);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLog, setEditingLog] = useState<WorkLog | null>(null);
 
+  const { isRefreshing, refreshList, refreshListWithToast } = useRefreshList<
+    WorkLogListItem[]
+  >({
+    apiUrl: "/api/work-logs",
+  });
+
+  const transformWorkLogData = (data: WorkLogListItem[]): WorkLog[] => {
+    return data.map((log) => ({
+      id: log.id,
+      employeeName: log.employeeName || "Unknown",
+      date: log.date || "",
+      projectName: log.projectName || "Unknown",
+      taskName: log.taskName || "Unknown",
+      hours: Number.parseFloat(log.hoursWorked || "0"),
+      isOvertime: log.isOvertime || false,
+      note: log.note || "",
+      userId: log.userId || undefined,
+      taskId: log.taskId || undefined,
+      projectId: log.projectId || undefined,
+    }));
+  };
+
+  const handleRefresh = async () => {
+    const refreshedData = await refreshListWithToast();
+    if (refreshedData) {
+      setWorkLogs(transformWorkLogData(refreshedData));
+    }
+  };
+
   useEffect(() => {
-    let logs = initialLogs;
+    let logs = workLogs;
 
     // Filter by Date From
     if (dateFrom) {
@@ -80,14 +116,20 @@ export function WorkTimeView({
     );
 
     setFilteredLogs(logs);
-  }, [searchTerm, dateFrom, dateTo, initialLogs]);
+  }, [searchTerm, dateFrom, dateTo, workLogs]);
 
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleCloseAddModal = () => {
+  const handleCloseAddModal = async (shouldRefresh?: boolean) => {
     setIsAddModalOpen(false);
+    if (shouldRefresh) {
+      const refreshedData = await refreshList();
+      if (refreshedData) {
+        setWorkLogs(transformWorkLogData(refreshedData));
+      }
+    }
   };
 
   const handleOpenEditModal = (log: WorkLog) => {
@@ -95,9 +137,15 @@ export function WorkTimeView({
     setIsEditModalOpen(true);
   };
 
-  const handleCloseEditModal = () => {
+  const handleCloseEditModal = async (shouldRefresh?: boolean) => {
     setIsEditModalOpen(false);
     setEditingLog(null);
+    if (shouldRefresh) {
+      const refreshedData = await refreshList();
+      if (refreshedData) {
+        setWorkLogs(transformWorkLogData(refreshedData));
+      }
+    }
   };
 
   return (
@@ -106,8 +154,8 @@ export function WorkTimeView({
         <WorkTimeAddModal
           onClose={handleCloseAddModal}
           availableEmployees={availableEmployees}
-          availableProjects={availableProjects}
-          projectTasksMap={projectTasksMap}
+          userProjectsMap={userProjectsMap}
+          userProjectTasksMap={userProjectTasksMap}
         />
       )}
 
@@ -116,8 +164,8 @@ export function WorkTimeView({
           workLog={editingLog}
           onClose={handleCloseEditModal}
           availableEmployees={availableEmployees}
-          availableProjects={availableProjects}
-          projectTasksMap={projectTasksMap}
+          userProjectsMap={userProjectsMap}
+          userProjectTasksMap={userProjectTasksMap}
         />
       )}
 
@@ -132,7 +180,7 @@ export function WorkTimeView({
             <FaPlus />
             <span>Dodaj wpis</span>
           </Button>
-          <RefreshButton onClick={() => {}} isRefreshing={false} />
+          <RefreshButton onClick={handleRefresh} isRefreshing={isRefreshing} />
         </div>
 
         <div className="relative grow">
@@ -177,51 +225,46 @@ export function WorkTimeView({
         data={filteredLogs}
         keyExtractor={(item) => item.id}
         emptyMessage="Nie znaleziono wpisów czasu pracy."
+        rowTitle={(item) => (item.note ? `Opis: ${item.note}` : "Brak opisu")}
         columns={
           [
             {
               key: "employeeName",
               header: "Pracownik",
-              className: "p-4 text-gray-800 font-medium",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-800 font-medium w-40",
+              headerClassName: "p-4 w-40",
             },
             {
               key: "date",
               header: "Data",
-              className: "p-4 text-gray-700 whitespace-nowrap",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-700 whitespace-nowrap w-32",
+              headerClassName: "p-4 w-32",
             },
             {
               key: "projectName",
               header: "Projekt",
-              className: "p-4 text-gray-700",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-700 truncate w-48",
+              headerClassName: "p-4 w-48",
             },
             {
               key: "taskName",
               header: "Zadanie",
-              className: "p-4 text-gray-700 font-medium",
-              headerClassName: "p-4",
+              className: "p-4 text-gray-700 font-medium truncate w-48",
+              headerClassName: "p-4 w-48",
             },
             {
               key: "hours",
-              header: "Liczba godzin",
-              className: "p-4 text-gray-800 font-bold text-center",
-              headerClassName: "p-4 text-center",
+              header: "Godz.",
+              className: "p-4 text-gray-800 font-bold text-center w-24",
+              headerClassName: "p-4 text-center w-24",
             },
             {
               key: "isOvertime",
-              header: "Nadgodziny",
+              header: "Nadg.",
               render: (item) => <OvertimeBadge isOvertime={item.isOvertime} />,
-              className: "p-4 flex justify-center",
-              headerClassName: "p-4 text-center",
+              className: "p-4 w-10",
+              headerClassName: "p-4 text-center w-10",
               align: "center",
-            },
-            {
-              key: "note",
-              header: "Opis",
-              className: "p-4 text-gray-500 italic truncate max-w-xs",
-              headerClassName: "p-4",
             },
           ] as TableColumn<WorkLog>[]
         }
@@ -236,7 +279,31 @@ export function WorkTimeView({
             {
               icon: <FaTrash size={16} />,
               label: "Usuń",
-              onClick: () => alert("Usuwanie (do implementacji)"),
+              onClick: async (item) => {
+                const deletePromise = async () => {
+                  const response = await fetch(`/api/work-logs/${item.id}`, {
+                    method: "DELETE",
+                  });
+
+                  const data = await response.json();
+                  if (!data.ok) {
+                    throw new Error(data.error || "Failed to delete work log");
+                  }
+
+                  return data;
+                };
+
+                await toast.promise(deletePromise(), {
+                  loading: "Usuwanie wpisu...",
+                  success: "Wpis został usunięty!",
+                  error: (err) => `Błąd: ${err.message}`,
+                });
+
+                const refreshedData = await refreshList();
+                if (refreshedData) {
+                  setWorkLogs(transformWorkLogData(refreshedData));
+                }
+              },
               variant: "red",
             },
           ] as TableAction<WorkLog>[]
