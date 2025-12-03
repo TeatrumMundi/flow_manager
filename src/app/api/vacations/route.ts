@@ -1,16 +1,24 @@
 import { NextResponse } from "next/server";
 import { createVacationInDb } from "@/dataBase/query/vacations/createVacationInDb";
+import { listVacationsByUserFromDb } from "@/dataBase/query/vacations/listVacationsByUserFromDb";
 import { listVacationStatusesFromDb } from "@/dataBase/query/vacations/listVacationStatusesFromDb";
 import { listVacationsFromDb } from "@/dataBase/query/vacations/listVacationsFromDb";
 import { listVacationTypesFromDb } from "@/dataBase/query/vacations/listVacationTypesFromDb";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const vacationsData = await listVacationsFromDb();
+    // Check for userId query parameter
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+
+    // Fetch vacations - filtered by userId if provided
+    const vacationsData = userId
+      ? await listVacationsByUserFromDb(Number(userId))
+      : await listVacationsFromDb();
 
     const vacations = vacationsData.map((vacation) => ({
       id: vacation.id,
-      userId: vacation.userId,
+      visibleUserId: vacation.userId,
       employeeName: vacation.employeeName || "Nieznany pracownik",
       vacationType: vacation.vacationType || "Nieznany typ",
       startDate: vacation.startDate || "",

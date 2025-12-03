@@ -33,7 +33,7 @@ export default async function VacationsPage() {
 
   const vacations = vacationsData.map((vacation) => ({
     id: vacation.id,
-    visibleUserId: vacation.userId,
+    visibleUserId: vacation.userId ?? undefined,
     employeeName: vacation.employeeName || "Nieznany pracownik",
     vacationType: vacation.vacationType || "Nieznany typ",
     startDate: vacation.startDate || "",

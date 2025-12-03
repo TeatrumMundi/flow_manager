@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
 import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
@@ -43,6 +44,7 @@ export function VacationsView({
   hasFullAccess = false,
   currentUserId,
 }: VacationsViewProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Wszystkie");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
@@ -57,10 +59,15 @@ export function VacationsView({
     null,
   );
 
+  // Build API URL with userId filter for non-admin users
+  const apiUrl = hasFullAccess
+    ? "/api/vacations"
+    : `/api/vacations?userId=${currentUserId}`;
+
   const { isRefreshing, refreshList, refreshListWithToast } = useRefreshList<
     Vacation[]
   >({
-    apiUrl: "/api/vacations",
+    apiUrl,
   });
 
   const { deleteVacation } = useDeleteVacation();
@@ -150,7 +157,15 @@ export function VacationsView({
 
   // Get actions for a specific vacation item
   const getVacationActions = (vacation: Vacation): TableAction<Vacation>[] => {
-    const canEdit = hasFullAccess || vacation.visibleUserId === currentUserId;
+    // Statuses that lock the vacation from being edited by regular users
+    const lockedStatuses = ["Zaakceptowany", "Odrzucony"];
+    const isLocked = lockedStatuses.includes(vacation.status);
+
+    // Regular users cannot edit/delete locked vacations
+    // Admins can always edit/delete
+    const canEdit =
+      hasFullAccess ||
+      (vacation.visibleUserId === currentUserId && !isLocked);
 
     if (!canEdit) {
       return [];
