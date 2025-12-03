@@ -1,6 +1,12 @@
-import { eq } from "drizzle-orm";
-import { projectAssignments, projects } from "@/dataBase/schema";
+import { and, eq, inArray } from "drizzle-orm";
+import {
+  projectAssignments,
+  projects,
+  userProfiles,
+  users,
+} from "@/dataBase/schema";
 import { database } from "@/utils/db";
+import type { ProjectListItem } from "./listProjectsFromDb";
 
 /**
  * Lists all projects assigned to a specific user.
@@ -14,7 +20,24 @@ import { database } from "@/utils/db";
  * console.log(`User has ${userProjects.length} projects assigned`);
  * ```
  */
-export async function listProjectsByUserFromDb(userId: number) {
+export async function listProjectsByUserFromDb(
+  userId: number,
+): Promise<ProjectListItem[]> {
+  // First get all project IDs that the user is assigned to
+  const userProjectIds = await database
+    .selectDistinct({
+      projectId: projectAssignments.projectId,
+    })
+    .from(projectAssignments)
+    .where(eq(projectAssignments.userId, userId));
+
+  if (userProjectIds.length === 0) {
+    return [];
+  }
+
+  const projectIdList = userProjectIds.map((p) => p.projectId);
+
+  // Then get full project data with manager info for those projects
   const result = await database
     .select({
       id: projects.id,
@@ -26,13 +49,24 @@ export async function listProjectsByUserFromDb(userId: number) {
       startDate: projects.startDate,
       endDate: projects.endDate,
       isArchived: projects.isArchived,
+      createdAt: projects.createdAt,
+      updatedAt: projects.updatedAt,
+      managerFirstName: userProfiles.firstName,
+      managerLastName: userProfiles.lastName,
+      managerEmail: users.email,
     })
     .from(projects)
-    .innerJoin(
+    .leftJoin(
       projectAssignments,
-      eq(projects.id, projectAssignments.projectId),
+      and(
+        eq(projects.id, projectAssignments.projectId),
+        eq(projectAssignments.roleOnProject, "Manager"),
+      ),
     )
-    .where(eq(projectAssignments.userId, userId));
+    .leftJoin(users, eq(projectAssignments.userId, users.id))
+    .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
+    .where(inArray(projects.id, projectIdList))
+    .orderBy(projects.createdAt);
 
   return result;
 }

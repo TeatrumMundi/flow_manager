@@ -3,14 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
-import {
-  DataTable,
-  type TableAction,
-  type TableColumn,
-} from "@/components/common/CustomTable";
+import { DataTable, type TableColumn } from "@/components/common/CustomTable";
 import { RefreshButton } from "@/components/common/RefreshButton";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import type { ProjectListItem } from "@/dataBase/query/projects/listProjectsFromDb";
@@ -25,6 +22,7 @@ import { ProjectEditModal } from "./ProjectEditModal";
 export function ProjectsView({
   initialProjects,
   availableStatuses,
+  hasFullAccess = false,
 }: ProjectsViewProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,7 +53,9 @@ export function ProjectsView({
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   useEffect(() => {
     let filteredList = projects;
@@ -93,6 +93,23 @@ export function ProjectsView({
     setIsAddModalOpen(false);
   };
 
+  const handleOpenDeleteModal = (project: Project) => {
+    setProjectToDelete(project);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setProjectToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+    await deleteProject(projectToDelete);
+    await handleSilentRefreshProjects();
+    handleCloseDeleteModal();
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pl-PL", {
       style: "currency",
@@ -119,15 +136,28 @@ export function ProjectsView({
         />
       )}
 
+      {isDeleteModalOpen && projectToDelete && (
+        <ConfirmDeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          title="Usuń projekt"
+          itemName={projectToDelete.name}
+          description="Czy na pewno chcesz usunąć ten projekt?"
+        />
+      )}
+
       <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
-        <Button
-          variant="primary"
-          onClick={handleOpenAddModal}
-          className="w-full md:w-auto"
-        >
-          <FaPlus />
-          <span>Dodaj projekt</span>
-        </Button>
+        {hasFullAccess && (
+          <Button
+            variant="primary"
+            onClick={handleOpenAddModal}
+            className="w-full md:w-auto"
+          >
+            <FaPlus />
+            <span>Dodaj projekt</span>
+          </Button>
+        )}
 
         <RefreshButton
           onClick={handleRefreshProjects}
@@ -227,31 +257,43 @@ export function ProjectsView({
           ] as TableColumn<Project>[]
         }
         actions={
-          [
-            {
-              icon: <FaInfo size={16} />,
-              label: "Szczegóły",
-              onClick: (project) => {
-                router.push(`/projects/${encodeURIComponent(project.name)}`);
-              },
-              variant: "yellow",
-            },
-            {
-              icon: <FaEdit size={16} />,
-              label: "Edytuj",
-              onClick: (project) => handleOpenEditModal(project),
-              variant: "blue",
-            },
-            {
-              icon: <FaTrash size={16} />,
-              label: "Usuń",
-              onClick: async (project) => {
-                await deleteProject(project);
-                await handleSilentRefreshProjects();
-              },
-              variant: "red",
-            },
-          ] as TableAction<Project>[]
+          hasFullAccess
+            ? [
+                {
+                  icon: <FaInfo size={16} />,
+                  label: "Szczegóły",
+                  onClick: (project) => {
+                    router.push(
+                      `/projects/${encodeURIComponent(project.name)}`,
+                    );
+                  },
+                  variant: "yellow",
+                },
+                {
+                  icon: <FaEdit size={16} />,
+                  label: "Edytuj",
+                  onClick: (project) => handleOpenEditModal(project),
+                  variant: "blue",
+                },
+                {
+                  icon: <FaTrash size={16} />,
+                  label: "Usuń",
+                  onClick: (project) => handleOpenDeleteModal(project),
+                  variant: "red",
+                },
+              ]
+            : [
+                {
+                  icon: <FaInfo size={16} />,
+                  label: "Szczegóły",
+                  onClick: (project) => {
+                    router.push(
+                      `/projects/${encodeURIComponent(project.name)}`,
+                    );
+                  },
+                  variant: "yellow",
+                },
+              ]
         }
       />
     </>
