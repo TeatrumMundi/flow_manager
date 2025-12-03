@@ -12,15 +12,15 @@ import { CustomSelect } from "@/components/common/CustomSelect";
 interface WorkTimeAddModalProps {
   onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: string }[];
-  projectTasksMap: Record<string, { label: string; value: string }[]>;
   userProjectsMap: Record<string, { label: string; value: string }[]>;
+  userProjectTasksMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeAddModal({
   onClose,
   availableEmployees,
-  projectTasksMap,
   userProjectsMap,
+  userProjectTasksMap,
 }: WorkTimeAddModalProps) {
   const router = useRouter();
 
@@ -59,16 +59,27 @@ export function WorkTimeAddModal({
     }
   }, [formData.employeeName, userProjectsMap, formData.projectName]);
 
-  // Update tasks when project changes
+  // Update tasks when employee or project changes
   useEffect(() => {
-    if (formData.projectName && projectTasksMap[formData.projectName]) {
-      setAvailableTasks(projectTasksMap[formData.projectName]);
-      // Reset task selection if it doesn't belong to the new project
-      setFormData((prev) => ({ ...prev, taskName: "" }));
+    if (formData.employeeName && formData.projectName && userProjectTasksMap) {
+      const key = `${formData.employeeName}_${formData.projectName}`;
+      const userTasks = userProjectTasksMap[key] || [];
+      setAvailableTasks(userTasks);
+      // Reset task selection if it doesn't belong to the new list
+      const taskIds = userTasks.map((t) => t.value);
+      if (formData.taskName && !taskIds.includes(formData.taskName)) {
+        setFormData((prev) => ({ ...prev, taskName: "" }));
+      }
     } else {
       setAvailableTasks([]);
+      setFormData((prev) => ({ ...prev, taskName: "" }));
     }
-  }, [formData.projectName, projectTasksMap]);
+  }, [
+    formData.employeeName,
+    formData.projectName,
+    userProjectTasksMap,
+    formData.taskName,
+  ]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -131,6 +142,7 @@ export function WorkTimeAddModal({
           value={formData.employeeName}
           onChange={handleChange}
           options={availableEmployees}
+          searchable={true}
           required
         />
 
@@ -141,6 +153,7 @@ export function WorkTimeAddModal({
             value={formData.projectName}
             onChange={handleChange}
             options={filteredProjects}
+            searchable={true}
             placeholder={
               formData.employeeName && filteredProjects.length === 0
                 ? "Pracownik nie jest przypisany do żadnego projektu"
@@ -157,15 +170,19 @@ export function WorkTimeAddModal({
             value={formData.taskName}
             onChange={handleChange}
             options={availableTasks}
+            searchable={true}
             placeholder={
               formData.employeeName && filteredProjects.length === 0
                 ? "Pracownik nie ma projektów"
-                : formData.projectName
-                  ? "Wybierz zadanie"
-                  : "Najpierw wybierz projekt"
+                : !formData.projectName
+                  ? "Najpierw wybierz projekt"
+                  : availableTasks.length === 0
+                    ? "Brak tasków przypisanych do Ciebie w tym projekcie"
+                    : "Wybierz zadanie"
             }
             disabled={
-              !!(formData.employeeName && filteredProjects.length === 0)
+              !!(formData.employeeName && filteredProjects.length === 0) ||
+              (!!formData.projectName && availableTasks.length === 0)
             }
             required
           />

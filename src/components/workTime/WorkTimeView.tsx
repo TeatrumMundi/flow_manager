@@ -34,15 +34,15 @@ export interface WorkLog {
 interface WorkTimeViewProps {
   initialLogs: WorkLog[];
   availableEmployees: { label: string; value: string }[];
-  projectTasksMap: Record<string, { label: string; value: string }[]>;
   userProjectsMap: Record<string, { label: string; value: string }[]>;
+  userProjectTasksMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeView({
   initialLogs,
   availableEmployees,
-  projectTasksMap,
   userProjectsMap,
+  userProjectTasksMap,
 }: WorkTimeViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -154,8 +154,8 @@ export function WorkTimeView({
         <WorkTimeAddModal
           onClose={handleCloseAddModal}
           availableEmployees={availableEmployees}
-          projectTasksMap={projectTasksMap}
           userProjectsMap={userProjectsMap}
+          userProjectTasksMap={userProjectTasksMap}
         />
       )}
 
@@ -164,8 +164,8 @@ export function WorkTimeView({
           workLog={editingLog}
           onClose={handleCloseEditModal}
           availableEmployees={availableEmployees}
-          projectTasksMap={projectTasksMap}
           userProjectsMap={userProjectsMap}
+          userProjectTasksMap={userProjectTasksMap}
         />
       )}
 

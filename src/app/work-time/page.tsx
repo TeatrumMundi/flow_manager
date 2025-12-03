@@ -2,8 +2,7 @@
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { WorkTimeView } from "@/components/workTime/WorkTimeView";
 import { listProjectsByUserFromDb } from "@/dataBase/query/projects/listProjectsByUserFromDb";
-import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
-import { listTasksByProjectFromDb } from "@/dataBase/query/tasks/listTasksByProjectFromDb";
+import { listTasksByUserAndProjectFromDb } from "@/dataBase/query/tasks/listTasksByUserAndProjectFromDb";
 import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 import { listWorkLogsFromDb } from "@/dataBase/query/workLogs/listWorkLogsFromDb";
 
@@ -15,7 +14,6 @@ export default async function WorkTimePage() {
   // Fetch data from database
   const workLogsData = await listWorkLogsFromDb();
   const usersData = await listUsersFromDb();
-  const projectsData = await listProjectsFromDb({ isArchived: false });
 
   // Transform work logs to match component interface
   const workLogs = workLogsData.map((log) => ({
@@ -40,20 +38,6 @@ export default async function WorkTimePage() {
       value: String(user.id),
     }));
 
-  // Build project tasks map
-  const projectTasksMap: Record<string, { label: string; value: string }[]> =
-    {};
-
-  for (const project of projectsData) {
-    if (project.id) {
-      const tasks = await listTasksByProjectFromDb(project.id);
-      projectTasksMap[String(project.id)] = tasks.map((task) => ({
-        label: task.title || "Unknown",
-        value: String(task.id),
-      }));
-    }
-  }
-
   // Build user projects map - map of userId to their assigned projects
   // Include all employees even if they have no projects (empty array)
   const userProjectsMap: Record<string, { label: string; value: string }[]> =
@@ -69,6 +53,31 @@ export default async function WorkTimePage() {
         value: String(project.id),
       }));
   }
+
+  // Build user-project-tasks map - map of "userId_projectId" to their assigned tasks
+  // Include all user-project combinations even if they have no tasks (empty array)
+  const userProjectTasksMap: Record<
+    string,
+    { label: string; value: string }[]
+  > = {};
+
+  for (const employee of availableEmployees) {
+    const userId = Number(employee.value);
+    const employeeProjects = userProjectsMap[employee.value] || [];
+
+    for (const project of employeeProjects) {
+      const projectId = Number(project.value);
+      const key = `${userId}_${projectId}`;
+      const userTasks = await listTasksByUserAndProjectFromDb(
+        userId,
+        projectId,
+      );
+      userProjectTasksMap[key] = userTasks.map((task) => ({
+        label: task.title || "Unknown",
+        value: String(task.id),
+      }));
+    }
+  }
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
@@ -80,8 +89,8 @@ export default async function WorkTimePage() {
         <WorkTimeView
           initialLogs={workLogs}
           availableEmployees={availableEmployees}
-          projectTasksMap={projectTasksMap}
           userProjectsMap={userProjectsMap}
+          userProjectTasksMap={userProjectTasksMap}
         />
       </main>
     </div>

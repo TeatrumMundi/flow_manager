@@ -14,16 +14,16 @@ interface WorkTimeEditModalProps {
   workLog: WorkLog;
   onClose: (shouldRefresh?: boolean) => void;
   availableEmployees: { label: string; value: string }[];
-  projectTasksMap: Record<string, { label: string; value: string }[]>;
   userProjectsMap: Record<string, { label: string; value: string }[]>;
+  userProjectTasksMap: Record<string, { label: string; value: string }[]>;
 }
 
 export function WorkTimeEditModal({
   workLog,
   onClose,
   availableEmployees,
-  projectTasksMap,
   userProjectsMap,
+  userProjectTasksMap,
 }: WorkTimeEditModalProps) {
   const router = useRouter();
 
@@ -62,14 +62,27 @@ export function WorkTimeEditModal({
     }
   }, [formData.employeeName, userProjectsMap, formData.projectName]);
 
-  // Update tasks when project changes
+  // Update tasks when employee or project changes
   useEffect(() => {
-    if (formData.projectName && projectTasksMap[formData.projectName]) {
-      setAvailableTasks(projectTasksMap[formData.projectName]);
+    if (formData.employeeName && formData.projectName && userProjectTasksMap) {
+      const key = `${formData.employeeName}_${formData.projectName}`;
+      const userTasks = userProjectTasksMap[key] || [];
+      setAvailableTasks(userTasks);
+      // Reset task selection if it doesn't belong to the new list
+      const taskIds = userTasks.map((t) => t.value);
+      if (formData.taskName && !taskIds.includes(formData.taskName)) {
+        setFormData((prev) => ({ ...prev, taskName: "" }));
+      }
     } else {
       setAvailableTasks([]);
+      setFormData((prev) => ({ ...prev, taskName: "" }));
     }
-  }, [formData.projectName, projectTasksMap]);
+  }, [
+    formData.employeeName,
+    formData.projectName,
+    userProjectTasksMap,
+    formData.taskName,
+  ]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -132,6 +145,7 @@ export function WorkTimeEditModal({
           value={formData.employeeName}
           onChange={handleChange}
           options={availableEmployees}
+          searchable={true}
           required
         />
 
@@ -142,6 +156,7 @@ export function WorkTimeEditModal({
             value={formData.projectName}
             onChange={handleChange}
             options={filteredProjects}
+            searchable={true}
             placeholder={
               formData.employeeName && filteredProjects.length === 0
                 ? "Pracownik nie jest przypisany do żadnego projektu"
@@ -158,13 +173,19 @@ export function WorkTimeEditModal({
             value={formData.taskName}
             onChange={handleChange}
             options={availableTasks}
+            searchable={true}
             placeholder={
               formData.employeeName && filteredProjects.length === 0
                 ? "Pracownik nie ma projektów"
-                : "Wybierz zadanie"
+                : !formData.projectName
+                  ? "Najpierw wybierz projekt"
+                  : availableTasks.length === 0
+                    ? "Brak tasków przypisanych do Ciebie w tym projekcie"
+                    : "Wybierz zadanie"
             }
             disabled={
-              !!(formData.employeeName && filteredProjects.length === 0)
+              !!(formData.employeeName && filteredProjects.length === 0) ||
+              (!!formData.projectName && availableTasks.length === 0)
             }
             required
           />
