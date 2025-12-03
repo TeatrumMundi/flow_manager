@@ -164,8 +164,7 @@ export function VacationsView({
     // Regular users cannot edit/delete locked vacations
     // Admins can always edit/delete
     const canEdit =
-      hasFullAccess ||
-      (vacation.visibleUserId === currentUserId && !isLocked);
+      hasFullAccess || (vacation.visibleUserId === currentUserId && !isLocked);
 
     if (!canEdit) {
       return [];
