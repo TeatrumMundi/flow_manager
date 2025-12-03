@@ -33,6 +33,7 @@ export interface DataTableProps<T> {
   className?: string;
   headerClassName?: string;
   rowClassName?: string | ((item: T) => string);
+  rowTitle?: (item: T) => string;
 }
 
 const variantClasses = {
@@ -55,6 +56,7 @@ export function DataTable<T>({
   className = "",
   headerClassName = "bg-blue-600/50",
   rowClassName = "border-t border-gray-200 hover:bg-gray-50/50",
+  rowTitle,
 }: DataTableProps<T>) {
   const allSelected =
     selectable &&
@@ -134,7 +136,11 @@ export function DataTable<T>({
               const isSelected = selectedItems.includes(itemKey);
 
               return (
-                <tr key={itemKey} className={getRowClassName(item)}>
+                <tr
+                  key={itemKey}
+                  className={getRowClassName(item)}
+                  title={rowTitle ? rowTitle(item) : undefined}
+                >
                   {/* Selection checkbox */}
                   {selectable && (
                     <td className="p-4 border-r border-blue-600/20">

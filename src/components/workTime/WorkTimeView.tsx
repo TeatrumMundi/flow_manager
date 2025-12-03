@@ -177,51 +177,52 @@ export function WorkTimeView({
         data={filteredLogs}
         keyExtractor={(item) => item.id}
         emptyMessage="Nie znaleziono wpisów czasu pracy."
+        rowTitle={(item) => (item.note ? `Opis: ${item.note}` : "Brak opisu")}
         columns={
           [
             {
               key: "employeeName",
               header: "Pracownik",
-              className: "p-4 text-gray-800 font-medium",
-              headerClassName: "p-4",
+              width: "w-40",
+              className: "px-2 py-3 text-gray-800 font-medium",
+              headerClassName: "px-2 py-3",
             },
             {
               key: "date",
               header: "Data",
-              className: "p-4 text-gray-700 whitespace-nowrap",
-              headerClassName: "p-4",
+              width: "w-28",
+              className: "px-2 py-3 text-gray-700 whitespace-nowrap text-sm",
+              headerClassName: "px-2 py-3",
             },
             {
               key: "projectName",
               header: "Projekt",
-              className: "p-4 text-gray-700",
-              headerClassName: "p-4",
+              width: "w-36",
+              className: "px-2 py-3 text-gray-700 truncate",
+              headerClassName: "px-2 py-3",
             },
             {
               key: "taskName",
               header: "Zadanie",
-              className: "p-4 text-gray-700 font-medium",
-              headerClassName: "p-4",
+              width: "w-40",
+              className: "px-2 py-3 text-gray-700 font-medium truncate",
+              headerClassName: "px-2 py-3",
             },
             {
               key: "hours",
-              header: "Liczba godzin",
-              className: "p-4 text-gray-800 font-bold text-center",
-              headerClassName: "p-4 text-center",
+              header: "Godz.",
+              width: "w-16",
+              className: "px-2 py-3 text-gray-800 font-bold text-center",
+              headerClassName: "px-2 py-3 text-center",
             },
             {
               key: "isOvertime",
-              header: "Nadgodziny",
+              header: "Nadg.",
+              width: "w-16",
               render: (item) => <OvertimeBadge isOvertime={item.isOvertime} />,
-              className: "p-4 flex justify-center",
-              headerClassName: "p-4 text-center",
+              className: "px-2 py-3 flex justify-center",
+              headerClassName: "px-2 py-3 text-center",
               align: "center",
-            },
-            {
-              key: "note",
-              header: "Opis",
-              className: "p-4 text-gray-500 italic truncate max-w-xs",
-              headerClassName: "p-4",
             },
           ] as TableColumn<WorkLog>[]
         }
