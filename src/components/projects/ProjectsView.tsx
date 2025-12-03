@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit, FaInfo, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+import { ConfirmDeleteModal } from "@/components/common/ConfirmDeleteModal";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
@@ -52,7 +53,9 @@ export function ProjectsView({
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   useEffect(() => {
     let filteredList = projects;
@@ -90,6 +93,23 @@ export function ProjectsView({
     setIsAddModalOpen(false);
   };
 
+  const handleOpenDeleteModal = (project: Project) => {
+    setProjectToDelete(project);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setProjectToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+    await deleteProject(projectToDelete);
+    await handleSilentRefreshProjects();
+    handleCloseDeleteModal();
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pl-PL", {
       style: "currency",
@@ -113,6 +133,17 @@ export function ProjectsView({
           onClose={handleCloseAddModal}
           availableStatuses={availableStatuses}
           onProjectChange={handleSilentRefreshProjects}
+        />
+      )}
+
+      {isDeleteModalOpen && projectToDelete && (
+        <ConfirmDeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          title="Usuń projekt"
+          itemName={projectToDelete.name}
+          description="Czy na pewno chcesz usunąć ten projekt?"
         />
       )}
 
@@ -247,10 +278,7 @@ export function ProjectsView({
                 {
                   icon: <FaTrash size={16} />,
                   label: "Usuń",
-                  onClick: async (project) => {
-                    await deleteProject(project);
-                    await handleSilentRefreshProjects();
-                  },
+                  onClick: (project) => handleOpenDeleteModal(project),
                   variant: "red",
                 },
               ]

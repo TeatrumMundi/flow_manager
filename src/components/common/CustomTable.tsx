@@ -24,6 +24,7 @@ export interface DataTableProps<T> {
   data: T[];
   columns: TableColumn<T>[];
   actions?: TableAction<T>[];
+  getActions?: (item: T) => TableAction<T>[];
   keyExtractor: (item: T) => string | number;
   emptyMessage?: string;
   selectable?: boolean;
@@ -47,6 +48,7 @@ export function DataTable<T>({
   data,
   columns,
   actions,
+  getActions,
   keyExtractor,
   emptyMessage = "Nie znaleziono elementów.",
   selectable = false,
@@ -70,6 +72,19 @@ export function DataTable<T>({
     return rowClassName;
   };
 
+  // Check if any row has actions (for showing the actions column header)
+  const hasAnyActions =
+    (actions && actions.length > 0) ||
+    (getActions && data.some((item) => getActions(item).length > 0));
+
+  // Get actions for a specific item
+  const getItemActions = (item: T): TableAction<T>[] => {
+    if (getActions) {
+      return getActions(item);
+    }
+    return actions || [];
+  };
+
   return (
     <>
       <div
@@ -82,8 +97,8 @@ export function DataTable<T>({
             {columns.map((col) => (
               <col key={col.key} className={col.width || ""} />
             ))}
-            {actions && actions.length > 0 && (
-              <col style={{ width: `${actions.length * 12 + 8}px` }} />
+            {hasAnyActions && (
+              <col style={{ width: `${(actions?.length || 2) * 12 + 8}px` }} />
             )}
           </colgroup>
 
@@ -121,7 +136,7 @@ export function DataTable<T>({
               ))}
 
               {/* Actions column header */}
-              {actions && actions.length > 0 && (
+              {hasAnyActions && (
                 <th className="p-2 font-semibold text-gray-600 text-center border-l border-blue-600/20">
                   Akcje
                 </th>
@@ -176,10 +191,10 @@ export function DataTable<T>({
                   ))}
 
                   {/* Actions column */}
-                  {actions && actions.length > 0 && (
+                  {hasAnyActions && (
                     <td className="p-2 border-l border-blue-600/20">
                       <div className="flex justify-center gap-2">
-                        {actions.map((action) => (
+                        {getItemActions(item).map((action) => (
                           <button
                             key={action.label}
                             type="button"

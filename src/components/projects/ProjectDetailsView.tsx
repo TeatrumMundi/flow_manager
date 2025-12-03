@@ -53,6 +53,7 @@ export function ProjectDetailsView({
   allUsers,
   onBack,
   hasFullAccess = false,
+  currentUserId,
 }: ProjectDetailsViewProps) {
   const [assignments, setAssignments] = useState<ProjectAssignmentListItem[]>(
     [],
@@ -202,23 +203,32 @@ export function ProjectDetailsView({
     },
   ];
 
-  // Define table actions for tasks - only for admins
-  const taskActions: TableAction<ProjectTaskListItem>[] = hasFullAccess
-    ? [
-        {
-          icon: <FaEdit size={16} />,
-          label: "Edytuj zadanie",
-          onClick: handleEditTask,
-          variant: "blue",
-        },
-        {
-          icon: <FaTrash size={16} />,
-          label: "Usuń zadanie",
-          onClick: handleDeleteTask,
-          variant: "red",
-        },
-      ]
-    : [];
+  // Define table actions for tasks
+  // Admins can edit/delete all tasks, regular users can only edit/delete their own tasks
+  const getTaskActions = (
+    task: ProjectTaskListItem,
+  ): TableAction<ProjectTaskListItem>[] => {
+    const canEditTask = hasFullAccess || task.assignedToId === currentUserId;
+
+    if (!canEditTask) {
+      return [];
+    }
+
+    return [
+      {
+        icon: <FaEdit size={16} />,
+        label: "Edytuj zadanie",
+        onClick: handleEditTask,
+        variant: "blue",
+      },
+      {
+        icon: <FaTrash size={16} />,
+        label: "Usuń zadanie",
+        onClick: handleDeleteTask,
+        variant: "red",
+      },
+    ];
+  };
 
   // Get available users (not already assigned)
   const availableUsers = allUsers.filter(
@@ -544,42 +554,38 @@ export function ProjectDetailsView({
       {/* Tasks tile - Full width below */}
       <div className="bg-white rounded-xl border border-slate-200 mt-8">
         <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-slate-800">
+          <h2 className="text-lg font-semibold text-slate-800 bg-blue-500/50 px-2 py-1 rounded-md border border-blue-600/20">
             Zadania w projekcie ({tasks.length})
           </h2>
-          {hasFullAccess && (
-            <Button
-              variant="primary"
-              onClick={() => setIsTaskAddModalOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <FaPlus />
-              <span>Dodaj zadanie</span>
-            </Button>
-          )}
+          <Button
+            variant="primary"
+            onClick={() => setIsTaskAddModalOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <FaPlus />
+            <span>Dodaj zadanie</span>
+          </Button>
         </div>
         {isLoadingTasks ? (
           <p className="text-slate-500 p-6">Ładowanie zadań...</p>
         ) : tasks.length === 0 ? (
           <div className="p-6 text-center">
             <p className="text-slate-500 mb-4">Brak zadań w tym projekcie.</p>
-            {hasFullAccess && (
-              <Button
-                variant="primary"
-                onClick={() => setIsTaskAddModalOpen(true)}
-                className="mx-auto"
-              >
-                <FaPlus />
-                <span>Dodaj pierwsze zadanie</span>
-              </Button>
-            )}
+            <Button
+              variant="primary"
+              onClick={() => setIsTaskAddModalOpen(true)}
+              className="mx-auto"
+            >
+              <FaPlus />
+              <span>Dodaj pierwsze zadanie</span>
+            </Button>
           </div>
         ) : (
           <div className="p-6">
             <DataTable
               data={tasks}
               columns={taskColumns}
-              actions={taskActions}
+              getActions={getTaskActions}
               keyExtractor={(task) => task.id}
               emptyMessage="Brak zadań w tym projekcie."
             />
@@ -602,6 +608,8 @@ export function ProjectDetailsView({
               `${assignment.firstName || ""} ${assignment.lastName || ""} (${assignment.email})`.trim(),
             value: assignment.userId,
           }))}
+          currentUserId={currentUserId}
+          hasFullAccess={hasFullAccess}
         />
       )}
 

@@ -22,20 +22,27 @@ interface TaskAddModalProps {
   projectId: number;
   onClose: (shouldRefresh?: boolean) => void;
   availableUsers: { label: string; value: number | string }[];
+  currentUserId?: number;
+  hasFullAccess?: boolean;
 }
 
 export function TaskAddModal({
   projectId,
   onClose,
   availableUsers,
+  currentUserId,
+  hasFullAccess = false,
 }: TaskAddModalProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // For regular users, auto-assign to themselves
+  const defaultAssignedToId = hasFullAccess ? "" : String(currentUserId || "");
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    assignedToId: "",
+    assignedToId: defaultAssignedToId,
     status: "Do zrobienia",
     estimatedHours: "",
   });
@@ -133,13 +140,29 @@ export function TaskAddModal({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <CustomSelect
-            label="Przypisz do"
-            name="assignedToId"
-            value={formData.assignedToId}
-            onChange={handleChange}
-            options={[{ label: "Nieprzypisane", value: "" }, ...availableUsers]}
-          />
+          {hasFullAccess ? (
+            <CustomSelect
+              label="Przypisz do"
+              name="assignedToId"
+              value={formData.assignedToId}
+              onChange={handleChange}
+              options={[
+                { label: "Nieprzypisane", value: "" },
+                ...availableUsers,
+              ]}
+            />
+          ) : (
+            <CustomInput
+              label="Przypisany do"
+              name="assignedToDisplay"
+              value={
+                availableUsers.find(
+                  (u) => String(u.value) === formData.assignedToId,
+                )?.label || "Ty"
+              }
+              disabled
+            />
+          )}
           <CustomSelect
             label="Status *"
             name="status"
