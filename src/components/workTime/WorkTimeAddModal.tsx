@@ -14,6 +14,8 @@ interface WorkTimeAddModalProps {
   availableEmployees: { label: string; value: string }[];
   userProjectsMap: Record<string, { label: string; value: string }[]>;
   userProjectTasksMap: Record<string, { label: string; value: string }[]>;
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }
 
 export function WorkTimeAddModal({
@@ -21,11 +23,20 @@ export function WorkTimeAddModal({
   availableEmployees,
   userProjectsMap,
   userProjectTasksMap,
+  hasFullAccess = false,
+  currentUserId,
 }: WorkTimeAddModalProps) {
   const router = useRouter();
 
+  // If user doesn't have full access, force selection to their own ID
+  const defaultEmployee = hasFullAccess
+    ? availableEmployees[0]?.value || ""
+    : currentUserId
+      ? String(currentUserId)
+      : availableEmployees[0]?.value || "";
+
   const [formData, setFormData] = useState({
-    employeeName: availableEmployees[0]?.value || "",
+    employeeName: defaultEmployee,
     projectName: "",
     taskName: "",
     date: new Date().toISOString().split("T")[0],
@@ -136,15 +147,27 @@ export function WorkTimeAddModal({
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <CustomSelect
-          label="Pracownik *"
-          name="employeeName"
-          value={formData.employeeName}
-          onChange={handleChange}
-          options={availableEmployees}
-          searchable={true}
-          required
-        />
+        {hasFullAccess ? (
+          <CustomSelect
+            label="Pracownik *"
+            name="employeeName"
+            value={formData.employeeName}
+            onChange={handleChange}
+            options={availableEmployees}
+            searchable={true}
+            required
+          />
+        ) : (
+          <CustomInput
+            label="Pracownik"
+            name="employeeNameDisplay"
+            value={
+              availableEmployees.find((e) => e.value === formData.employeeName)
+                ?.label || ""
+            }
+            disabled
+          />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CustomSelect

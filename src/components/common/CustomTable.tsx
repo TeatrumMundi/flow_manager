@@ -18,6 +18,7 @@ export interface TableAction<T> {
   onClick: (item: T) => void;
   className?: string;
   variant?: "blue" | "red" | "yellow" | "green";
+  hidden?: boolean | ((item: T) => boolean);
 }
 
 export interface DataTableProps<T> {
@@ -77,12 +78,14 @@ export function DataTable<T>({
     (actions && actions.length > 0) ||
     (getActions && data.some((item) => getActions(item).length > 0));
 
-  // Get actions for a specific item
+  // Get actions for a specific item, filtering out hidden ones
   const getItemActions = (item: T): TableAction<T>[] => {
-    if (getActions) {
-      return getActions(item);
-    }
-    return actions || [];
+    const itemActions = getActions ? getActions(item) : actions || [];
+    return itemActions.filter((action) => {
+      if (action.hidden === undefined) return true;
+      if (typeof action.hidden === "function") return !action.hidden(item);
+      return !action.hidden;
+    });
   };
 
   return (

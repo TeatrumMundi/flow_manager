@@ -36,6 +36,9 @@ interface WorkTimeViewProps {
   availableEmployees: { label: string; value: string }[];
   userProjectsMap: Record<string, { label: string; value: string }[]>;
   userProjectTasksMap: Record<string, { label: string; value: string }[]>;
+  hasFullAccess?: boolean;
+  canViewAll?: boolean;
+  currentUserId?: number;
 }
 
 export function WorkTimeView({
@@ -43,6 +46,9 @@ export function WorkTimeView({
   availableEmployees,
   userProjectsMap,
   userProjectTasksMap,
+  hasFullAccess = false,
+  canViewAll: _canViewAll = false,
+  currentUserId,
 }: WorkTimeViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -156,6 +162,8 @@ export function WorkTimeView({
           availableEmployees={availableEmployees}
           userProjectsMap={userProjectsMap}
           userProjectTasksMap={userProjectTasksMap}
+          hasFullAccess={hasFullAccess}
+          currentUserId={currentUserId}
         />
       )}
 
@@ -166,6 +174,8 @@ export function WorkTimeView({
           availableEmployees={availableEmployees}
           userProjectsMap={userProjectsMap}
           userProjectTasksMap={userProjectTasksMap}
+          hasFullAccess={hasFullAccess}
+          currentUserId={currentUserId}
         />
       )}
 
@@ -275,6 +285,7 @@ export function WorkTimeView({
               label: "Edytuj",
               onClick: (item) => handleOpenEditModal(item),
               variant: "blue",
+              hidden: (item) => !hasFullAccess && item.userId !== currentUserId,
             },
             {
               icon: <FaTrash size={16} />,
@@ -305,6 +316,7 @@ export function WorkTimeView({
                 }
               },
               variant: "red",
+              hidden: (item) => !hasFullAccess && item.userId !== currentUserId,
             },
           ] as TableAction<WorkLog>[]
         }

@@ -1,9 +1,12 @@
-﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
+﻿import { auth } from "@/auth";
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { WorkTimeView } from "@/components/workTime/WorkTimeView";
 import { listProjectsByUserFromDb } from "@/dataBase/query/projects/listProjectsByUserFromDb";
 import { listTasksByUserAndProjectFromDb } from "@/dataBase/query/tasks/listTasksByUserAndProjectFromDb";
+import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
+import { listWorkLogsByUserFromDb } from "@/dataBase/query/workLogs/listWorkLogsByUserFromDb";
 import { listWorkLogsFromDb } from "@/dataBase/query/workLogs/listWorkLogsFromDb";
 
 // Turn off static rendering and caching for this page
@@ -11,8 +14,35 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function WorkTimePage() {
-  // Fetch data from database
-  const workLogsData = await listWorkLogsFromDb();
+  // Get current user session and profile
+  const session = await auth();
+  const userProfile = session?.user?.email
+    ? await getFullUserProfileFromDbByEmail(session.user.email)
+    : null;
+
+  // Define access levels based on user role
+  // Full access: Administrator, Zarząd - can see, add, edit, delete all logs
+  // View all + own edit: HR, Księgowość - can see all logs but only add/edit/delete own
+  // Own only: Regular employees - can only see and manage their own logs
+  const fullAccessRoles = ["Administrator", "Zarząd"];
+  const viewAllRoles = ["HR", "Księgowość"];
+
+  const hasFullAccess = userProfile?.role?.name
+    ? fullAccessRoles.includes(userProfile.role.name)
+    : false;
+
+  const canViewAll = userProfile?.role?.name
+    ? viewAllRoles.includes(userProfile.role.name)
+    : false;
+
+  // Fetch work logs based on user role
+  // Full access or view all roles can see all logs
+  // Regular employees see only their own
+  const workLogsData =
+    hasFullAccess || canViewAll || !userProfile?.id
+      ? await listWorkLogsFromDb()
+      : await listWorkLogsByUserFromDb(userProfile.id);
+
   const usersData = await listUsersFromDb();
 
   // Transform work logs to match component interface
@@ -83,7 +113,11 @@ export default async function WorkTimePage() {
       <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
         <div className="flex items-center justify-between mb-8">
           <BackToDashboardButton />
-          <SectionTitleTile title="Czas pracy" />
+          <SectionTitleTile
+            title={
+              hasFullAccess || canViewAll ? "Czas pracy" : "Mój czas pracy"
+            }
+          />
         </div>
 
         <WorkTimeView
@@ -91,6 +125,9 @@ export default async function WorkTimePage() {
           availableEmployees={availableEmployees}
           userProjectsMap={userProjectsMap}
           userProjectTasksMap={userProjectTasksMap}
+          hasFullAccess={hasFullAccess}
+          canViewAll={canViewAll}
+          currentUserId={userProfile?.id}
         />
       </main>
     </div>

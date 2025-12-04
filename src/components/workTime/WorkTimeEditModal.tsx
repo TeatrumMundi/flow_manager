@@ -16,6 +16,8 @@ interface WorkTimeEditModalProps {
   availableEmployees: { label: string; value: string }[];
   userProjectsMap: Record<string, { label: string; value: string }[]>;
   userProjectTasksMap: Record<string, { label: string; value: string }[]>;
+  hasFullAccess?: boolean;
+  currentUserId?: number;
 }
 
 export function WorkTimeEditModal({
@@ -24,6 +26,7 @@ export function WorkTimeEditModal({
   availableEmployees,
   userProjectsMap,
   userProjectTasksMap,
+  hasFullAccess = false,
 }: WorkTimeEditModalProps) {
   const router = useRouter();
 
@@ -139,15 +142,24 @@ export function WorkTimeEditModal({
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <CustomSelect
-          label="Pracownik *"
-          name="employeeName"
-          value={formData.employeeName}
-          onChange={handleChange}
-          options={availableEmployees}
-          searchable={true}
-          required
-        />
+        {hasFullAccess ? (
+          <CustomSelect
+            label="Pracownik *"
+            name="employeeName"
+            value={formData.employeeName}
+            onChange={handleChange}
+            options={availableEmployees}
+            searchable={true}
+            required
+          />
+        ) : (
+          <CustomInput
+            label="Pracownik"
+            name="employeeNameDisplay"
+            value={workLog.employeeName}
+            disabled
+          />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CustomSelect
