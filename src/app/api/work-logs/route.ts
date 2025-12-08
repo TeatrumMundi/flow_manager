@@ -1,11 +1,42 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { createWorkLogInDb } from "@/dataBase/query/workLogs/createWorkLogInDb";
+import { listWorkLogsByUserFromDb } from "@/dataBase/query/workLogs/listWorkLogsByUserFromDb";
 import { listWorkLogsFromDb } from "@/dataBase/query/workLogs/listWorkLogsFromDb";
 
 // GET /api/work-logs - List all work logs
 export async function GET() {
   try {
-    const workLogs = await listWorkLogsFromDb();
+    const session = await auth();
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const userProfile = await getFullUserProfileFromDbByEmail(
+      session.user.email,
+    );
+
+    const fullAccessRoles = ["Administrator", "Zarząd"];
+    const viewAllRoles = ["HR", "Księgowość"];
+
+    const hasFullAccess = userProfile?.role?.name
+      ? fullAccessRoles.includes(userProfile.role.name)
+      : false;
+
+    const canViewAll = userProfile?.role?.name
+      ? viewAllRoles.includes(userProfile.role.name)
+      : false;
+
+    const workLogs =
+      hasFullAccess || canViewAll || !userProfile?.id
+        ? await listWorkLogsFromDb()
+        : await listWorkLogsByUserFromDb(userProfile.id);
+
     return NextResponse.json({ ok: true, data: workLogs });
   } catch (error) {
     console.error("Error fetching work logs:", error);
