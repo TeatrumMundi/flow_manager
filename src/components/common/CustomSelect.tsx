@@ -44,23 +44,26 @@ export function CustomSelect({
   const [dropdownPosition, setDropdownPosition] = useState<"bottom" | "top">(
       "bottom",
   );
-
+  const [isPositionCalculated, setIsPositionCalculated] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const optionsListRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Normalize options to consistent format
   const normalizedOptions = options.map((option) =>
       typeof option === "string" ? { label: option, value: option } : option,
   );
 
+  // Filter options based on search term
   const filteredOptions = normalizedOptions.filter((option) =>
       option.label.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // Get selected option
   const selectedOption = normalizedOptions.find(
       (option) => String(option.value) === String(value),
   );
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -76,31 +79,36 @@ export function CustomSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Calculate position before opening and focus search input
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
+      // Calculate dropdown position first
       const rect = dropdownRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      const dropdownHeight = 250;
+      const dropdownHeight = 250; // approximate max-height of dropdown
 
+      // Open upward if there's not enough space below and more space above
       if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
         setDropdownPosition("top");
       } else {
         setDropdownPosition("bottom");
       }
 
-      if (searchable && searchInputRef.current) {
-        requestAnimationFrame(() => {
-          searchInputRef.current?.focus();
-        });
-      }
+      // Mark as calculated so dropdown can render
+      setIsPositionCalculated(true);
 
-      if (optionsListRef.current) {
-        optionsListRef.current.scrollTop = 0;
+      // Focus search input after position is calculated
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
       }
+    } else if (!isOpen) {
+      // Reset when closed
+      setIsPositionCalculated(false);
     }
-  }, [isOpen, searchable]);
+  }, [isOpen]);
 
+  // Handle keyboard navigation
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isOpen) {
       if (
@@ -117,14 +125,16 @@ export function CustomSelect({
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
-        setHighlightedIndex((prev) =>
-            prev < filteredOptions.length - 1 ? prev + 1 : prev,
+        setHighlightedIndex((previousIndex) =>
+            previousIndex < filteredOptions.length - 1
+                ? previousIndex + 1
+                : previousIndex,
         );
         break;
       case "ArrowUp":
         event.preventDefault();
-        setHighlightedIndex((prev) =>
-            prev > 0 ? prev - 1 : prev,
+        setHighlightedIndex((previousIndex) =>
+            previousIndex > 0 ? previousIndex - 1 : previousIndex,
         );
         break;
       case "Enter":
@@ -141,7 +151,9 @@ export function CustomSelect({
     }
   };
 
+  // Handle option selection
   const handleSelectOption = (optionValue: string | number) => {
+    // Create synthetic event to match onChange signature
     const syntheticEvent = {
       target: { name, value: String(optionValue) },
     } as ChangeEvent<HTMLSelectElement>;
@@ -152,12 +164,14 @@ export function CustomSelect({
     setHighlightedIndex(0);
   };
 
+  // Reset highlighted index when filtered options change
   useEffect(() => {
     setHighlightedIndex(0);
   }, []);
 
   const selectElement = (
-      <div className="relative w-full" ref={dropdownRef}>
+      <div className="relative" ref={dropdownRef}>
+        {/* Hidden native select for form compatibility */}
         <select
             name={name}
             value={value}
@@ -174,6 +188,7 @@ export function CustomSelect({
           ))}
         </select>
 
+        {/* Custom select button */}
         <button
             type="button"
             onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -208,6 +223,7 @@ export function CustomSelect({
               role="img"
               aria-label="Toggle dropdown"
           >
+            <title>Toggle dropdown</title>
             <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -217,18 +233,18 @@ export function CustomSelect({
           </svg>
         </button>
 
-        {isOpen && (
+        {/* Dropdown menu */}
+        {isOpen && isPositionCalculated && (
             <div
-                className={`absolute z-50 w-full bg-white border border-gray-300 shadow-lg overflow-hidden flex flex-col ${
+                className={`absolute z-50 w-full bg-white border border-gray-300 shadow-lg overflow-hidden ${
                     dropdownPosition === "top"
                         ? "bottom-full rounded-t-lg mb-0"
                         : "top-full rounded-b-lg mt-0"
                 }`}
-                // ZMIANA: min-width: 100% zapewnia równą szerokość, max-height ogranicza wysokość
-                style={{ maxHeight: '300px', minWidth: '100%' }}
             >
+              {/* Search input (only if searchable) */}
               {searchable && (
-                  <div className="p-2 border-b border-gray-200 shrink-0 bg-white sticky top-0 z-10">
+                  <div className="p-2 border-b border-gray-200">
                     <CustomInput
                         type="text"
                         name="search"
@@ -243,24 +259,22 @@ export function CustomSelect({
                   </div>
               )}
 
-              <div
-                  className="overflow-y-auto w-full"
-                  ref={optionsListRef}
-              >
-                <ul className="py-1 w-full m-0 list-none">
+              {/* Options list */}
+              <div className="overflow-y-auto max-h-60">
+                <ul className="py-1">
                   {filteredOptions.length > 0 ? (
                       filteredOptions.map((option, index) => (
-                          <li key={String(option.value)} className="w-full">
+                          <li key={String(option.value)}>
                             <button
                                 type="button"
                                 onClick={() => handleSelectOption(option.value)}
-                                className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors cursor-pointer block ${
+                                className={`w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors cursor-pointer ${
                                     String(option.value) === String(value)
                                         ? "bg-blue-100 text-blue-800 font-medium"
                                         : "text-gray-800"
                                 } ${index === highlightedIndex ? "bg-blue-50" : ""}`}
                             >
-                              <span className="block truncate">{option.label}</span>
+                              {option.label}
                             </button>
                           </li>
                       ))
@@ -276,10 +290,12 @@ export function CustomSelect({
       </div>
   );
 
+  // If no label or hideLabel is true, return just the select
   if (!label || hideLabel) {
     return selectElement;
   }
 
+  // Otherwise return with label wrapper
   return (
       <div>
         <label
