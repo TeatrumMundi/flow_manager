@@ -39,11 +39,11 @@ interface ExpensesViewProps {
 }
 
 export function ExpensesView({
-  initialExpenses,
-  availableCategories,
-  availableStatuses,
-  availableProjects,
-}: ExpensesViewProps) {
+                               initialExpenses,
+                               availableCategories,
+                               availableStatuses,
+                               availableProjects,
+                             }: ExpensesViewProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Wszystkie");
@@ -60,20 +60,27 @@ export function ExpensesView({
     setExpenses(initialExpenses);
   }, [initialExpenses]);
 
+  // FIX: Poprawione filtrowanie po ID
   useEffect(() => {
     let filtered = expenses;
 
     if (selectedCategory !== "Wszystkie") {
-      filtered = filtered.filter((e) => e.category === selectedCategory);
+      // Porównujemy ID kategorii (liczba) z wybraną wartością (string -> number)
+      filtered = filtered.filter(
+          (e) => e.categoryId === Number(selectedCategory),
+      );
     }
 
     if (selectedProject !== "Wszystkie") {
-      filtered = filtered.filter((e) => e.projectName === selectedProject);
+      // Porównujemy ID projektu (liczba) z wybraną wartością (string -> number)
+      filtered = filtered.filter(
+          (e) => e.projectId === Number(selectedProject),
+      );
     }
 
     if (searchTerm) {
       filtered = filtered.filter((e) =>
-        e.name.toLowerCase().includes(searchTerm.toLowerCase()),
+          e.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
@@ -135,145 +142,144 @@ export function ExpensesView({
   };
 
   return (
-    <div className="space-y-6">
-      {isAddModalOpen && (
-        <ExpenseAddModal
-          onClose={handleCloseAddModal}
-          availableCategories={availableCategories}
-          availableStatuses={availableStatuses}
-          availableProjects={availableProjects}
-        />
-      )}
+      <div className="space-y-6">
+        {isAddModalOpen && (
+            <ExpenseAddModal
+                onClose={handleCloseAddModal}
+                availableCategories={availableCategories}
+                availableStatuses={availableStatuses}
+                availableProjects={availableProjects}
+            />
+        )}
 
-      {isEditModalOpen && editingExpense && (
-        <ExpenseEditModal
-          expense={editingExpense}
-          onClose={handleCloseEditModal}
-          availableCategories={availableCategories}
-          availableStatuses={availableStatuses}
-          availableProjects={availableProjects}
-        />
-      )}
+        {isEditModalOpen && editingExpense && (
+            <ExpenseEditModal
+                expense={editingExpense}
+                onClose={handleCloseEditModal}
+                availableCategories={availableCategories}
+                availableStatuses={availableStatuses}
+                availableProjects={availableProjects}
+            />
+        )}
 
-      {/* Pasek narzędzi */}
-      <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
-        <Button
-          variant="primary"
-          onClick={handleOpenAddModal}
-          className="w-full md:w-auto"
-        >
-          <FaPlus />
-          <span>Dodaj wydatek</span>
-        </Button>
-        <RefreshButton onClick={() => {}} isRefreshing={false} />
+        {/* Pasek narzędzi */}
+        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+          <Button
+              variant="primary"
+              onClick={handleOpenAddModal}
+              className="w-full md:w-auto"
+          >
+            <FaPlus />
+            <span>Dodaj wydatek</span>
+          </Button>
+          <RefreshButton onClick={() => {}} isRefreshing={false} />
 
-        <div className="relative grow w-full">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-          <CustomInput
-            type="text"
-            name="searchExpense"
-            placeholder="Szukaj po nazwie wydatku..."
-            className="pl-10"
-            hideLabel
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+          <div className="relative grow w-full">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+            <CustomInput
+                type="text"
+                name="searchExpense"
+                placeholder="Szukaj po nazwie wydatku..."
+                className="pl-10"
+                hideLabel
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <CustomSelect
+              name="categoryFilter"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              hideLabel
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
+              placeholder="Kategorie"
+              options={[
+                { label: "Wszystkie kategorie", value: "Wszystkie" },
+                ...availableCategories,
+              ]}
+          />
+          <CustomSelect
+              name="projectFilter"
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+              hideLabel
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
+              placeholder="Projekty"
+              options={[
+                { label: "Wszystkie projekty", value: "Wszystkie" },
+                ...availableProjects,
+              ]}
           />
         </div>
-        <CustomSelect
-          name="categoryFilter"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          hideLabel
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
-          placeholder="Kategorie"
-          options={[
-            { label: "Wszystkie kategorie", value: "Wszystkie" },
-            ...availableCategories,
-          ]}
+
+        {/* Tabela */}
+        <DataTable
+            data={filteredExpenses}
+            keyExtractor={(item) => item.id}
+            emptyMessage="Nie znaleziono wydatków."
+            columns={
+              [
+                {
+                  key: "name",
+                  header: "Nazwa",
+                  className: "p-4 text-gray-800 font-medium w-50",
+                  headerClassName: "p-4 w-50",
+                },
+                {
+                  key: "category",
+                  header: "Kategoria",
+                  className: "p-4 text-gray-700 w-40",
+                  headerClassName: "p-4 w-40",
+                },
+                {
+                  key: "projectName",
+                  header: "Projekt",
+                  className: "p-4 text-gray-700 w-48",
+                  headerClassName: "p-4 w-48",
+                },
+                {
+                  key: "amount",
+                  header: "Kwota",
+                  className: "p-4 text-gray-800 font-semibold w-32",
+                  headerClassName: "p-4 w-32",
+                  render: (item) => formatCurrency(item.amount),
+                },
+                {
+                  key: "date",
+                  header: "Data",
+                  className: "p-4 text-gray-700 w-32",
+                  headerClassName: "p-4 w-32",
+                },
+                {
+                  key: "status",
+                  header: "Status",
+                  render: (item) => (
+                      <StatusBadge status={item.status} type="expense" />
+                  ),
+                  className: "p-4 w-32",
+                  headerClassName: "p-4 w-32",
+                },
+              ] as TableColumn<Expense>[]
+            }
+            actions={
+              [
+                {
+                  icon: <FaEdit size={16} />,
+                  label: "Edytuj",
+                  onClick: (item) => handleOpenEditModal(item),
+                  variant: "blue",
+                },
+                {
+                  icon: <FaTrash size={16} />,
+                  label: "Usuń",
+                  onClick: (item) => handleDeleteExpense(item),
+                  variant: "red",
+                },
+              ] as TableAction<Expense>[]
+            }
         />
-        <CustomSelect
-          name="projectFilter"
-          value={selectedProject}
-          onChange={(e) => setSelectedProject(e.target.value)}
-          hideLabel
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full"
-          placeholder="Projekty"
-          options={[
-            { label: "Wszystkie projekty", value: "Wszystkie" },
-            ...availableProjects,
-          ]}
-        />
+
+        <ExpensesSummary expenses={filteredExpenses} />
       </div>
-
-      {/* Tabela */}
-      <DataTable
-        data={filteredExpenses}
-        keyExtractor={(item) => item.id}
-        emptyMessage="Nie znaleziono wydatków."
-        columns={
-          [
-            {
-              key: "name",
-              header: "Nazwa",
-              className: "p-4 text-gray-800 font-medium w-50",
-              headerClassName: "p-4 w-50",
-            },
-            {
-              key: "category",
-              header: "Kategoria",
-              className: "p-4 text-gray-700 w-40",
-              headerClassName: "p-4 w-40",
-            },
-            {
-              key: "projectName",
-              header: "Projekt",
-              className: "p-4 text-gray-700 w-48",
-              headerClassName: "p-4 w-48",
-            },
-            {
-              key: "amount",
-              header: "Kwota",
-              className: "p-4 text-gray-800 font-semibold w-32",
-              headerClassName: "p-4 w-32",
-              render: (item) => formatCurrency(item.amount),
-            },
-            {
-              key: "date",
-              header: "Data",
-              className: "p-4 text-gray-700 w-32",
-              headerClassName: "p-4 w-32",
-            },
-            {
-              key: "status",
-              header: "Status",
-              render: (item) => (
-                <StatusBadge status={item.status} type="expense" />
-              ),
-              className: "p-4 w-32",
-              headerClassName: "p-4 w-32",
-            },
-          ] as TableColumn<Expense>[]
-        }
-        actions={
-          [
-            {
-              icon: <FaEdit size={16} />,
-              label: "Edytuj",
-              onClick: (item) => handleOpenEditModal(item),
-              variant: "blue",
-            },
-            {
-              icon: <FaTrash size={16} />,
-              label: "Usuń",
-              onClick: (item) => handleDeleteExpense(item),
-              variant: "red",
-            },
-          ] as TableAction<Expense>[]
-        }
-      />
-
-      {/* Podsumowanie (teraz na dole, pod tabelą) */}
-      <ExpensesSummary expenses={filteredExpenses} />
-    </div>
   );
 }
