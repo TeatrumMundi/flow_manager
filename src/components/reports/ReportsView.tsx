@@ -6,13 +6,13 @@ import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect } from "@/components/common/CustomSelect";
 import { AbsenceChart } from "./AbsenceChart";
-import { CostsBarChart } from "./CostsBarChart";
+import { ProjectCostChart } from "./ProjectCostChart"; // ZMIANA
 import { TaskCompletionChart } from "./TaskCompletionChart";
 
-// Zaktualizowany interfejs danych (zamiast efficiency jest tasks)
+// Zaktualizowany interfejs danych
 interface ReportsData {
   tasks: { completed: number; active: number; archived: number; paused: number };
-  costs: { label: string; value: number }[];
+  projectCost: { amount: number; projectName: string }; // ZMIANA
   absence: { present: number; vacation: number; sick: number };
 }
 
@@ -77,14 +77,14 @@ export function ReportsView({ availableProjects, initialData }: ReportsViewProps
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
-          {/* LEWY: Nowy wykres zadań */}
+          {/* LEWY: Wykres zadań (Donut) */}
           <div className="lg:col-span-1 h-96">
             <TaskCompletionChart data={initialData.tasks} />
           </div>
 
-          {/* ŚRODKOWY: Stary wykres kosztów (na razie bez zmian) */}
+          {/* ŚRODKOWY: Nowy wykres kosztów (Słupek) */}
           <div className="lg:col-span-1 h-96">
-            <CostsBarChart data={initialData.costs} />
+            <ProjectCostChart data={initialData.projectCost} />
           </div>
 
           {/* PRAWY: Wykres absencji */}

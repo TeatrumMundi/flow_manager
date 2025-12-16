@@ -10,19 +10,19 @@ const availableProjects = [
   "HR Revamp",
 ];
 
-// Zaktualizowane dane (tasks zamiast efficiency)
+// Zaktualizowane dane
 const mockReportData = {
   tasks: {
-    completed: 24, // 75% z 32
+    completed: 24,
     active: 4,
     archived: 3,
     paused: 1,
   },
-  costs: [
-    { label: "Sty", value: 20 },
-    { label: "Lut", value: 35 },
-    { label: "Mar", value: 45 },
-  ],
+  // Nowe dane dla środkowego wykresu
+  projectCost: {
+    amount: 2040,
+    projectName: "Mobile App",
+  },
   absence: {
     present: 50,
     vacation: 30,
