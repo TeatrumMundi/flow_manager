@@ -8,12 +8,19 @@ import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import { CustomSelect, type SelectOption } from "@/components/common/CustomSelect";
 import { AbsenceChart } from "./AbsenceChart";
-import { ProjectCostChart } from "./ProjectCostChart";
 import { TaskCompletionChart } from "./TaskCompletionChart";
+import { WorkHoursChart } from "./WorkHoursChart";
 
 interface ReportsData {
-  tasks: { completed: number; active: number; archived: number; paused: number };
-  projectCost: { amount: number; projectName: string };
+  tasks: {
+    todo: number;
+    inProgress: number;
+    inReview: number;
+    done: number;
+    blocked: number;
+    canceled: number;
+  };
+  workHours: { totalHours: number };
   absence: { present: number; vacation: number; sick: number };
 }
 
@@ -64,6 +71,15 @@ export function ReportsView({
     toast.success("Generowanie raportu PDF...");
   };
 
+  const foundOption = availableProjects.find((p) => {
+    const value = typeof p === "string" ? p : p.value;
+    return String(value) === String(selectedProject);
+  });
+
+  const selectedProjectLabel = foundOption
+      ? (typeof foundOption === "string" ? foundOption : foundOption.label)
+      : "Wszystkie projekty";
+
   return (
       <div className="flex flex-col gap-6">
         <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50 relative z-20">
@@ -87,7 +103,6 @@ export function ReportsView({
               />
 
               <div className="w-full">
-                {/* FIX: Dodano pełne klasy stylowania (border, padding) */}
                 <CustomSelect
                     label="Projekt"
                     name="project"
@@ -115,9 +130,16 @@ export function ReportsView({
           <div className="lg:col-span-1 h-96">
             <TaskCompletionChart data={initialData.tasks} />
           </div>
+
           <div className="lg:col-span-1 h-96">
-            <ProjectCostChart data={initialData.projectCost} />
+            <WorkHoursChart
+                data={initialData.workHours}
+                projectName={selectedProjectLabel}
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+            />
           </div>
+
           <div className="lg:col-span-1 h-96">
             <AbsenceChart data={initialData.absence} />
           </div>

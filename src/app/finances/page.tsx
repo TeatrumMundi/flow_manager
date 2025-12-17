@@ -2,7 +2,6 @@
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { FinancesView } from "@/components/finances/FinancesView";
 
-// Dane do symulacji (w przyszłości z DB)
 const mockFinancialData = {
   kpis: {
     revenue: 750000,
@@ -24,7 +23,7 @@ const mockFinancialData = {
     { name: "Projekt D", profitability: 82 },
   ],
   revenueVsCosts: {
-    revenue: 400000, // do paska postępu
+    revenue: 400000,
     costs: 300000,
   },
   planVsExecution: {

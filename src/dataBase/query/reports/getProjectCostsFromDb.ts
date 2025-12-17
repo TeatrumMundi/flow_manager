@@ -25,7 +25,6 @@ export async function getProjectCostsFromDb(filters?: CostFilters) {
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    // 1. Pobieramy sumę wydatków
     const [costResult] = await database
         .select({
             totalAmount: sql<number>`sum(${expenses.amount})`.mapWith(Number),
@@ -33,7 +32,6 @@ export async function getProjectCostsFromDb(filters?: CostFilters) {
         .from(expenses)
         .where(whereClause);
 
-    // 2. Pobieramy nazwę projektu (jeśli wybrano konkretny)
     let projectName = "Wszystkie projekty";
 
     if (filters?.projectId) {
