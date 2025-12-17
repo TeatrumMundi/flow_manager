@@ -1,36 +1,82 @@
 ﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ReportsView } from "@/components/reports/ReportsView";
+import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
+import { getAbsenceStatsFromDb } from "@/dataBase/query/reports/getAbsenceStatsFromDb";
+import { getProjectCostsFromDb } from "@/dataBase/query/reports/getProjectCostsFromDb";
+import { getTaskStatsFromDb } from "@/dataBase/query/reports/getTaskStatsFromDb";
 
-const availableProjects = [
-  "Wszystkie",
-  "Website Redesign",
-  "System implementation",
-  "Mobile App",
-  "HR Revamp",
-];
+export const dynamic = "force-dynamic";
 
-// Zaktualizowane dane (tasks zamiast efficiency)
-const mockReportData = {
-  tasks: {
-    completed: 24, // 75% z 32
-    active: 4,
-    archived: 3,
-    paused: 1,
-  },
-  costs: [
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function ReportsPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+
+  const today = new Date();
+  const defaultDateTo = today.toISOString().slice(0, 7);
+  const defaultDateFrom = new Date(today.setMonth(today.getMonth() - 2))
+      .toISOString()
+      .slice(0, 7);
+
+  const dateFromParam = (params.dateFrom as string) || defaultDateFrom;
+  const dateToParam = (params.dateTo as string) || defaultDateTo;
+  const projectIdParam = params.project as string;
+
+  const dateFromFull = `${dateFromParam}-01`;
+
+  const [year, month] = dateToParam.split("-").map(Number);
+  const dateToFull = new Date(year, month, 0).toISOString().slice(0, 10);
+
+  const projectId =
+      projectIdParam && projectIdParam !== "Wszystkie"
+          ? Number(projectIdParam)
+          : undefined;
+
+  const [projectsData, taskStats, projectCosts, absenceStats] =
+      await Promise.all([
+        listProjectsFromDb(),
+        getTaskStatsFromDb({
+          projectId,
+          dateFrom: dateFromFull,
+          dateTo: dateToFull,
+        }),
+        getProjectCostsFromDb({
+          projectId,
+          dateFrom: dateFromFull,
+          dateTo: dateToFull,
+        }),
+        getAbsenceStatsFromDb({
+          projectId,
+          dateFrom: dateFromFull,
+          dateTo: dateToFull,
+        }),
+      ]);
+
+  const availableProjects = [
+    { label: "Wszystkie", value: "Wszystkie" },
+    ...projectsData.map((p) => ({
+      // FIX: Dodano zabezpieczenie || "...", aby label był zawsze stringiem
+      label: p.name || `Projekt #${p.id}`,
+      value: p.id,
+    })),
+  ];
+
+  const mockCostsHistory = [
     { label: "Sty", value: 20 },
     { label: "Lut", value: 35 },
     { label: "Mar", value: 45 },
-  ],
-  absence: {
-    present: 50,
-    vacation: 30,
-    sick: 20,
-  },
-};
+  ];
 
-export default async function ReportsPage() {
+  const reportData = {
+    tasks: taskStats,
+    projectCost: projectCosts,
+    absence: absenceStats,
+    costs: mockCostsHistory,
+  };
+
   return (
       <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
         <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
@@ -41,7 +87,12 @@ export default async function ReportsPage() {
 
           <ReportsView
               availableProjects={availableProjects}
-              initialData={mockReportData}
+              initialData={reportData}
+              initialFilters={{
+                dateFrom: dateFromParam,
+                dateTo: dateToParam,
+                project: projectIdParam || "Wszystkie",
+              }}
           />
         </main>
       </div>

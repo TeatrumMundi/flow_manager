@@ -10,6 +10,18 @@ interface TaskData {
 export function TaskCompletionChart({ data }: { data: TaskData }) {
     const total = data.completed + data.active + data.archived + data.paused;
 
+    // FIX: Jeśli brak zadań, zwróć stan pusty
+    if (total === 0) {
+        return (
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 h-full flex flex-col justify-center items-center text-center">
+                <h3 className="text-lg font-bold text-gray-800 mb-6 self-start">Realizacja zadań</h3>
+                <div className="w-40 h-40 rounded-full border-4 border-gray-100 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">Brak danych</span>
+                </div>
+            </div>
+        );
+    }
+
     // Obliczamy stopnie dla każdego segmentu (conic-gradient)
     const degCompleted = (data.completed / total) * 360;
     const degActive = (data.active / total) * 360;
