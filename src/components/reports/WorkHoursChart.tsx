@@ -80,7 +80,6 @@ export function WorkHoursChart({
             <span className="text-gray-500 text-sm">godz.</span>
           </div>
         </div>
-
       </div>
     </div>
   );
