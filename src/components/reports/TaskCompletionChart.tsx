@@ -84,7 +84,6 @@ export function TaskCompletionChart({ data }: { data: TaskData }) {
                     </div>
                 </div>
 
-                {/* Legenda (Grid 2 kolumny x 3 wiersze) */}
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-6 w-full text-xs">
                     {/* Kolumna 1 */}
                     <div className="flex items-center gap-2">

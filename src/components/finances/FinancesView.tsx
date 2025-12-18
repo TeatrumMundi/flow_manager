@@ -1,183 +1,165 @@
 ﻿"use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
+import type { ChangeEvent } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/common/CustomButton";
-import { CustomSelect } from "@/components/common/CustomSelect";
-import { BarChart } from "./BarChart";
+import { CustomInput } from "@/components/common/CustomInput";
+import { CustomSelect, type SelectOption } from "@/components/common/CustomSelect";
+import { CostStructureChart } from "./CostStructureChart";
+import { ExecutionChart } from "./ExecutionChart";
 import { KPICard } from "./KPICard";
-import { TrendChart } from "./TrendChart";
+import { TotalCostBarChart } from "./TotalCostBarChart";
 
-interface FinancesData {
-  kpis: {
-    revenue: number;
-    costs: number;
-    netProfit: number;
-    margin: number;
+interface FinancialStats {
+  kpi: {
+    remainingBudget: number;
+    mostExpensiveCategory: { name: string | null; amount: number };
+    budgetUtilization: number;
+    averageMonthlyCost: number;
   };
-  trendAnalysis: { month: string; profit: number }[];
-  projectProfitability: { name: string; profitability: number }[];
-  revenueVsCosts: { revenue: number; costs: number };
-  planVsExecution: { planned: number; executed: number };
+  charts: {
+    execution: number;
+    structure: { name: string | null; amount: number }[];
+    totalCost: number;
+  };
 }
 
 interface FinancesViewProps {
-  initialData: FinancesData;
-  availableProjects: string[];
-  availableSupervisors: string[];
+  availableProjects: SelectOption[];
+  initialData: FinancialStats;
+  initialFilters: {
+    dateFrom: string;
+    dateTo: string;
+    project: string;
+  };
 }
 
 export function FinancesView({
-  initialData,
-  availableProjects,
-  availableSupervisors,
-}: FinancesViewProps) {
-  const [selectedProject, setSelectedProject] = useState("Wszystkie");
-  const [selectedSupervisor, setSelectedSupervisor] = useState("Wszystkie");
+                               availableProjects,
+                               initialData,
+                               initialFilters,
+                             }: FinancesViewProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleExportPDF = () => {
-    toast.success("Generowanie raportu PDF... (funkcja w przygotowaniu)");
+  const [selectedProject, setSelectedProject] = useState(initialFilters.project);
+  const [dateFrom, setDateFrom] = useState(initialFilters.dateFrom);
+  const [dateTo, setDateTo] = useState(initialFilters.dateTo);
+
+  const updateFilters = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(key, value);
+    router.push(`?${params.toString()}`);
   };
 
-  const formatK = (val: number) => `${(val / 1000).toFixed(0)} k zł`;
+  const handleDateFromChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setDateFrom(e.target.value);
+    updateFilters("dateFrom", e.target.value);
+  };
+
+  const handleDateToChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setDateTo(e.target.value);
+    updateFilters("dateTo", e.target.value);
+  };
+
+  const handleProjectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedProject(e.target.value);
+    updateFilters("project", e.target.value);
+  };
+
+  const handleExportPDF = () => {
+    toast.success("Generowanie raportu PDF...");
+  };
+
+  const formatPLN = (val: number) =>
+      new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 }).format(val);
+
+  // Pobieranie nazwy projektu do wyświetlenia na wykresach
+  const foundOption = availableProjects.find((p) => {
+    const value = typeof p === "string" ? p : p.value;
+    return String(value) === String(selectedProject);
+  });
+
+  const projectLabel = foundOption
+      ? (typeof foundOption === "string" ? foundOption : foundOption.label)
+      : "wszystkie projekty";
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* --- Rząd 1: Filtry i KPI --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Kolumna 1: Filtry */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col gap-4">
-          <CustomSelect
-            label="Przełożony"
-            name="supervisor"
-            value={selectedSupervisor}
-            onChange={(e) => setSelectedSupervisor(e.target.value)}
-            options={availableSupervisors}
-          />
-          <CustomSelect
-            label="Projekt"
-            name="project"
-            value={selectedProject}
-            onChange={(e) => setSelectedProject(e.target.value)}
-            options={availableProjects}
-          />
-        </div>
+      <div className="flex flex-col gap-6">
 
-        {/* Kolumny 2-4: KPI Cards */}
-        <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KPICard
-            label="Przychody"
-            value={formatK(initialData.kpis.revenue)}
-          />
-          <KPICard label="Koszty" value={formatK(initialData.kpis.costs)} />
-          <KPICard
-            label="Zysk netto"
-            value={formatK(initialData.kpis.netProfit)}
-          />
-          <KPICard
-            label="Marża"
-            value={initialData.kpis.margin.toString()}
-            unit="%"
-          />
-        </div>
-      </div>
+        {/* --- Filtry --- */}
+        <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50">
+          <div className="flex flex-col lg:flex-row gap-4 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto flex-grow">
+              <CustomInput
+                  type="month"
+                  name="dateFrom"
+                  label="Data od"
+                  value={dateFrom}
+                  onChange={handleDateFromChange}
+                  className="bg-white"
+              />
+              <CustomInput
+                  type="month"
+                  name="dateTo"
+                  label="Data do"
+                  value={dateTo}
+                  onChange={handleDateToChange}
+                  className="bg-white"
+              />
 
-      {/* --- Rząd 2: Wykresy główne --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Kolumna 1: Plan vs Wykonanie */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-between">
-          <h3 className="text-md font-bold text-gray-800 mb-2">
-            Plan vs wykonanie
-          </h3>
-          <div className="space-y-4 my-auto">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-semibold text-blue-600">Plan</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-8 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white z-10">
-                  100%
-                </div>
-                <div
-                  className="bg-blue-600 h-8 rounded-full"
-                  style={{ width: "100%" }}
-                ></div>
+              <div className="w-full">
+                <CustomSelect
+                    name="project"
+                    label="Projekt"
+                    value={selectedProject}
+                    onChange={handleProjectChange}
+                    options={availableProjects}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white"
+                />
               </div>
             </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-semibold text-blue-400">Wykonanie</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-8 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white z-10">
-                  {initialData.planVsExecution.executed}%
-                </div>
-                <div
-                  className="bg-blue-400 h-8 rounded-full"
-                  style={{ width: `${initialData.planVsExecution.executed}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-between text-xs text-gray-400 mt-2 px-1">
-            <span>0</span>
-            <span>50%</span>
-            <span>100%</span>
-          </div>
-        </div>
-
-        {/* Kolumny 2-4: Wykresy */}
-        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <TrendChart data={initialData.trendAnalysis} />
-          <BarChart data={initialData.projectProfitability} />
-        </div>
-      </div>
-
-      {/* --- Rząd 3: Paski Przychody/Koszty i Przycisk --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center">
-        <div className="lg:col-span-3 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="w-20 font-bold text-gray-700 text-sm">
-                Przychody
-              </span>
-              <div className="grow bg-gray-100 rounded-full h-4 relative">
-                <div
-                  className="bg-blue-600 h-4 rounded-full"
-                  style={{ width: "80%" }}
-                ></div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="w-20 font-bold text-gray-700 text-sm">
-                Koszty
-              </span>
-              <div className="grow bg-gray-100 rounded-full h-4 relative">
-                <div
-                  className="bg-blue-400 h-4 rounded-full"
-                  style={{ width: "60%" }}
-                ></div>
-              </div>
-            </div>
-            <div className="flex justify-end gap-12 text-xs text-gray-500 pr-4">
-              <span>100 k</span>
-              <span>200 k</span>
-              <span>300 k</span>
-              <span>400 k zł</span>
+            <div className="w-full lg:w-auto">
+              <Button variant="primary" onClick={handleExportPDF} className="w-full lg:w-auto h-[42px]">Eksportuj: PDF</Button>
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-1 flex justify-center">
-          <Button
-            variant="primary"
-            onClick={handleExportPDF}
-            className="w-full h-14 text-lg"
-          >
-            Eksportuj: PDF
-          </Button>
+        {/* --- KPI Cards --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <KPICard
+              label="Pozostały budżet"
+              value={formatPLN(initialData.kpi.remainingBudget)}
+          />
+          <KPICard
+              label="Najdroższa kategoria"
+              subValue={initialData.kpi.mostExpensiveCategory.name || "Brak danych"}
+              value={formatPLN(initialData.kpi.mostExpensiveCategory.amount)}
+          />
+          <KPICard
+              label="Wykorzystanie budżetu"
+              value={`${Math.round(initialData.kpi.budgetUtilization)}%`}
+          />
+          <KPICard
+              label="Średni koszt miesięczny projektu"
+              value={formatPLN(initialData.kpi.averageMonthlyCost)}
+          />
+        </div>
+
+        {/* --- Wykresy --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 h-96">
+            <ExecutionChart data={{ percentage: initialData.charts.execution, label: projectLabel }} />
+          </div>
+          <div className="lg:col-span-1 h-96">
+            <CostStructureChart data={initialData.charts.structure} />
+          </div>
+          <div className="lg:col-span-1 h-96">
+            <TotalCostBarChart data={{ amount: initialData.charts.totalCost, label: projectLabel }} />
+          </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -20,7 +20,6 @@ export function ProjectCostChart({ data }: { data: ProjectCostData }) {
                 Koszty projektu
             </h3>
 
-            {/* ZMIANA: Zmieniono text-3xl na text-2xl */}
             <div className="text-2xl font-bold text-gray-900 mb-8">
                 {formatCurrency(data.amount)}
             </div>
