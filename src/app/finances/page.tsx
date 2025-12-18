@@ -1,61 +1,72 @@
 ﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { FinancesView } from "@/components/finances/FinancesView";
+import { getFinancialStatsFromDb } from "@/dataBase/query/finances/getFinancialStatsFromDb";
+import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
 
-const mockFinancialData = {
-  kpis: {
-    revenue: 750000,
-    costs: 500000,
-    netProfit: 250000,
-    margin: 33.3,
-  },
-  trendAnalysis: [
-    { month: "Sty", profit: 6 },
-    { month: "Lut", profit: 14 },
-    { month: "Mar", profit: 21 },
-    { month: "Kwi", profit: 20 },
-    { month: "Maj", profit: 27 },
-  ],
-  projectProfitability: [
-    { name: "Projekt A", profitability: 30 },
-    { name: "Projekt B", profitability: 70 },
-    { name: "Projekt C", profitability: 95 },
-    { name: "Projekt D", profitability: 82 },
-  ],
-  revenueVsCosts: {
-    revenue: 400000,
-    costs: 300000,
-  },
-  planVsExecution: {
-    planned: 100,
-    executed: 85,
-  },
-};
+export const dynamic = "force-dynamic";
 
-const availableProjects = [
-  "Wszystkie",
-  "Projekt A",
-  "Projekt B",
-  "Projekt C",
-  "Projekt D",
-];
-const availableSupervisors = ["Wszystkie", "Jan Kowalski", "Anna Nowak"];
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
-export default async function FinancesPage() {
+export default async function FinancesPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+
+  const today = new Date();
+  const defaultDateTo = today.toISOString().slice(0, 7);
+  const defaultDateFrom = new Date(today.setMonth(today.getMonth() - 2))
+      .toISOString()
+      .slice(0, 7);
+
+  const dateFromParam = (params.dateFrom as string) || defaultDateFrom;
+  const dateToParam = (params.dateTo as string) || defaultDateTo;
+  const projectIdParam = params.project as string;
+
+  const dateFromFull = `${dateFromParam}-01`;
+  const [year, month] = dateToParam.split("-").map(Number);
+  const dateToFull = new Date(year, month, 0).toISOString().slice(0, 10);
+
+  const projectId =
+      projectIdParam && projectIdParam !== "Wszystkie"
+          ? Number(projectIdParam)
+          : undefined;
+
+  const [projectsData, financialStats] = await Promise.all([
+    listProjectsFromDb(),
+    getFinancialStatsFromDb({
+      projectId,
+      dateFrom: dateFromFull,
+      dateTo: dateToFull,
+    }),
+  ]);
+
+  const availableProjects = [
+    { label: "Wszystkie", value: "Wszystkie" },
+    ...projectsData.map((p) => ({
+      label: p.name || `Projekt #${p.id}`,
+      value: p.id,
+    })),
+  ];
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
-      <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
-        <div className="flex items-center justify-between mb-8">
-          <BackToDashboardButton />
-          <SectionTitleTile title="Finanse" />
-        </div>
+      <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
+        <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-8">
+            <BackToDashboardButton />
+            <SectionTitleTile title="Finanse" />
+          </div>
 
-        <FinancesView
-          initialData={mockFinancialData}
-          availableProjects={availableProjects}
-          availableSupervisors={availableSupervisors}
-        />
-      </main>
-    </div>
+          <FinancesView
+              availableProjects={availableProjects}
+              initialData={financialStats}
+              initialFilters={{
+                dateFrom: dateFromParam,
+                dateTo: dateToParam,
+                project: projectIdParam || "Wszystkie",
+              }}
+          />
+        </main>
+      </div>
   );
 }
