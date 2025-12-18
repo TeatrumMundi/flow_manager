@@ -54,7 +54,7 @@ export function WorkHoursChart({
         Liczba przepracowanych godzin
       </h3>
 
-      <div className="flex-grow flex flex-col items-center justify-center">
+      <div className="grow flex flex-col items-center justify-center">
         {/* Nazwa Projektu nad wykresem */}
         <p
           className="text-sm font-semibold text-gray-700 mb-4 text-center px-4 truncate w-full"
@@ -81,10 +81,6 @@ export function WorkHoursChart({
           </div>
         </div>
 
-        {/* Zakres dat pod wykresem */}
-        <p className="text-xs text-gray-500 mt-6 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-          {formattedDateRange}
-        </p>
       </div>
     </div>
   );

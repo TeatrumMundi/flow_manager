@@ -50,7 +50,7 @@ export async function GET(request: Request) {
       await page.setExtraHTTPHeaders({ cookie: cookieHeader });
     }
 
-    await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
+    await page.setViewport({ width: 1600, height: 900, deviceScaleFactor: 2 });
 
     await page.goto(url.toString(), {
       waitUntil: "networkidle0",
@@ -62,11 +62,12 @@ export async function GET(request: Request) {
 
     const pdf = await page.pdf({
       format: "A4",
+      landscape: true,
       printBackground: true,
-      preferCSSPageSize: true,
+      preferCSSPageSize: false,
       margin: {
-        top: "12mm",
-        bottom: "12mm",
+        top: "10mm",
+        bottom: "10mm",
         left: "10mm",
         right: "10mm",
       },

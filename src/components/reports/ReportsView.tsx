@@ -45,8 +45,6 @@ export function ReportsView({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const isPdfExport = searchParams.get("export") === "pdf";
-
   const [selectedProject, setSelectedProject] = useState(
     initialFilters.project,
   );
@@ -102,10 +100,17 @@ export function ReportsView({
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
 
-      const projectPart = selectedProject
-        ? String(selectedProject)
-        : "Wszystkie";
-      const filename = `raport_${dateFrom}_${dateTo}_${projectPart}.pdf`;
+      // Format nazwy pliku: Raport_2024-01_2024-03_NazwaProjektu.pdf
+      const sanitize = (str: string) =>
+        str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-zA-Z0-9]/g, "_")
+          .replace(/_+/g, "_")
+          .replace(/^_|_$/g, "");
+
+      const projectName = sanitize(selectedProjectLabel);
+      const filename = `Raport_${dateFrom}_${dateTo}_${projectName}.pdf`;
 
       const a = document.createElement("a");
       a.href = url;
@@ -174,16 +179,14 @@ export function ReportsView({
           </div>
 
           <div className="w-full lg:w-auto">
-            {!isPdfExport && (
-              <Button
-                variant="primary"
-                onClick={handleExportPDF}
-                disabled={isExporting}
-                className="w-full lg:w-auto h-[42px]"
-              >
-                Eksportuj: PDF
-              </Button>
-            )}
+            <Button
+              variant="primary"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="w-full lg:w-auto h-[42px]"
+            >
+              Eksportuj: PDF
+            </Button>
           </div>
         </div>
       </div>
