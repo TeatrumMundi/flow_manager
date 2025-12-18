@@ -1,15 +1,15 @@
-﻿import { and, eq, gte, lte, sql } from "drizzle-orm";
-import { vacationTypes, vacations, workLogs } from "@/dataBase/schema";
+﻿import { and, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { projectAssignments, vacationTypes, vacations, workLogs } from "@/dataBase/schema";
 import { database } from "@/utils/db";
 
 export interface AbsenceFilters {
-    projectId?: number; // Opcjonalnie można filtrować po projekcie (trudniejsze dla urlopów)
+    projectId?: number;
     dateFrom: string;
     dateTo: string;
 }
 
 export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
-    // 1. Policz dni obecności (na podstawie unikalnych wpisów w work_logs)
+    // 1. Dni obecności (z logów pracy)
     const workLogConditions = [
         gte(workLogs.date, filters.dateFrom),
         lte(workLogs.date, filters.dateTo),
@@ -21,23 +21,35 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
 
     const [presenceResult] = await database
         .select({
-            // Liczymy unikalne pary (user_id, date), bo pracownik może mieć kilka wpisów jednego dnia
             daysPresent: sql<number>`count(distinct concat(${workLogs.userId}, '_', ${workLogs.date}))`.mapWith(Number),
         })
         .from(workLogs)
         .where(and(...workLogConditions));
 
-    // 2. Policz dni urlopów i chorobowego
-    // Uwaga: Urlopy są zazwyczaj przypisane do użytkownika, a nie projektu.
-    // Jeśli filtrujemy po projekcie, powinniśmy pobrać tylko userów z tego projektu,
-    // ale dla uproszczenia w tym raporcie pominiemy filtr projektu dla urlopów,
-    // lub założymy, że raport jest globalny jeśli chodzi o HR.
-
+    // 2. Dni urlopów i chorobowego
+    // FIX: Jeśli wybrano projekt, pobieramy urlopy TYLKO użytkowników przypisanych do tego projektu
     const vacationConditions = [
-        // Sprawdzamy czy zakres urlopu nachodzi na zakres filtru
         gte(vacations.endDate, filters.dateFrom),
         lte(vacations.startDate, filters.dateTo),
     ];
+
+    if (filters.projectId) {
+        // Pobierz ID użytkowników przypisanych do projektu
+        const assignedUsers = await database
+            .select({ userId: projectAssignments.userId })
+            .from(projectAssignments)
+            .where(eq(projectAssignments.projectId, filters.projectId));
+
+        const userIds = assignedUsers.map((u) => u.userId);
+
+        if (userIds.length > 0) {
+            vacationConditions.push(inArray(vacations.userId, userIds));
+        } else {
+            // Jeśli projekt nie ma pracowników, nie ma urlopów do liczenia
+            // Dodajemy warunek niemożliwy do spełnienia (id = -1), żeby zwróciło 0
+            vacationConditions.push(eq(vacations.id, -1));
+        }
+    }
 
     const vacationsList = await database
         .select({
@@ -52,19 +64,16 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
     let vacationDays = 0;
     let sickDays = 0;
 
-    // Proste obliczenie dni (nie uwzględnia weekendów i świąt idealnie, ale wystarczy do wykresu)
     const filterStart = new Date(filters.dateFrom).getTime();
     const filterEnd = new Date(filters.dateTo).getTime();
 
     vacationsList.forEach((v) => {
         if (!v.startDate || !v.endDate) return;
 
-        // Obliczamy część wspólną zakresu urlopu i zakresu filtru
         const start = Math.max(new Date(v.startDate).getTime(), filterStart);
         const end = Math.min(new Date(v.endDate).getTime(), filterEnd);
 
         if (end >= start) {
-            // +1 bo włącznie z datą końcową, / (1000 * 60 * 60 * 24) to milisekundy na dni
             const days = Math.floor((end - start) / (86400000)) + 1;
 
             const type = v.typeName?.toLowerCase() || "";
@@ -79,7 +88,7 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
     const presentDays = presenceResult?.daysPresent || 0;
     const totalRecordedDays = presentDays + vacationDays + sickDays;
 
-    // Obliczamy procenty (zabezpieczenie przed dzieleniem przez 0)
+    // FIX: Jeśli brak jakichkolwiek danych, zwracamy 0,0,0 co wyświetli "Brak danych"
     if (totalRecordedDays === 0) {
         return { present: 0, vacation: 0, sick: 0 };
     }

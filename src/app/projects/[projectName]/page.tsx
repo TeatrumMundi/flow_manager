@@ -7,7 +7,6 @@ import { getProjectByNameFromDb } from "@/dataBase/query/projects/getProjectByNa
 import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 
-// Turn off static rendering and caching for this page
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

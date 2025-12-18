@@ -65,14 +65,12 @@ export function ExpensesView({
     let filtered = expenses;
 
     if (selectedCategory !== "Wszystkie") {
-      // Porównujemy ID kategorii (liczba) z wybraną wartością (string -> number)
       filtered = filtered.filter(
           (e) => e.categoryId === Number(selectedCategory),
       );
     }
 
     if (selectedProject !== "Wszystkie") {
-      // Porównujemy ID projektu (liczba) z wybraną wartością (string -> number)
       filtered = filtered.filter(
           (e) => e.projectId === Number(selectedProject),
       );

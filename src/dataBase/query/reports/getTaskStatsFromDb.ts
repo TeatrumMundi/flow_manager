@@ -15,7 +15,7 @@ export async function getTaskStatsFromDb(filters?: TaskStatsFilters) {
         conditions.push(eq(tasks.projectId, filters.projectId));
     }
 
-    // Filtrowanie po dacie (np. tasks.updatedAt lub createdAt)
+    // Filtrowanie po dacie
     if (filters?.dateFrom) {
         conditions.push(gte(tasks.updatedAt, filters.dateFrom));
     }
@@ -25,7 +25,6 @@ export async function getTaskStatsFromDb(filters?: TaskStatsFilters) {
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    // Pobieramy liczbę zadań pogrupowaną po statusie
     const result = await database
         .select({
             status: tasks.status,
@@ -35,34 +34,32 @@ export async function getTaskStatsFromDb(filters?: TaskStatsFilters) {
         .where(whereClause)
         .groupBy(tasks.status);
 
+    // Inicjalizacja licznika dla 6 konkretnych statusów
     const stats = {
-        completed: 0,
-        active: 0,
-        archived: 0,
-        paused: 0,
+        todo: 0,       // Do zrobienia
+        inProgress: 0, // W trakcie
+        inReview: 0,   // W przeglądzie
+        done: 0,       // Ukończone
+        blocked: 0,    // Zablokowane
+        canceled: 0,   // Anulowane
     };
 
-    // Mapowanie statusów z Twojego systemu (widocznych na screenie)
     result.forEach((row) => {
         const status = row.status?.toLowerCase().trim() || "";
         const count = row.count;
 
-        // 1. Zakończony (Ukończone)
-        if (status === "ukończone" || status === "ukończono" || status === "zakończone") {
-            stats.completed += count;
-        }
-        // 2. Wstrzymany (Zablokowane)
-        else if (status === "zablokowane" || status === "wstrzymane") {
-            stats.paused += count;
-        }
-        // 3. Zarchiwizowany (Anulowane)
-        else if (status === "anulowane" || status === "zarchiwizowane") {
-            stats.archived += count;
-        }
-        // 4. Aktywny (Wszystko co "żyje": Do zrobienia, W trakcie, W przeglądzie)
-        else {
-            // Zakładamy, że "do zrobienia", "w trakcie", "w przeglądzie" to aktywne
-            stats.active += count;
+        if (status === "do zrobienia" || status === "to do") {
+            stats.todo += count;
+        } else if (status === "w trakcie" || status === "in progress") {
+            stats.inProgress += count;
+        } else if (status === "w przeglądzie" || status === "in review") {
+            stats.inReview += count;
+        } else if (status === "ukończone" || status === "done") {
+            stats.done += count;
+        } else if (status === "zablokowane" || status === "blocked") {
+            stats.blocked += count;
+        } else if (status === "anulowane" || status === "canceled" || status === "cancelled") {
+            stats.canceled += count;
         }
     });
 
