@@ -6,7 +6,10 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
-import { CustomSelect, type SelectOption } from "@/components/common/CustomSelect";
+import {
+  CustomSelect,
+  type SelectOption,
+} from "@/components/common/CustomSelect";
 import { AbsenceChart } from "./AbsenceChart";
 import { TaskCompletionChart } from "./TaskCompletionChart";
 import { WorkHoursChart } from "./WorkHoursChart";
@@ -35,16 +38,19 @@ interface ReportsViewProps {
 }
 
 export function ReportsView({
-                              availableProjects,
-                              initialData,
-                              initialFilters,
-                            }: ReportsViewProps) {
+  availableProjects,
+  initialData,
+  initialFilters,
+}: ReportsViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedProject, setSelectedProject] = useState(initialFilters.project);
+  const [selectedProject, setSelectedProject] = useState(
+    initialFilters.project,
+  );
   const [dateFrom, setDateFrom] = useState(initialFilters.dateFrom);
   const [dateTo, setDateTo] = useState(initialFilters.dateTo);
+  const [isExporting, setIsExporting] = useState(false);
 
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -52,12 +58,16 @@ export function ReportsView({
     router.push(`?${params.toString()}`);
   };
 
-  const handleDateFromChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleDateFromChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setDateFrom(e.target.value);
     updateFilters("dateFrom", e.target.value);
   };
 
-  const handleDateToChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleDateToChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setDateTo(e.target.value);
     updateFilters("dateTo", e.target.value);
   };
@@ -67,8 +77,60 @@ export function ReportsView({
     updateFilters("project", e.target.value);
   };
 
-  const handleExportPDF = () => {
-    toast.success("Generowanie raportu PDF...");
+  const handleExportPDF = async () => {
+    try {
+      setIsExporting(true);
+      toast.loading("Generowanie raportu PDF...", { id: "pdf" });
+
+      const currentPath = `/reports?${searchParams.toString()}`;
+      const res = await fetch(
+        `/api/reports/pdf?path=${encodeURIComponent(currentPath)}`,
+        {
+          method: "GET",
+        },
+      );
+
+      if (!res.ok) {
+        const maybeJson = await res
+          .json()
+          .catch(() => ({ error: "Nie udało się wygenerować PDF" }));
+        throw new Error(maybeJson?.error || "Nie udało się wygenerować PDF");
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      // Format nazwy pliku: Raport_2024-01_2024-03_NazwaProjektu.pdf
+      const sanitize = (str: string) =>
+        str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-zA-Z0-9]/g, "_")
+          .replace(/_+/g, "_")
+          .replace(/^_|_$/g, "");
+
+      const projectName = sanitize(selectedProjectLabel);
+      const filename = `Raport_${dateFrom}_${dateTo}_${projectName}.pdf`;
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("PDF gotowy!", { id: "pdf" });
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Błąd eksportu PDF",
+        {
+          id: "pdf",
+        },
+      );
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const foundOption = availableProjects.find((p) => {
@@ -77,73 +139,76 @@ export function ReportsView({
   });
 
   const selectedProjectLabel = foundOption
-      ? (typeof foundOption === "string" ? foundOption : foundOption.label)
-      : "Wszystkie projekty";
+    ? typeof foundOption === "string"
+      ? foundOption
+      : foundOption.label
+    : "Wszystkie projekty";
 
   return (
-      <div className="flex flex-col gap-6">
-        <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50 relative z-20">
-          <div className="flex flex-col lg:flex-row gap-4 items-end">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto flex-grow">
-              <CustomInput
-                  type="month"
-                  name="dateFrom"
-                  label="Data od"
-                  value={dateFrom}
-                  onChange={handleDateFromChange}
-                  className="bg-white"
-              />
-              <CustomInput
-                  type="month"
-                  name="dateTo"
-                  label="Data do"
-                  value={dateTo}
-                  onChange={handleDateToChange}
-                  className="bg-white"
-              />
-
-              <div className="w-full">
-                <CustomSelect
-                    label="Projekt"
-                    name="project"
-                    value={selectedProject}
-                    onChange={handleProjectChange}
-                    options={availableProjects}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white"
-                />
-              </div>
-            </div>
-
-            <div className="w-full lg:w-auto">
-              <Button
-                  variant="primary"
-                  onClick={handleExportPDF}
-                  className="w-full lg:w-auto h-[42px]"
-              >
-                Eksportuj: PDF
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
-          <div className="lg:col-span-1 h-96">
-            <TaskCompletionChart data={initialData.tasks} />
-          </div>
-
-          <div className="lg:col-span-1 h-96">
-            <WorkHoursChart
-                data={initialData.workHours}
-                projectName={selectedProjectLabel}
-                dateFrom={dateFrom}
-                dateTo={dateTo}
+    <div className="flex flex-col gap-6">
+      <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50 relative z-20">
+        <div className="flex flex-col lg:flex-row gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto grow">
+            <CustomInput
+              type="month"
+              name="dateFrom"
+              label="Data od"
+              value={dateFrom}
+              onChange={handleDateFromChange}
+              className="bg-white"
             />
+            <CustomInput
+              type="month"
+              name="dateTo"
+              label="Data do"
+              value={dateTo}
+              onChange={handleDateToChange}
+              className="bg-white"
+            />
+
+            <div className="w-full">
+              <CustomSelect
+                label="Projekt"
+                name="project"
+                value={selectedProject}
+                onChange={handleProjectChange}
+                options={availableProjects}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white"
+              />
+            </div>
           </div>
 
-          <div className="lg:col-span-1 h-96">
-            <AbsenceChart data={initialData.absence} />
+          <div className="w-full lg:w-auto">
+            <Button
+              variant="primary"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="w-full lg:w-auto h-[42px]"
+            >
+              Eksportuj: PDF
+            </Button>
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
+        <div className="lg:col-span-1 h-96">
+          <TaskCompletionChart data={initialData.tasks} />
+        </div>
+
+        <div className="lg:col-span-1 h-96">
+          <WorkHoursChart
+            data={initialData.workHours}
+            projectName={selectedProjectLabel}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+          />
+        </div>
+
+        <div className="lg:col-span-1 h-96">
+          <AbsenceChart data={initialData.absence} />
+        </div>
+      </div>
+    </div>
   );
 }

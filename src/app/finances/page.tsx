@@ -1,5 +1,6 @@
 ﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
+import { FinancesPdfView } from "@/components/finances/FinancesPdfView";
 import { FinancesView } from "@/components/finances/FinancesView";
 import { getFinancialStatsFromDb } from "@/dataBase/query/finances/getFinancialStatsFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
@@ -16,8 +17,8 @@ export default async function FinancesPage({ searchParams }: PageProps) {
   const today = new Date();
   const defaultDateTo = today.toISOString().slice(0, 7);
   const defaultDateFrom = new Date(today.setMonth(today.getMonth() - 2))
-      .toISOString()
-      .slice(0, 7);
+    .toISOString()
+    .slice(0, 7);
 
   const dateFromParam = (params.dateFrom as string) || defaultDateFrom;
   const dateToParam = (params.dateTo as string) || defaultDateTo;
@@ -28,9 +29,9 @@ export default async function FinancesPage({ searchParams }: PageProps) {
   const dateToFull = new Date(year, month, 0).toISOString().slice(0, 10);
 
   const projectId =
-      projectIdParam && projectIdParam !== "Wszystkie"
-          ? Number(projectIdParam)
-          : undefined;
+    projectIdParam && projectIdParam !== "Wszystkie"
+      ? Number(projectIdParam)
+      : undefined;
 
   const [projectsData, financialStats] = await Promise.all([
     listProjectsFromDb(),
@@ -49,24 +50,61 @@ export default async function FinancesPage({ searchParams }: PageProps) {
     })),
   ];
 
-  return (
-      <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
-        <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
-          <div className="flex items-center justify-between mb-8">
-            <BackToDashboardButton />
-            <SectionTitleTile title="Finanse" />
-          </div>
+  const isPdfExport = params.export === "pdf";
 
-          <FinancesView
-              availableProjects={availableProjects}
-              initialData={financialStats}
-              initialFilters={{
-                dateFrom: dateFromParam,
-                dateTo: dateToParam,
-                project: projectIdParam || "Wszystkie",
-              }}
-          />
-        </main>
-      </div>
+  const selectedProjectLabel = availableProjects.find((p) => {
+    const value = typeof p === "string" ? p : p.value;
+    return String(value) === String(projectIdParam || "Wszystkie");
+  })
+    ? typeof availableProjects.find((p) => {
+        const value = typeof p === "string" ? p : p.value;
+        return String(value) === String(projectIdParam || "Wszystkie");
+      }) === "string"
+      ? availableProjects.find((p) => {
+          const value = typeof p === "string" ? p : p.value;
+          return String(value) === String(projectIdParam || "Wszystkie");
+        })
+      : (
+          availableProjects.find((p) => {
+            const value = typeof p === "string" ? p : p.value;
+            return String(value) === String(projectIdParam || "Wszystkie");
+          }) as { label: string; value: string | number }
+        )?.label
+    : "Wszystkie projekty";
+
+  const totalBudget =
+    financialStats.kpi.remainingBudget + financialStats.charts.totalCost;
+
+  if (isPdfExport) {
+    return (
+      <FinancesPdfView
+        initialData={financialStats}
+        dateFrom={dateFromParam}
+        dateTo={dateToParam}
+        projectLabel={selectedProjectLabel as string}
+        totalBudget={totalBudget}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
+      <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
+        <div className="flex items-center justify-between mb-8">
+          <BackToDashboardButton />
+          <SectionTitleTile title="Finanse" />
+        </div>
+
+        <FinancesView
+          availableProjects={availableProjects}
+          initialData={financialStats}
+          initialFilters={{
+            dateFrom: dateFromParam,
+            dateTo: dateToParam,
+            project: projectIdParam || "Wszystkie",
+          }}
+        />
+      </main>
+    </div>
   );
 }
