@@ -53,7 +53,6 @@ export function CostStructureChart({ data }: { data: CategoryData[] }) {
             <h3 className="text-sm font-semibold text-gray-800 mb-2">Struktura kosztów</h3>
 
             <div className="flex-grow flex flex-col items-center justify-center">
-                {/* Wykres Kołowy - Powiększony */}
                 <div
                     className="w-40 h-40 rounded-full shrink-0 shadow-sm relative border-2 border-white"
                     style={{
@@ -62,10 +61,8 @@ export function CostStructureChart({ data }: { data: CategoryData[] }) {
                         boxShadow: "inset 0 0 0 0px white"
                     }}
                 >
-                    {/* Opcjonalnie: Białe linie podziału (maska SVG) - trudne w czystym CSS */}
                 </div>
 
-                {/* Legenda - Na dole, siatka 2 kolumny */}
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-6 w-full px-2 text-[11px] text-gray-600">
                     {data.slice(0, 6).map((item, index) => (
                         <div key={index} className="flex items-center gap-2">

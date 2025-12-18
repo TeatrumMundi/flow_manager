@@ -93,7 +93,6 @@ export function FinancesView({
         <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50">
           <div className="flex flex-col lg:flex-row gap-4 items-end">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto flex-grow">
-              {/* FIX: Dodano prop 'name' do inputów */}
               <CustomInput
                   type="month"
                   name="dateFrom"
@@ -112,7 +111,6 @@ export function FinancesView({
               />
 
               <div className="w-full">
-                {/* FIX: Dodano prop 'name' do selecta */}
                 <CustomSelect
                     name="project"
                     label="Projekt"

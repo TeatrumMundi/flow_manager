@@ -26,8 +26,6 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
         .from(workLogs)
         .where(and(...workLogConditions));
 
-    // 2. Dni urlopów i chorobowego
-    // FIX: Jeśli wybrano projekt, pobieramy urlopy TYLKO użytkowników przypisanych do tego projektu
     const vacationConditions = [
         gte(vacations.endDate, filters.dateFrom),
         lte(vacations.startDate, filters.dateTo),
@@ -88,7 +86,6 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
     const presentDays = presenceResult?.daysPresent || 0;
     const totalRecordedDays = presentDays + vacationDays + sickDays;
 
-    // FIX: Jeśli brak jakichkolwiek danych, zwracamy 0,0,0 co wyświetli "Brak danych"
     if (totalRecordedDays === 0) {
         return { present: 0, vacation: 0, sick: 0 };
     }

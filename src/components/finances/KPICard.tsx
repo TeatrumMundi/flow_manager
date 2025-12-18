@@ -9,7 +9,6 @@ export function KPICard({ label, value, subValue }: KPICardProps) {
         <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center h-28 border border-gray-100 text-center">
             <span className="text-sm text-gray-500 font-medium mb-1">{label}</span>
 
-            {/* Jeśli jest podtytuł (np. nazwa kategorii), wyświetlamy go */}
             {subValue && (
                 <span className="text-sm font-bold text-gray-800 mb-1 truncate w-full px-2">{subValue}</span>
             )}

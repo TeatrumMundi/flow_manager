@@ -39,9 +39,7 @@ export function AbsenceChart({ data }: { data: AbsenceData }) {
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 h-full flex flex-col">
         <h3 className="text-lg font-bold text-gray-800 mb-4">Absencja</h3>
 
-        {/* Wyśrodkowanie pionowe zawartości */}
         <div className="flex-grow flex flex-col items-center justify-center">
-          {/* Wykres Kołowy - Powiększony do w-40 h-40 */}
           <div
               className="w-40 h-40 rounded-full relative shadow-inner shrink-0"
               style={{
@@ -80,7 +78,6 @@ export function AbsenceChart({ data }: { data: AbsenceData }) {
             )}
           </div>
 
-          {/* Legenda - Przeniesiona na dół */}
           <div className="flex justify-center gap-6 mt-8 w-full text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>

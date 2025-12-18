@@ -18,7 +18,6 @@ export function TotalCostBarChart({ data }: { data: CostData }) {
             </div>
 
             <div className="flex-grow w-full flex items-end justify-center pb-2">
-                {/* Niebieski blok - zawsze pełna wysokość dla efektu wizualnego */}
                 <div className="w-24 h-40 bg-blue-600 rounded-md"></div>
             </div>
 

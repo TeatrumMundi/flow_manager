@@ -60,7 +60,6 @@ export function ExpensesView({
     setExpenses(initialExpenses);
   }, [initialExpenses]);
 
-  // FIX: Poprawione filtrowanie po ID
   useEffect(() => {
     let filtered = expenses;
 

@@ -30,7 +30,6 @@ export function WorkHoursChart({ data, projectName, dateFrom, dateTo }: WorkHour
                 <div className="w-40 h-40 rounded-full border-4 border-gray-100 flex items-center justify-center">
                     <span className="text-gray-400 text-sm">Brak danych</span>
                 </div>
-                {/* Wyświetlamy kontekst nawet przy braku danych */}
                 <div className="mt-6 text-center">
                     <p className="text-sm font-semibold text-gray-700">{projectName}</p>
                     <p className="text-xs text-gray-500 mt-1">{formattedDateRange}</p>
