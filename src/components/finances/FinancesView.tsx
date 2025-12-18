@@ -76,7 +76,6 @@ export function FinancesView({
   const formatPLN = (val: number) =>
       new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 }).format(val);
 
-  // Pobieranie nazwy projektu do wyświetlenia na wykresach
   const foundOption = availableProjects.find((p) => {
     const value = typeof p === "string" ? p : p.value;
     return String(value) === String(selectedProject);
@@ -86,10 +85,11 @@ export function FinancesView({
       ? (typeof foundOption === "string" ? foundOption : foundOption.label)
       : "wszystkie projekty";
 
+  const totalBudgetCalculated = initialData.kpi.remainingBudget + initialData.charts.totalCost;
+
   return (
       <div className="flex flex-col gap-6">
 
-        {/* --- Filtry --- */}
         <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50">
           <div className="flex flex-col lg:flex-row gap-4 items-end">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto flex-grow">
@@ -148,7 +148,6 @@ export function FinancesView({
           />
         </div>
 
-        {/* --- Wykresy --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 h-96">
             <ExecutionChart data={{ percentage: initialData.charts.execution, label: projectLabel }} />
@@ -157,7 +156,13 @@ export function FinancesView({
             <CostStructureChart data={initialData.charts.structure} />
           </div>
           <div className="lg:col-span-1 h-96">
-            <TotalCostBarChart data={{ amount: initialData.charts.totalCost, label: projectLabel }} />
+            <TotalCostBarChart
+                data={{
+                  usedAmount: initialData.charts.totalCost,
+                  totalBudget: totalBudgetCalculated,
+                  label: projectLabel
+                }}
+            />
           </div>
         </div>
       </div>
