@@ -53,7 +53,7 @@ export function TotalCostBarChart({ data }: { data: CostData }) {
           Budżet przekroczony! ({formatCurrency(totalBudget)})
         </div>
 
-        <div className="flex-grow w-full flex items-end justify-center pb-2">
+        <div className="grow w-full flex items-end justify-center pb-2">
           <div className="w-24 h-40 bg-red-600 rounded-md shadow-sm"></div>
         </div>
 
@@ -82,7 +82,7 @@ export function TotalCostBarChart({ data }: { data: CostData }) {
         z budżetu: {formatCurrency(totalBudget)}
       </div>
 
-      <div className="flex-grow w-full flex items-end justify-center pb-2">
+      <div className="grow w-full flex items-end justify-center pb-2">
         <div className="w-24 h-40 bg-gray-200 rounded-md relative overflow-hidden flex items-end shadow-inner">
           <div
             className="w-full bg-blue-600 rounded-b-md transition-all duration-500"

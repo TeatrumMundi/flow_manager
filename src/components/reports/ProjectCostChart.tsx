@@ -25,7 +25,7 @@ export function ProjectCostChart({ data }: { data: ProjectCostData }) {
       </div>
 
       {/* Słupek i nazwa */}
-      <div className="flex-grow flex flex-col justify-end items-center gap-4">
+      <div className="grow flex flex-col justify-end items-center gap-4">
         {/* Niebieski blok */}
         <div className="w-24 h-48 bg-blue-600 rounded-md"></div>
 
