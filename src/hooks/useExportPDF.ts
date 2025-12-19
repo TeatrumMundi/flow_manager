@@ -80,15 +80,15 @@ export function useExportPDF(options: UseExportPDFOptions = {}) {
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-      // A4 dimensions in points (72 points per inch)
-      const a4Width = 595.28;
-      const a4Height = 841.89;
+      // A4 landscape dimensions in points (72 points per inch)
+      const pageWidth = 841.89;
+      const pageHeight = 595.28;
       const padding = 40;
       const headerHeight = 60;
 
       // Calculate scaling to fit image within page (accounting for header)
-      const maxWidth = a4Width - padding * 2;
-      const maxHeight = a4Height - padding * 2 - headerHeight;
+      const maxWidth = pageWidth - padding * 2;
+      const maxHeight = pageHeight - padding * 2 - headerHeight;
 
       const imgAspectRatio = pngImage.width / pngImage.height;
       const pageAspectRatio = maxWidth / maxHeight;
@@ -107,14 +107,14 @@ export function useExportPDF(options: UseExportPDFOptions = {}) {
       }
 
       // Add page and draw image
-      const page = pdfDoc.addPage([a4Width, a4Height]);
+      const page = pdfDoc.addPage([pageWidth, pageHeight]);
 
       // Draw header with title
       const titleFontSize = 18;
       const titleWidth = fontBold.widthOfTextAtSize(filename, titleFontSize);
       page.drawText(filename, {
-        x: (a4Width - titleWidth) / 2,
-        y: a4Height - padding - 20,
+        x: (pageWidth - titleWidth) / 2,
+        y: pageHeight - padding - 20,
         size: titleFontSize,
         font: fontBold,
         color: rgb(0.12, 0.16, 0.22),
@@ -129,8 +129,8 @@ export function useExportPDF(options: UseExportPDFOptions = {}) {
           dateRangeFontSize,
         );
         page.drawText(dateRangeText, {
-          x: (a4Width - dateRangeWidth) / 2,
-          y: a4Height - padding - 40,
+          x: (pageWidth - dateRangeWidth) / 2,
+          y: pageHeight - padding - 40,
           size: dateRangeFontSize,
           font: font,
           color: rgb(0.42, 0.45, 0.5),
@@ -138,8 +138,8 @@ export function useExportPDF(options: UseExportPDFOptions = {}) {
       }
 
       // Draw image below header
-      const x = (a4Width - scaledWidth) / 2;
-      const y = a4Height - padding - headerHeight - scaledHeight;
+      const x = (pageWidth - scaledWidth) / 2;
+      const y = pageHeight - padding - headerHeight - scaledHeight;
 
       page.drawImage(pngImage, {
         x,
