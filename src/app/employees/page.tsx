@@ -1,3 +1,5 @@
+// Employees – HR/admin view of employees with assignments overview.
+// Server component with dynamic rendering due to auth.
 import { auth } from "@/auth";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
@@ -18,11 +20,14 @@ export default async function EmployeesPage() {
     ? await getFullUserProfileFromDbByEmail(session.user.email)
     : null;
 
-  // Check if user has admin privileges
-  const privilegedRoles = ["Administrator", "Zarząd", "HR", "Księgowość"];
-  const hasAdminPrivileges = userProfile?.role?.name
-    ? privilegedRoles.includes(userProfile.role.name)
-    : false;
+  // Resolve admin privileges from role name
+  const roleName = userProfile?.role?.name ?? "";
+  const hasAdminPrivileges = [
+    "Administrator",
+    "Zarząd",
+    "HR",
+    "Księgowość",
+  ].includes(roleName);
 
   // Fetch all data in parallel for better performance
   const [employeesData, supervisors, employmentTypes, allProjectAssignments] =

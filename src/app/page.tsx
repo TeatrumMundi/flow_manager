@@ -1,3 +1,5 @@
+// Home (/) – shows login form or a quick profile link.
+// Server component with dynamic rendering (no cache) due to auth session.
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -12,9 +14,7 @@ export default async function Home() {
 
   return (
     <main className="relative flex items-center justify-center min-h-screen px-4">
-      {/* Main content */}
       <div className="w-full max-w-md bg-white/50 backdrop-blur-md rounded-3xl shadow-xl p-7 pl-14 pr-14 flex flex-col items-center space-y-8">
-        {/* Logo + Title */}
         <div className="flex items-center">
           <Image
             src="/flowIcon.png"
@@ -28,8 +28,6 @@ export default async function Home() {
             Flow Manager
           </h1>
         </div>
-
-        {/* Login Form or Profile Link */}
         {session?.user ? (
           <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200 flex flex-col items-center space-y-4">
             <p className="text-gray-700 text-center">

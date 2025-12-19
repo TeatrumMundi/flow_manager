@@ -1,3 +1,5 @@
+// Project details – shows a single project with assignments and tasks.
+// Server component; resolves access based on user role.
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
@@ -24,11 +26,9 @@ export default async function ProjectDetailsPage({ params }: Props) {
     ? await getFullUserProfileFromDbByEmail(session.user.email)
     : null;
 
-  // Check if user has admin/management privileges (full access)
-  const privilegedRoles = ["Administrator", "Zarząd"];
-  const hasFullAccess = userProfile?.role?.name
-    ? privilegedRoles.includes(userProfile.role.name)
-    : false;
+  // Determine access level from role name
+  const roleName = userProfile?.role?.name ?? "";
+  const hasFullAccess = ["Administrator", "Zarząd"].includes(roleName);
 
   const project = await getProjectByNameFromDb(projectName);
 

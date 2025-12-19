@@ -1,4 +1,6 @@
-﻿import { auth } from "@/auth";
+﻿// Projects – lists all or user-visible projects based on role.
+// Server component with dynamic rendering due to auth.
+import { auth } from "@/auth";
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ProjectsView } from "@/components/projects/ProjectsView";
@@ -18,11 +20,9 @@ export default async function ProjectsPage() {
     ? await getFullUserProfileFromDbByEmail(session.user.email)
     : null;
 
-  // Check if user has admin/management privileges (can see all projects)
-  const privilegedRoles = ["Administrator", "Zarząd"];
-  const hasFullAccess = userProfile?.role?.name
-    ? privilegedRoles.includes(userProfile.role.name)
-    : false;
+  // Determine access level once from role name
+  const roleName = userProfile?.role?.name ?? "";
+  const hasFullAccess = ["Administrator", "Zarząd"].includes(roleName);
 
   // Fetch projects based on user role
   const projectsData =

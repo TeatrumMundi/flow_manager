@@ -1,3 +1,5 @@
+// RootLayout – wraps all pages with shared UI, font and styles.
+// Adds background and global toaster; sets app metadata.
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type React from "react";

@@ -1,3 +1,5 @@
+// Users – admin interface to view and manage users.
+// Server component; pulls roles, supervisors and employment types.
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { UsersInterface } from "@/components/users/UsersInterface";
@@ -9,13 +11,9 @@ import type { EmploymentType } from "@/types/EmploymentType";
 import type { UserRoles } from "@/types/UserRole";
 
 export default async function UsersPage() {
-  // Fetch users from database
   const users = await listUsersFromDb();
-  // Fetch supervisors (roleId 1 or 2)
   const supervisors = await listSupervisorsFromDb();
-  // Fetch employment types
   const employmentTypes: EmploymentType[] = await listEmploymentTypesFromDb();
-  // Fetch unique roles
   const roleTypes: UserRoles[] = await listUserRolesFromDb();
 
   return (

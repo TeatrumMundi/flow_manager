@@ -1,3 +1,5 @@
+// Expenses – list and manage expenses with categories, statuses, and projects.
+// Server component; dynamic rendering disabled to reflect live data.
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { ExpensesView } from "@/components/expenses/ExpenseView";
@@ -16,7 +18,6 @@ export default async function ExpensesPage() {
   const statuses = await listExpenseStatusesFromDb();
   const projects = await listProjectsFromDb();
 
-  // Map expenses data to match component expectations
   const expenses = expensesData.map((expense) => ({
     id: expense.id,
     name: expense.name,

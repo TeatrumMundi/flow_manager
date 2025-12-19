@@ -1,3 +1,8 @@
+// Projects API – list, create and bulk-delete projects.
+// Endpoints:
+// GET /api/projects    – list with optional filters
+// POST /api/projects   – create a project
+// DELETE /api/projects – bulk delete by IDs
 import { NextResponse } from "next/server";
 import { createProjectInDb } from "@/dataBase/query/projects/createProjectInDb";
 import { deleteMultipleProjectsFromDb } from "@/dataBase/query/projects/deleteProjectFromDb";

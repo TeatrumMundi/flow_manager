@@ -1,4 +1,6 @@
-﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
+﻿// Finances – KPIs and charts with simple filters.
+// Server component; dynamic rendering for up-to-date stats.
+import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { FinancesView } from "@/components/finances/FinancesView";
 import { getFinancialStatsFromDb } from "@/dataBase/query/finances/getFinancialStatsFromDb";
