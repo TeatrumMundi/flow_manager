@@ -2,8 +2,8 @@
 import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
 import { WorkTimeView } from "@/components/workTime/WorkTimeView";
-import { listProjectsByUserFromDb } from "@/dataBase/query/projects/listProjectsByUserFromDb";
-import { listTasksByUserAndProjectFromDb } from "@/dataBase/query/tasks/listTasksByUserAndProjectFromDb";
+import { listAllProjectAssignmentsFromDb } from "@/dataBase/query/projects/listAllProjectAssignmentsFromDb";
+import { listAllTaskAssignmentsFromDb } from "@/dataBase/query/tasks/listAllTaskAssignmentsFromDb";
 import getFullUserProfileFromDbByEmail from "@/dataBase/query/users/getFullUserProfileFromDbByEmail";
 import { listUsersFromDb } from "@/dataBase/query/users/listUsersFromDb";
 import { listWorkLogsByUserFromDb } from "@/dataBase/query/workLogs/listWorkLogsByUserFromDb";
@@ -43,7 +43,13 @@ export default async function WorkTimePage() {
       ? await listWorkLogsFromDb()
       : await listWorkLogsByUserFromDb(userProfile.id);
 
-  const usersData = await listUsersFromDb();
+  // Fetch all data in parallel for better performance
+  const [usersData, allProjectAssignments, allTaskAssignments] =
+    await Promise.all([
+      listUsersFromDb(),
+      listAllProjectAssignmentsFromDb(),
+      listAllTaskAssignmentsFromDb(),
+    ]);
 
   // Transform work logs to match component interface
   const workLogs = workLogsData.map((log) => ({
@@ -68,46 +74,44 @@ export default async function WorkTimePage() {
       value: String(user.id),
     }));
 
-  // Build user projects map - map of userId to their assigned projects
-  // Include all employees even if they have no projects (empty array)
+  // Build user projects map from pre-fetched data (no additional queries)
   const userProjectsMap: Record<string, { label: string; value: string }[]> =
     {};
 
   for (const employee of availableEmployees) {
-    const userId = Number(employee.value);
-    const userProjects = await listProjectsByUserFromDb(userId);
-    userProjectsMap[employee.value] = userProjects
-      .filter((project) => !project.isArchived)
-      .map((project) => ({
-        label: project.name || "Unknown",
-        value: String(project.id),
-      }));
+    userProjectsMap[employee.value] = [];
   }
 
-  // Build user-project-tasks map - map of "userId_projectId" to their assigned tasks
-  // Include all user-project combinations even if they have no tasks (empty array)
+  for (const assignment of allProjectAssignments) {
+    if (assignment.isArchived) continue;
+    const userIdStr = String(assignment.userId);
+    if (!userProjectsMap[userIdStr]) {
+      userProjectsMap[userIdStr] = [];
+    }
+    userProjectsMap[userIdStr].push({
+      label: assignment.projectName || "Unknown",
+      value: String(assignment.projectId),
+    });
+  }
+
+  // Build user-project-tasks map from pre-fetched data (no additional queries)
   const userProjectTasksMap: Record<
     string,
     { label: string; value: string }[]
   > = {};
 
-  for (const employee of availableEmployees) {
-    const userId = Number(employee.value);
-    const employeeProjects = userProjectsMap[employee.value] || [];
-
-    for (const project of employeeProjects) {
-      const projectId = Number(project.value);
-      const key = `${userId}_${projectId}`;
-      const userTasks = await listTasksByUserAndProjectFromDb(
-        userId,
-        projectId,
-      );
-      userProjectTasksMap[key] = userTasks.map((task) => ({
-        label: task.title || "Unknown",
-        value: String(task.id),
-      }));
+  for (const task of allTaskAssignments) {
+    if (!task.assignedToId || !task.projectId) continue;
+    const key = `${task.assignedToId}_${task.projectId}`;
+    if (!userProjectTasksMap[key]) {
+      userProjectTasksMap[key] = [];
     }
+    userProjectTasksMap[key].push({
+      label: task.title || "Unknown",
+      value: String(task.id),
+    });
   }
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
       <main className="w-full max-w-7xl mx-auto bg-white/30 backdrop-blur-md rounded-2xl shadow-lg p-8">
