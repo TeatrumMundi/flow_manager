@@ -1,5 +1,6 @@
 "use client";
-
+// CustomTable – flexible data table with actions, selection, and sticky headers.
+// Supports custom render functions, row selection, and action buttons per row.
 import type { ReactNode } from "react";
 
 export interface TableColumn<T> {
@@ -73,12 +74,10 @@ export function DataTable<T>({
     return rowClassName;
   };
 
-  // Check if any row has actions (for showing the actions column header)
   const hasAnyActions =
     (actions && actions.length > 0) ||
     (getActions && data.some((item) => getActions(item).length > 0));
 
-  // Get actions for a specific item, filtering out hidden ones
   const getItemActions = (item: T): TableAction<T>[] => {
     const itemActions = getActions ? getActions(item) : actions || [];
     return itemActions.filter((action) => {
@@ -94,7 +93,6 @@ export function DataTable<T>({
         className={`overflow-auto bg-white/50 rounded-sm shadow ${className}`}
       >
         <table className="w-full text-left" style={{ minWidth: "max-content" }}>
-          {/* Column sizing */}
           <colgroup>
             {selectable && <col style={{ width: "48px" }} />}
             {columns.map((col) => (
@@ -105,13 +103,10 @@ export function DataTable<T>({
             )}
           </colgroup>
 
-          {/* Table header */}
-          {/* ZMIANA: Dodano sticky top-0 z-10 i backdrop-blur, żeby nagłówek "pływał" nad treścią */}
           <thead
             className={`sticky top-0 z-10 backdrop-blur-md ${headerClassName}`}
           >
             <tr className="h-10">
-              {/* Select all checkbox */}
               {selectable && (
                 <th className="p-4 border-r border-blue-600/20">
                   <div className="flex items-center justify-center h-full">
@@ -125,7 +120,6 @@ export function DataTable<T>({
                 </th>
               )}
 
-              {/* Column headers */}
               {columns.map((col) => (
                 <th
                   key={col.key}
@@ -141,7 +135,6 @@ export function DataTable<T>({
                 </th>
               ))}
 
-              {/* Actions column header */}
               {hasAnyActions && (
                 <th className="p-2 font-semibold text-gray-600 text-center border-l border-blue-600/20">
                   Akcje
@@ -150,7 +143,6 @@ export function DataTable<T>({
             </tr>
           </thead>
 
-          {/* Table body */}
           <tbody>
             {data.map((item) => {
               const itemKey = keyExtractor(item);
@@ -162,7 +154,6 @@ export function DataTable<T>({
                   className={getRowClassName(item)}
                   title={rowTitle ? rowTitle(item) : undefined}
                 >
-                  {/* Selection checkbox */}
                   {selectable && (
                     <td className="p-4 border-r border-blue-600/20">
                       <div className="flex items-center justify-center h-full">
@@ -176,7 +167,6 @@ export function DataTable<T>({
                     </td>
                   )}
 
-                  {/* Data columns */}
                   {columns.map((col) => (
                     <td
                       key={col.key}
@@ -196,7 +186,6 @@ export function DataTable<T>({
                     </td>
                   ))}
 
-                  {/* Actions column */}
                   {hasAnyActions && (
                     <td className="p-2 border-l border-blue-600/20">
                       <div className="flex justify-center gap-2">
@@ -224,7 +213,6 @@ export function DataTable<T>({
         </table>
       </div>
 
-      {/* Empty state */}
       {data.length === 0 && (
         <p className="text-center text-gray-500 mt-8">{emptyMessage}</p>
       )}

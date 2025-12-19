@@ -1,9 +1,5 @@
 ﻿import { and, eq, gte, inArray, lte, sql } from "drizzle-orm";
-import {
-  projectAssignments,
-  vacations,
-  workLogs,
-} from "@/dataBase/schema";
+import { projectAssignments, vacations, workLogs } from "@/dataBase/schema";
 import { database } from "@/utils/db";
 
 export interface AbsenceFilters {
@@ -13,7 +9,7 @@ export interface AbsenceFilters {
 }
 
 export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
-  // 1. Dni obecności (z logów pracy)
+  // 1. Presence days (from work logs)
   const workLogConditions = [
     gte(workLogs.date, filters.dateFrom),
     lte(workLogs.date, filters.dateTo),
@@ -24,14 +20,14 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
   }
 
   const [presenceResult] = await database
-      .select({
-        daysPresent:
-            sql<number>`count(distinct concat(${workLogs.userId}, '_', ${workLogs.date}))`.mapWith(
-                Number,
-            ),
-      })
-      .from(workLogs)
-      .where(and(...workLogConditions));
+    .select({
+      daysPresent:
+        sql<number>`count(distinct concat(${workLogs.userId}, '_', ${workLogs.date}))`.mapWith(
+          Number,
+        ),
+    })
+    .from(workLogs)
+    .where(and(...workLogConditions));
 
   const vacationConditions = [
     gte(vacations.endDate, filters.dateFrom),
@@ -40,9 +36,9 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
 
   if (filters.projectId) {
     const assignedUsers = await database
-        .select({ userId: projectAssignments.userId })
-        .from(projectAssignments)
-        .where(eq(projectAssignments.projectId, filters.projectId));
+      .select({ userId: projectAssignments.userId })
+      .from(projectAssignments)
+      .where(eq(projectAssignments.projectId, filters.projectId));
 
     const userIds = assignedUsers.map((u) => u.userId);
 
@@ -54,12 +50,12 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
   }
 
   const vacationsList = await database
-      .select({
-        startDate: vacations.startDate,
-        endDate: vacations.endDate,
-      })
-      .from(vacations)
-      .where(and(...vacationConditions));
+    .select({
+      startDate: vacations.startDate,
+      endDate: vacations.endDate,
+    })
+    .from(vacations)
+    .where(and(...vacationConditions));
 
   let absenceDays = 0;
 

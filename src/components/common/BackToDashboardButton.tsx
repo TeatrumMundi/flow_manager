@@ -1,3 +1,5 @@
+// BackToDashboardButton – navigation link or button with back arrow.
+// Can render as Link (default) or button when onClick provided.
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 

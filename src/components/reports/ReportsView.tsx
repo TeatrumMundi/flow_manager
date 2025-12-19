@@ -1,4 +1,6 @@
 ﻿"use client";
+// ReportsView – filters UI and charts grid; supports PDF export.
+// Client component; syncs filters via URLSearchParams and router.
 
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
@@ -46,7 +48,7 @@ export function ReportsView({
   const searchParams = useSearchParams();
 
   const [selectedProject, setSelectedProject] = useState(
-      initialFilters.project,
+    initialFilters.project,
   );
   const [dateFrom, setDateFrom] = useState(initialFilters.dateFrom);
   const [dateTo, setDateTo] = useState(initialFilters.dateTo);
@@ -64,14 +66,14 @@ export function ReportsView({
   };
 
   const handleDateFromChange = (
-      e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setDateFrom(e.target.value);
     updateFilters("dateFrom", e.target.value);
   };
 
   const handleDateToChange = (
-      e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setDateTo(e.target.value);
     updateFilters("dateTo", e.target.value);
@@ -88,78 +90,78 @@ export function ReportsView({
   });
 
   const selectedProjectLabel = foundOption
-      ? typeof foundOption === "string"
-          ? foundOption
-          : foundOption.label
-      : "Wszystkie projekty";
+    ? typeof foundOption === "string"
+      ? foundOption
+      : foundOption.label
+    : "Wszystkie projekty";
 
   return (
-      <div className="flex flex-col gap-6">
-        <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50 relative z-20">
-          <div className="flex flex-col lg:flex-row gap-4 items-end">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto grow">
-              <CustomInput
-                  type="month"
-                  name="dateFrom"
-                  label="Data od"
-                  value={dateFrom}
-                  onChange={handleDateFromChange}
-                  className="bg-white"
-              />
-              <CustomInput
-                  type="month"
-                  name="dateTo"
-                  label="Data do"
-                  value={dateTo}
-                  onChange={handleDateToChange}
-                  className="bg-white"
-              />
+    <div className="flex flex-col gap-6">
+      <div className="bg-white/50 backdrop-blur-md rounded-xl p-4 shadow-sm border border-white/50 relative z-20">
+        <div className="flex flex-col lg:flex-row gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full lg:w-auto grow">
+            <CustomInput
+              type="month"
+              name="dateFrom"
+              label="Data od"
+              value={dateFrom}
+              onChange={handleDateFromChange}
+              className="bg-white"
+            />
+            <CustomInput
+              type="month"
+              name="dateTo"
+              label="Data do"
+              value={dateTo}
+              onChange={handleDateToChange}
+              className="bg-white"
+            />
 
-              <div className="w-full">
-                <CustomSelect
-                    label="Projekt"
-                    name="project"
-                    value={selectedProject}
-                    onChange={handleProjectChange}
-                    options={availableProjects}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white"
-                />
-              </div>
-            </div>
-
-            <div className="w-full lg:w-auto">
-              <Button
-                  variant="primary"
-                  onClick={exportToPDF}
-                  disabled={isExporting}
-                  className="w-full lg:w-auto h-10.5"
-              >
-                {isExporting ? "Eksportowanie..." : "Eksportuj: PDF"}
-              </Button>
+            <div className="w-full">
+              <CustomSelect
+                label="Projekt"
+                name="project"
+                value={selectedProject}
+                onChange={handleProjectChange}
+                options={availableProjects}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 bg-white"
+              />
             </div>
           </div>
-        </div>
 
-        <div ref={contentRef}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
-            <div className="lg:col-span-1 h-96">
-              <TaskCompletionChart data={initialData.tasks} />
-            </div>
-
-            <div className="lg:col-span-1 h-96">
-              <WorkHoursChart
-                  data={initialData.workHours}
-                  projectName={selectedProjectLabel}
-                  dateFrom={dateFrom}
-                  dateTo={dateTo}
-              />
-            </div>
-
-            <div className="lg:col-span-1 h-96">
-              <AbsenceChart data={initialData.absence} />
-            </div>
+          <div className="w-full lg:w-auto">
+            <Button
+              variant="primary"
+              onClick={exportToPDF}
+              disabled={isExporting}
+              className="w-full lg:w-auto h-10.5"
+            >
+              {isExporting ? "Eksportowanie..." : "Eksportuj: PDF"}
+            </Button>
           </div>
         </div>
       </div>
+
+      <div ref={contentRef}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
+          <div className="lg:col-span-1 h-96">
+            <TaskCompletionChart data={initialData.tasks} />
+          </div>
+
+          <div className="lg:col-span-1 h-96">
+            <WorkHoursChart
+              data={initialData.workHours}
+              projectName={selectedProjectLabel}
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+            />
+          </div>
+
+          <div className="lg:col-span-1 h-96">
+            <AbsenceChart data={initialData.absence} />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

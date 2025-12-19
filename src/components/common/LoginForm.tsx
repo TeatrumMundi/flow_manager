@@ -1,5 +1,6 @@
 "use client";
-
+// LoginForm – credentials-based login with NextAuth.
+// Shows toast notifications and redirects to profile on success.
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -21,7 +22,6 @@ export default function LoginForm() {
       if (result?.error) {
         throw new Error("Invalid credentials");
       }
-      // Redirect on success after a short delay to show the success toast
       setTimeout(() => {
         router.push("/profile/me");
       });
@@ -38,18 +38,13 @@ export default function LoginForm() {
   return (
     <div className="w-full bg-white/80 rounded-2xl shadow-md p-6 border border-gray-200">
       <form className="space-y-5" action={credentialsAction}>
-        {/* Email Input */}
         <CustomInput id="email" type="email" label="Email" name="email" />
-
-        {/* Password Input */}
         <CustomInput
           id="password"
           type="password"
           label="Password"
           name="password"
         />
-
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-700 transition-colors transform active:scale-[1.05] duration-500 cursor-pointer"

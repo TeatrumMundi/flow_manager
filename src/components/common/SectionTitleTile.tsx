@@ -1,3 +1,5 @@
+// SectionTitleTile – styled title badge for page sections.
+// Matches BackToDashboardButton visual style.
 interface SectionTitleTileProps {
   title: string;
   className?: string;

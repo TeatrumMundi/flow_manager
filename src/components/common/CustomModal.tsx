@@ -1,5 +1,6 @@
 "use client";
-
+// CustomModal – portal-based modal with backdrop, ESC key handler, and body scroll lock.
+// Sizes: sm, md (default), lg, xl.
 import type React from "react";
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -28,7 +29,6 @@ export function CustomModal({
   size = "md",
   showCloseButton = true,
 }: ModalProps) {
-  // Prevent body scroll when modal is open
   useEffect(() => {
     if (!isOpen) return;
 
@@ -40,7 +40,6 @@ export function CustomModal({
     };
   }, [isOpen]);
 
-  // Handle escape key press
   useEffect(() => {
     if (!isOpen) return;
 
@@ -58,9 +57,7 @@ export function CustomModal({
 
   if (!isOpen) return null;
 
-  // Render modal using portal to ensure proper z-index stacking
   return createPortal(
-    // Modal backdrop overlay
     <div
       role="dialog"
       aria-modal="true"
@@ -73,7 +70,6 @@ export function CustomModal({
         role="document"
         className={`bg-white rounded-2xl shadow-lg w-full ${sizeClasses[size]} p-8 m-4 max-h-[90vh] border-2 border-blue-600`}
       >
-        {/* Modal header */}
         <div className="flex items-center justify-between mb-6">
           <h2 id="modal-title" className="text-2xl font-bold text-gray-800">
             {title}
@@ -101,7 +97,6 @@ export function CustomModal({
           )}
         </div>
 
-        {/* Modal body */}
         <div>{children}</div>
       </div>
     </div>,

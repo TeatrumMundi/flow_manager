@@ -1,3 +1,5 @@
+// CustomInput – form input with label, error, and helper text support.
+// Auto-handles autocomplete attributes based on input type.
 import type { ChangeEvent, InputHTMLAttributes } from "react";
 
 export interface CustomInputProps
@@ -28,7 +30,6 @@ export function CustomInput({
   className = "",
   ...props
 }: CustomInputProps) {
-  // Set autocomplete based on input type if not provided
   const autoComplete =
     props.autoComplete ||
     (type === "email"

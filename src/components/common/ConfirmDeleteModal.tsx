@@ -1,5 +1,6 @@
 "use client";
-
+// ConfirmDeleteModal – reusable confirmation dialog for delete actions.
+// Shows warning icon, item name, and handles async delete operations.
 import { useState } from "react";
 import { FaExclamationTriangle, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/common/CustomButton";
@@ -50,29 +51,24 @@ export function ConfirmDeleteModal({
       showCloseButton={!loading}
     >
       <div className="flex flex-col items-center text-center">
-        {/* Warning icon */}
         <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
           <FaExclamationTriangle className="w-8 h-8 text-red-600" />
         </div>
 
-        {/* Description */}
         <p className="text-gray-600 mb-2">
           {description || "Czy na pewno chcesz usunąć ten element?"}
         </p>
 
-        {/* Item name if provided */}
         {itemName && (
           <p className="font-semibold text-gray-800 mb-4 px-4 py-2 bg-gray-100 rounded-lg">
             {itemName}
           </p>
         )}
 
-        {/* Warning message */}
         <p className="text-sm text-red-600 mb-6">
           Ta operacja jest nieodwracalna.
         </p>
 
-        {/* Buttons */}
         <div className="flex gap-4 w-full">
           <Button
             type="button"

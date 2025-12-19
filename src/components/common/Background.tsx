@@ -1,3 +1,5 @@
+// Background – full-screen static background image for the app.
+// Server-safe component; uses Next/Image with low quality for perf.
 import Image from "next/image";
 
 export default function Background() {

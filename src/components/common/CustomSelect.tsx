@@ -1,5 +1,6 @@
 "use client";
-
+// CustomSelect – enhanced select with search, keyboard nav, and auto-positioning.
+// Supports simple string[] or {label, value}[] options.
 import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { CustomInput } from "./CustomInput";
@@ -48,22 +49,18 @@ export function CustomSelect({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Normalize options to consistent format
   const normalizedOptions = options.map((option) =>
     typeof option === "string" ? { label: option, value: option } : option,
   );
 
-  // Filter options based on search term
   const filteredOptions = normalizedOptions.filter((option) =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // Get selected option
   const selectedOption = normalizedOptions.find(
     (option) => String(option.value) === String(value),
   );
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -79,23 +76,20 @@ export function CustomSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Calculate position before opening and focus search input
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
-      // Calculate dropdown position first
       const rect = dropdownRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      const dropdownHeight = 250; // approximate max-height of dropdown
+      const dropdownHeight = 250;
 
-      // Open upward if there's not enough space below and more space above
+      // Open upward if not enough space below
       if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
         setDropdownPosition("top");
       } else {
         setDropdownPosition("bottom");
       }
 
-      // Mark as calculated so dropdown can render
       setIsPositionCalculated(true);
 
       // Focus search input after position is calculated

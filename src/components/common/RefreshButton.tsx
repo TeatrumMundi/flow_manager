@@ -1,3 +1,5 @@
+// RefreshButton – success-variant button with spinning refresh icon.
+// Shows spinner animation when isRefreshing is true.
 import type React from "react";
 import { IoMdRefresh } from "react-icons/io";
 import { Button } from "@/components/common/CustomButton";

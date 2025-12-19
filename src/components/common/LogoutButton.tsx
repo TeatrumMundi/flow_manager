@@ -1,5 +1,6 @@
 "use client";
-
+// LogoutButton – sign-out button with toast feedback.
+// Clears user store and redirects to home.
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";

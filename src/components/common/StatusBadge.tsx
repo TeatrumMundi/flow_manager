@@ -1,3 +1,5 @@
+// StatusBadge – colored badge for status display.
+// Supports types: project, expense, vacation, user with context-specific colors.
 import type React from "react";
 
 export interface StatusBadgeProps {

@@ -1,3 +1,5 @@
+// CustomButton – styled button with variant support.
+// Variants: primary (blue), secondary (gray), danger (red), success (green).
 import type React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
