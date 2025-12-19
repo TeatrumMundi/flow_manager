@@ -170,7 +170,7 @@ export function ProjectsView({
           <CustomInput
             type="text"
             name="searchProjects"
-            placeholder="Szukaj po nazwie lub kierowniku..."
+            placeholder="Szukaj po nazwie lub managerze..."
             className="pl-10"
             hideLabel
             value={searchTerm}
@@ -216,7 +216,7 @@ export function ProjectsView({
                 <StatusBadge
                   status={project.status}
                   type="project"
-                  className="min-w-[150px]"
+                  className="min-w-37.5"
                 />
               ),
               headerClassName: "p-4",
@@ -224,7 +224,7 @@ export function ProjectsView({
             },
             {
               key: "manager",
-              header: "Kierownik",
+              header: "Manager",
               width: "w-48",
               render: (project) => (
                 <span className="text-gray-700">
