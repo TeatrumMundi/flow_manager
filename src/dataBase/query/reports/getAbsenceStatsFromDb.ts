@@ -2,7 +2,6 @@
 import {
   projectAssignments,
   vacations,
-  vacationTypes,
   workLogs,
 } from "@/dataBase/schema";
 import { database } from "@/utils/db";
@@ -25,14 +24,14 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
   }
 
   const [presenceResult] = await database
-    .select({
-      daysPresent:
-        sql<number>`count(distinct concat(${workLogs.userId}, '_', ${workLogs.date}))`.mapWith(
-          Number,
-        ),
-    })
-    .from(workLogs)
-    .where(and(...workLogConditions));
+      .select({
+        daysPresent:
+            sql<number>`count(distinct concat(${workLogs.userId}, '_', ${workLogs.date}))`.mapWith(
+                Number,
+            ),
+      })
+      .from(workLogs)
+      .where(and(...workLogConditions));
 
   const vacationConditions = [
     gte(vacations.endDate, filters.dateFrom),
@@ -40,35 +39,29 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
   ];
 
   if (filters.projectId) {
-    // Pobierz ID użytkowników przypisanych do projektu
     const assignedUsers = await database
-      .select({ userId: projectAssignments.userId })
-      .from(projectAssignments)
-      .where(eq(projectAssignments.projectId, filters.projectId));
+        .select({ userId: projectAssignments.userId })
+        .from(projectAssignments)
+        .where(eq(projectAssignments.projectId, filters.projectId));
 
     const userIds = assignedUsers.map((u) => u.userId);
 
     if (userIds.length > 0) {
       vacationConditions.push(inArray(vacations.userId, userIds));
     } else {
-      // Jeśli projekt nie ma pracowników, nie ma urlopów do liczenia
-      // Dodajemy warunek niemożliwy do spełnienia (id = -1), żeby zwróciło 0
       vacationConditions.push(eq(vacations.id, -1));
     }
   }
 
   const vacationsList = await database
-    .select({
-      startDate: vacations.startDate,
-      endDate: vacations.endDate,
-      typeName: vacationTypes.name,
-    })
-    .from(vacations)
-    .leftJoin(vacationTypes, eq(vacations.typeId, vacationTypes.id))
-    .where(and(...vacationConditions));
+      .select({
+        startDate: vacations.startDate,
+        endDate: vacations.endDate,
+      })
+      .from(vacations)
+      .where(and(...vacationConditions));
 
-  let vacationDays = 0;
-  let sickDays = 0;
+  let absenceDays = 0;
 
   const filterStart = new Date(filters.dateFrom).getTime();
   const filterEnd = new Date(filters.dateTo).getTime();
@@ -81,30 +74,22 @@ export async function getAbsenceStatsFromDb(filters: AbsenceFilters) {
 
     if (end >= start) {
       const days = Math.floor((end - start) / 86400000) + 1;
-
-      const type = v.typeName?.toLowerCase() || "";
-      if (
-        type.includes("chorob") ||
-        type.includes("sick") ||
-        type.includes("l4")
-      ) {
-        sickDays += days;
-      } else {
-        vacationDays += days;
-      }
+      absenceDays += days;
     }
   });
 
   const presentDays = presenceResult?.daysPresent || 0;
-  const totalRecordedDays = presentDays + vacationDays + sickDays;
+  const totalRecordedDays = presentDays + absenceDays;
 
   if (totalRecordedDays === 0) {
-    return { present: 0, vacation: 0, sick: 0 };
+    return { present: 0, absence: 0 };
   }
 
+  const presentPercentage = Math.round((presentDays / totalRecordedDays) * 100);
+  const absencePercentage = 100 - presentPercentage;
+
   return {
-    present: Math.round((presentDays / totalRecordedDays) * 100),
-    vacation: Math.round((vacationDays / totalRecordedDays) * 100),
-    sick: Math.round((sickDays / totalRecordedDays) * 100),
+    present: presentPercentage,
+    absence: absencePercentage,
   };
 }
