@@ -36,13 +36,13 @@ interface VacationsViewProps {
 }
 
 export function VacationsView({
-  initialVacations,
-  availableEmployees,
-  availableTypes,
-  availableStatuses,
-  hasFullAccess = false,
-  currentUserId,
-}: VacationsViewProps) {
+                                initialVacations,
+                                availableEmployees,
+                                availableTypes,
+                                availableStatuses,
+                                hasFullAccess = false,
+                                currentUserId,
+                              }: VacationsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("Wszystkie");
   const [selectedStatus, setSelectedStatus] = useState("Wszystkie");
@@ -54,16 +54,16 @@ export function VacationsView({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingVacation, setEditingVacation] = useState<Vacation | null>(null);
   const [vacationToDelete, setVacationToDelete] = useState<Vacation | null>(
-    null,
+      null,
   );
 
   // Build API URL with userId filter for non-admin users
   const apiUrl = hasFullAccess
-    ? "/api/vacations"
-    : `/api/vacations?userId=${currentUserId}`;
+      ? "/api/vacations"
+      : `/api/vacations?userId=${currentUserId}`;
 
   const { isRefreshing, refreshList, refreshListWithToast } = useRefreshList<
-    Vacation[]
+      Vacation[]
   >({
     apiUrl,
   });
@@ -114,7 +114,7 @@ export function VacationsView({
 
     if (searchTerm) {
       filtered = filtered.filter((v) =>
-        v.employeeName.toLowerCase().includes(searchTerm.toLowerCase()),
+          v.employeeName.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
@@ -162,7 +162,7 @@ export function VacationsView({
     // Regular users cannot edit/delete locked vacations
     // Admins can always edit/delete
     const canEdit =
-      hasFullAccess || (vacation.visibleUserId === currentUserId && !isLocked);
+        hasFullAccess || (vacation.visibleUserId === currentUserId && !isLocked);
 
     if (!canEdit) {
       return [];
@@ -185,162 +185,164 @@ export function VacationsView({
   };
 
   return (
-    <>
-      {isAddModalOpen && (
-        <VacationAddModal
-          onClose={handleCloseAddModal}
-          availableEmployees={availableEmployees}
-          availableTypes={availableTypes}
-          hasFullAccess={hasFullAccess}
-          currentUserId={currentUserId}
-        />
-      )}
+      <>
+        {isAddModalOpen && (
+            <VacationAddModal
+                onClose={handleCloseAddModal}
+                availableEmployees={availableEmployees}
+                availableTypes={availableTypes}
+                hasFullAccess={hasFullAccess}
+                currentUserId={currentUserId}
+            />
+        )}
 
-      {isEditModalOpen && editingVacation && (
-        <VacationEditModal
-          vacation={editingVacation}
-          onClose={handleCloseEditModal}
-          availableEmployees={availableEmployees}
-          availableTypes={availableTypes}
-          availableStatuses={availableStatuses}
-          hasFullAccess={hasFullAccess}
-          currentUserId={currentUserId}
-        />
-      )}
+        {isEditModalOpen && editingVacation && (
+            <VacationEditModal
+                vacation={editingVacation}
+                onClose={handleCloseEditModal}
+                availableEmployees={availableEmployees}
+                availableTypes={availableTypes}
+                availableStatuses={availableStatuses}
+                hasFullAccess={hasFullAccess}
+                currentUserId={currentUserId}
+            />
+        )}
 
-      {isDeleteModalOpen && vacationToDelete && (
-        <ConfirmDeleteModal
-          isOpen={isDeleteModalOpen}
-          onClose={handleCloseDeleteModal}
-          onConfirm={handleConfirmDelete}
-          title="Usuń wniosek urlopowy"
-          itemName={`${vacationToDelete.employeeName} (${vacationToDelete.startDate} - ${vacationToDelete.endDate})`}
-          description="Czy na pewno chcesz usunąć ten wniosek urlopowy?"
-        />
-      )}
+        {isDeleteModalOpen && vacationToDelete && (
+            <ConfirmDeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={handleCloseDeleteModal}
+                onConfirm={handleConfirmDelete}
+                title="Usuń wniosek urlopowy"
+                itemName={`${vacationToDelete.employeeName} (${vacationToDelete.startDate} - ${vacationToDelete.endDate})`}
+                description="Czy na pewno chcesz usunąć ten wniosek urlopowy?"
+            />
+        )}
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
-        <Button
-          variant="primary"
-          onClick={handleOpenAddModal}
-          className="w-full md:w-auto"
-        >
-          <FaPlus />
-          <span>Złóż wniosek</span>
-        </Button>
-        <RefreshButton onClick={handleRefresh} isRefreshing={isRefreshing} />
+        <div className="flex flex-col md:flex-row gap-4 mb-6 items-stretch md:items-center">
+          <Button
+              variant="primary"
+              onClick={handleOpenAddModal}
+              className="w-full md:w-auto"
+          >
+            <FaPlus />
+            <span>Złóż wniosek</span>
+          </Button>
+          <RefreshButton onClick={handleRefresh} isRefreshing={isRefreshing} />
 
-        <div className="relative grow w-full">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-          <CustomInput
-            type="text"
-            name="searchEmployee"
-            placeholder="Szukaj po imieniu i nazwisku..."
-            className="pl-10"
-            hideLabel
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+          <div className="relative grow w-full">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+            <CustomInput
+                type="text"
+                name="searchEmployee"
+                placeholder="Szukaj po imieniu i nazwisku..."
+                className="pl-10"
+                hideLabel
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <CustomSelect
+              name="typeFilter"
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              hideLabel
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full md:w-auto"
+              placeholder="Wszystkie typy"
+              options={[
+                { label: "Wszystkie typy", value: "Wszystkie" },
+                ...availableTypes.map((type) => ({
+                  label: type,
+                  value: type,
+                })),
+              ]}
+          />
+          <CustomSelect
+              name="statusFilter"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              hideLabel
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full md:w-auto"
+              placeholder="Wszystkie statusy"
+              options={[
+                { label: "Wszystkie statusy", value: "Wszystkie" },
+                ...availableStatuses.map((status) => ({
+                  label: status,
+                  value: status,
+                })),
+              ]}
           />
         </div>
 
-        <CustomSelect
-          name="typeFilter"
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-          hideLabel
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full md:w-auto"
-          placeholder="Wszystkie typy"
-          options={[
-            { label: "Wszystkie typy", value: "Wszystkie" },
-            ...availableTypes.map((type) => ({
-              label: type,
-              value: type,
-            })),
-          ]}
-        />
-        <CustomSelect
-          name="statusFilter"
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          hideLabel
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-gray-800 w-full md:w-auto"
-          placeholder="Wszystkie statusy"
-          options={[
-            { label: "Wszystkie statusy", value: "Wszystkie" },
-            ...availableStatuses.map((status) => ({
-              label: status,
-              value: status,
-            })),
-          ]}
-        />
-      </div>
-
-      <DataTable
-        data={filteredVacations}
-        keyExtractor={(item) => item.id}
-        emptyMessage="Nie znaleziono wniosków urlopowych."
-        columns={[
-          {
-            key: "employeeName",
-            header: "Imię i nazwisko",
-            className: "p-4 text-gray-800 font-medium",
-            headerClassName: "p-4",
-          },
-          {
-            key: "vacationType",
-            header: "Typ nieobecności",
-            className: "p-4 text-gray-700",
-            headerClassName: "p-4",
-          },
-          {
-            key: "startDate",
-            header: "Data rozpoczęcia",
-            className: "p-4 text-gray-700 text-center",
-            headerClassName: "p-4 text-center",
-          },
-          {
-            key: "endDate",
-            header: "Data zakończenia",
-            className: "p-4 text-gray-700 text-center",
-            headerClassName: "p-4 text-center",
-          },
-          {
-            key: "daysCount",
-            header: "Liczba dni",
-            render: (item) => {
-              const start = new Date(item.startDate);
-              const end = new Date(item.endDate);
-              const days =
-                !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())
-                  ? Math.max(
-                      1,
-                      Math.ceil(
-                        (end.getTime() - start.getTime()) /
-                          (1000 * 60 * 60 * 24),
-                      ) + 1,
-                    )
-                  : "-";
-              return (
-                <span title={`${item.startDate} – ${item.endDate}`}>
+        <DataTable
+            data={filteredVacations}
+            keyExtractor={(item) => item.id}
+            emptyMessage="Nie znaleziono wniosków urlopowych."
+            // ZMIANA: Dodano max-h-[65vh] aby włączyć scroll
+            className="max-h-[65vh]"
+            columns={[
+              {
+                key: "employeeName",
+                header: "Imię i nazwisko",
+                className: "p-4 text-gray-800 font-medium",
+                headerClassName: "p-4",
+              },
+              {
+                key: "vacationType",
+                header: "Typ nieobecności",
+                className: "p-4 text-gray-700",
+                headerClassName: "p-4",
+              },
+              {
+                key: "startDate",
+                header: "Data rozpoczęcia",
+                className: "p-4 text-gray-700 text-center",
+                headerClassName: "p-4 text-center",
+              },
+              {
+                key: "endDate",
+                header: "Data zakończenia",
+                className: "p-4 text-gray-700 text-center",
+                headerClassName: "p-4 text-center",
+              },
+              {
+                key: "daysCount",
+                header: "Liczba dni",
+                render: (item) => {
+                  const start = new Date(item.startDate);
+                  const end = new Date(item.endDate);
+                  const days =
+                      !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())
+                          ? Math.max(
+                              1,
+                              Math.ceil(
+                                  (end.getTime() - start.getTime()) /
+                                  (1000 * 60 * 60 * 24),
+                              ) + 1,
+                          )
+                          : "-";
+                  return (
+                      <span title={`${item.startDate} – ${item.endDate}`}>
                   {days}
                 </span>
-              );
-            },
-            className: "p-4 text-center text-gray-700",
-            headerClassName: "p-4 text-center",
-          },
-          {
-            key: "status",
-            header: "Status",
-            render: (item) => (
-              <StatusBadge status={item.status} type="vacation" />
-            ),
-            className: "p-4",
-            headerClassName: "p-4",
-          },
-        ]}
-        getActions={getVacationActions}
-      />
-    </>
+                  );
+                },
+                className: "p-4 text-center text-gray-700",
+                headerClassName: "p-4 text-center",
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (item) => (
+                    <StatusBadge status={item.status} type="vacation" />
+                ),
+                className: "p-4",
+                headerClassName: "p-4",
+              },
+            ]}
+            getActions={getVacationActions}
+        />
+      </>
   );
 }
