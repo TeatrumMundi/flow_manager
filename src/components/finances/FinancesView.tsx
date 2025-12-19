@@ -52,7 +52,6 @@ export function FinancesView({
   );
   const [dateFrom, setDateFrom] = useState(initialFilters.dateFrom);
   const [dateTo, setDateTo] = useState(initialFilters.dateTo);
-  const [isExporting, setIsExporting] = useState(false);
 
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -79,60 +78,8 @@ export function FinancesView({
     updateFilters("project", e.target.value);
   };
 
-  const handleExportPDF = async () => {
-    try {
-      setIsExporting(true);
-      toast.loading("Generowanie raportu PDF...", { id: "pdf" });
-
-      const currentPath = `/finances?${searchParams.toString()}`;
-      const res = await fetch(
-        `/api/reports/pdf?path=${encodeURIComponent(currentPath)}`,
-        {
-          method: "GET",
-        },
-      );
-
-      if (!res.ok) {
-        const maybeJson = await res
-          .json()
-          .catch(() => ({ error: "Nie udało się wygenerować PDF" }));
-        throw new Error(maybeJson?.error || "Nie udało się wygenerować PDF");
-      }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      // Format nazwy pliku: Raport_2024-01_2024-03_NazwaProjektu.pdf
-      const sanitize = (str: string) =>
-        str
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-zA-Z0-9]/g, "_")
-          .replace(/_+/g, "_")
-          .replace(/^_|_$/g, "");
-
-      const projectName = sanitize(projectLabel);
-      const filename = `Raport_Finansowy_${dateFrom}_${dateTo}_${projectName}.pdf`;
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-
-      toast.success("PDF gotowy!", { id: "pdf" });
-    } catch (error: unknown) {
-      toast.error(
-        error instanceof Error ? error.message : "Błąd eksportu PDF",
-        {
-          id: "pdf",
-        },
-      );
-    } finally {
-      setIsExporting(false);
-    }
+  const handleExportPDF = () => {
+    toast.error("Funkcja eksportu PDF jest wyłączona");
   };
 
   const formatPLN = (val: number) =>
@@ -189,11 +136,11 @@ export function FinancesView({
               />
             </div>
           </div>
+
           <div className="w-full lg:w-auto">
             <Button
               variant="primary"
               onClick={handleExportPDF}
-              disabled={isExporting}
               className="w-full lg:w-auto h-[42px]"
             >
               Eksportuj: PDF

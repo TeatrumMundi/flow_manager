@@ -1,6 +1,5 @@
 ﻿import { BackToDashboardButton } from "@/components/common/BackToDashboardButton";
 import { SectionTitleTile } from "@/components/common/SectionTitleTile";
-import { FinancesPdfView } from "@/components/finances/FinancesPdfView";
 import { FinancesView } from "@/components/finances/FinancesView";
 import { getFinancialStatsFromDb } from "@/dataBase/query/finances/getFinancialStatsFromDb";
 import { listProjectsFromDb } from "@/dataBase/query/projects/listProjectsFromDb";
@@ -50,42 +49,7 @@ export default async function FinancesPage({ searchParams }: PageProps) {
     })),
   ];
 
-  const isPdfExport = params.export === "pdf";
 
-  const selectedProjectLabel = availableProjects.find((p) => {
-    const value = typeof p === "string" ? p : p.value;
-    return String(value) === String(projectIdParam || "Wszystkie");
-  })
-    ? typeof availableProjects.find((p) => {
-        const value = typeof p === "string" ? p : p.value;
-        return String(value) === String(projectIdParam || "Wszystkie");
-      }) === "string"
-      ? availableProjects.find((p) => {
-          const value = typeof p === "string" ? p : p.value;
-          return String(value) === String(projectIdParam || "Wszystkie");
-        })
-      : (
-          availableProjects.find((p) => {
-            const value = typeof p === "string" ? p : p.value;
-            return String(value) === String(projectIdParam || "Wszystkie");
-          }) as { label: string; value: string | number }
-        )?.label
-    : "Wszystkie projekty";
-
-  const totalBudget =
-    financialStats.kpi.remainingBudget + financialStats.charts.totalCost;
-
-  if (isPdfExport) {
-    return (
-      <FinancesPdfView
-        initialData={financialStats}
-        dateFrom={dateFromParam}
-        dateTo={dateToParam}
-        projectLabel={selectedProjectLabel as string}
-        totalBudget={totalBudget}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-8 px-4">
