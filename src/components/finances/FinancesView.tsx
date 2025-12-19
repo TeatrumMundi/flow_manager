@@ -3,13 +3,13 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import {
   CustomSelect,
   type SelectOption,
 } from "@/components/common/CustomSelect";
+import { useExportPDF } from "@/hooks/useExportPDF";
 import { CostStructureChart } from "./CostStructureChart";
 import { ExecutionChart } from "./ExecutionChart";
 import { KPICard } from "./KPICard";
@@ -53,6 +53,12 @@ export function FinancesView({
   const [dateFrom, setDateFrom] = useState(initialFilters.dateFrom);
   const [dateTo, setDateTo] = useState(initialFilters.dateTo);
 
+  const { contentRef, exportToPDF, isExporting } = useExportPDF({
+    filename: "Finanse - Raport",
+    dateFrom,
+    dateTo,
+  });
+
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
@@ -76,10 +82,6 @@ export function FinancesView({
   const handleProjectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedProject(e.target.value);
     updateFilters("project", e.target.value);
-  };
-
-  const handleExportPDF = () => {
-    toast.error("Funkcja eksportu PDF jest wyłączona");
   };
 
   const formatPLN = (val: number) =>
@@ -140,56 +142,62 @@ export function FinancesView({
           <div className="w-full lg:w-auto">
             <Button
               variant="primary"
-              onClick={handleExportPDF}
-              className="w-full lg:w-auto h-[42px]"
+              onClick={exportToPDF}
+              disabled={isExporting}
+              className="w-full lg:w-auto h-10.5"
             >
-              Eksportuj: PDF
+              {isExporting ? "Eksportowanie..." : "Eksportuj: PDF"}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* --- KPI Cards --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard
-          label="Pozostały budżet"
-          value={formatPLN(initialData.kpi.remainingBudget)}
-        />
-        <KPICard
-          label="Najdroższa kategoria"
-          subValue={initialData.kpi.mostExpensiveCategory.name || "Brak danych"}
-          value={formatPLN(initialData.kpi.mostExpensiveCategory.amount)}
-        />
-        <KPICard
-          label="Wykorzystanie budżetu"
-          value={`${Math.round(initialData.kpi.budgetUtilization)}%`}
-        />
-        <KPICard
-          label="Średni koszt miesięczny projektu"
-          value={formatPLN(initialData.kpi.averageMonthlyCost)}
-        />
-      </div>
+      {/* --- Exportable content --- */}
+      <div ref={contentRef}>
+        {/* --- KPI Cards --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <KPICard
+            label="Pozostały budżet"
+            value={formatPLN(initialData.kpi.remainingBudget)}
+          />
+          <KPICard
+            label="Najdroższa kategoria"
+            subValue={
+              initialData.kpi.mostExpensiveCategory.name || "Brak danych"
+            }
+            value={formatPLN(initialData.kpi.mostExpensiveCategory.amount)}
+          />
+          <KPICard
+            label="Wykorzystanie budżetu"
+            value={`${Math.round(initialData.kpi.budgetUtilization)}%`}
+          />
+          <KPICard
+            label="Średni koszt miesięczny projektu"
+            value={formatPLN(initialData.kpi.averageMonthlyCost)}
+          />
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 h-96">
-          <ExecutionChart
-            data={{
-              percentage: initialData.charts.execution,
-              label: projectLabel,
-            }}
-          />
-        </div>
-        <div className="lg:col-span-1 h-96">
-          <CostStructureChart data={initialData.charts.structure} />
-        </div>
-        <div className="lg:col-span-1 h-96">
-          <TotalCostBarChart
-            data={{
-              usedAmount: initialData.charts.totalCost,
-              totalBudget: totalBudgetCalculated,
-              label: projectLabel,
-            }}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          <div className="lg:col-span-1 h-96">
+            <ExecutionChart
+              data={{
+                percentage: initialData.charts.execution,
+                label: projectLabel,
+              }}
+            />
+          </div>
+          <div className="lg:col-span-1 h-96">
+            <CostStructureChart data={initialData.charts.structure} />
+          </div>
+          <div className="lg:col-span-1 h-96">
+            <TotalCostBarChart
+              data={{
+                usedAmount: initialData.charts.totalCost,
+                totalBudget: totalBudgetCalculated,
+                label: projectLabel,
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

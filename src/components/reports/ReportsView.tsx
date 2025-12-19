@@ -3,13 +3,13 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ChangeEvent } from "react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { Button } from "@/components/common/CustomButton";
 import { CustomInput } from "@/components/common/CustomInput";
 import {
   CustomSelect,
   type SelectOption,
 } from "@/components/common/CustomSelect";
+import { useExportPDF } from "@/hooks/useExportPDF";
 import { AbsenceChart } from "./AbsenceChart";
 import { TaskCompletionChart } from "./TaskCompletionChart";
 import { WorkHoursChart } from "./WorkHoursChart";
@@ -51,6 +51,12 @@ export function ReportsView({
   const [dateFrom, setDateFrom] = useState(initialFilters.dateFrom);
   const [dateTo, setDateTo] = useState(initialFilters.dateTo);
 
+  const { contentRef, exportToPDF, isExporting } = useExportPDF({
+    filename: "Raporty - Podsumowanie",
+    dateFrom,
+    dateTo,
+  });
+
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
@@ -74,10 +80,6 @@ export function ReportsView({
   const handleProjectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedProject(e.target.value);
     updateFilters("project", e.target.value);
-  };
-
-  const handleExportPDF = () => {
-    toast.error("Funkcja eksportu PDF jest wyłączona");
   };
 
   const foundOption = availableProjects.find((p) => {
@@ -128,31 +130,35 @@ export function ReportsView({
           <div className="w-full lg:w-auto">
             <Button
               variant="primary"
-              onClick={handleExportPDF}
-              className="w-full lg:w-auto h-[42px]"
+              onClick={exportToPDF}
+              disabled={isExporting}
+              className="w-full lg:w-auto h-10.5"
             >
-              Eksportuj: PDF
+              {isExporting ? "Eksportowanie..." : "Eksportuj: PDF"}
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
-        <div className="lg:col-span-1 h-96">
-          <TaskCompletionChart data={initialData.tasks} />
-        </div>
+      {/* --- Exportable content --- */}
+      <div ref={contentRef}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-0">
+          <div className="lg:col-span-1 h-96">
+            <TaskCompletionChart data={initialData.tasks} />
+          </div>
 
-        <div className="lg:col-span-1 h-96">
-          <WorkHoursChart
-            data={initialData.workHours}
-            projectName={selectedProjectLabel}
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-          />
-        </div>
+          <div className="lg:col-span-1 h-96">
+            <WorkHoursChart
+              data={initialData.workHours}
+              projectName={selectedProjectLabel}
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+            />
+          </div>
 
-        <div className="lg:col-span-1 h-96">
-          <AbsenceChart data={initialData.absence} />
+          <div className="lg:col-span-1 h-96">
+            <AbsenceChart data={initialData.absence} />
+          </div>
         </div>
       </div>
     </div>
