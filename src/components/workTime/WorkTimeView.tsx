@@ -42,14 +42,14 @@ interface WorkTimeViewProps {
 }
 
 export function WorkTimeView({
-  initialLogs,
-  availableEmployees,
-  userProjectsMap,
-  userProjectTasksMap,
-  hasFullAccess = false,
-  canViewAll: _canViewAll = false,
-  currentUserId,
-}: WorkTimeViewProps) {
+                               initialLogs,
+                               availableEmployees,
+                               userProjectsMap,
+                               userProjectTasksMap,
+                               hasFullAccess = false,
+                               canViewAll: _canViewAll = false,
+                               currentUserId,
+                             }: WorkTimeViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Date range filters
@@ -64,7 +64,7 @@ export function WorkTimeView({
   const [editingLog, setEditingLog] = useState<WorkLog | null>(null);
 
   const { isRefreshing, refreshList, refreshListWithToast } = useRefreshList<
-    WorkLogListItem[]
+      WorkLogListItem[]
   >({
     apiUrl: "/api/work-logs",
   });
@@ -109,16 +109,16 @@ export function WorkTimeView({
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
       logs = logs.filter(
-        (log) =>
-          log.employeeName.toLowerCase().includes(lowerTerm) ||
-          log.projectName.toLowerCase().includes(lowerTerm) ||
-          log.taskName.toLowerCase().includes(lowerTerm),
+          (log) =>
+              log.employeeName.toLowerCase().includes(lowerTerm) ||
+              log.projectName.toLowerCase().includes(lowerTerm) ||
+              log.taskName.toLowerCase().includes(lowerTerm),
       );
     }
 
     // Sort by Date Descending
     logs.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
 
     setFilteredLogs(logs);
@@ -155,172 +155,173 @@ export function WorkTimeView({
   };
 
   return (
-    <>
-      {isAddModalOpen && (
-        <WorkTimeAddModal
-          onClose={handleCloseAddModal}
-          availableEmployees={availableEmployees}
-          userProjectsMap={userProjectsMap}
-          userProjectTasksMap={userProjectTasksMap}
-          hasFullAccess={hasFullAccess}
-          currentUserId={currentUserId}
-        />
-      )}
+      <>
+        {isAddModalOpen && (
+            <WorkTimeAddModal
+                onClose={handleCloseAddModal}
+                availableEmployees={availableEmployees}
+                userProjectsMap={userProjectsMap}
+                userProjectTasksMap={userProjectTasksMap}
+                hasFullAccess={hasFullAccess}
+                currentUserId={currentUserId}
+            />
+        )}
 
-      {isEditModalOpen && editingLog && (
-        <WorkTimeEditModal
-          workLog={editingLog}
-          onClose={handleCloseEditModal}
-          availableEmployees={availableEmployees}
-          userProjectsMap={userProjectsMap}
-          userProjectTasksMap={userProjectTasksMap}
-          hasFullAccess={hasFullAccess}
-          currentUserId={currentUserId}
-        />
-      )}
+        {isEditModalOpen && editingLog && (
+            <WorkTimeEditModal
+                workLog={editingLog}
+                onClose={handleCloseEditModal}
+                availableEmployees={availableEmployees}
+                userProjectsMap={userProjectsMap}
+                userProjectTasksMap={userProjectTasksMap}
+                hasFullAccess={hasFullAccess}
+                currentUserId={currentUserId}
+            />
+        )}
 
-      {/* Toolbar */}
-      <div className="flex flex-col xl:flex-row gap-4 mb-6 items-stretch xl:items-end">
-        <div className="flex gap-2">
-          <Button
-            variant="primary"
-            onClick={handleOpenAddModal}
-            className="whitespace-nowrap"
-          >
-            <FaPlus />
-            <span>Dodaj wpis</span>
-          </Button>
-          <RefreshButton onClick={handleRefresh} isRefreshing={isRefreshing} />
-        </div>
+        {/* Toolbar */}
+        <div className="flex flex-col xl:flex-row gap-4 mb-6 items-stretch xl:items-end">
+          <div className="flex gap-2">
+            <Button
+                variant="primary"
+                onClick={handleOpenAddModal}
+                className="whitespace-nowrap"
+            >
+              <FaPlus />
+              <span>Dodaj wpis</span>
+            </Button>
+            <RefreshButton onClick={handleRefresh} isRefreshing={isRefreshing} />
+          </div>
 
-        <div className="relative grow">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-          <CustomInput
-            type="text"
-            name="searchLogs"
-            placeholder="Szukaj po pracowniku, projekcie..."
-            className="pl-10 h-10"
-            hideLabel
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="flex gap-2 items-center">
-          <div className="w-40">
+          <div className="relative grow">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
             <CustomInput
-              type="date"
-              name="dateFrom"
-              label="Od:"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="h-10"
+                type="text"
+                name="searchLogs"
+                placeholder="Szukaj po pracowniku, projekcie..."
+                className="pl-10 h-10"
+                hideLabel
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="w-40">
-            <CustomInput
-              type="date"
-              name="dateTo"
-              label="Do:"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="h-10"
-            />
+
+          <div className="flex gap-2 items-center">
+            <div className="w-40">
+              <CustomInput
+                  type="date"
+                  name="dateFrom"
+                  label="Od:"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="h-10"
+              />
+            </div>
+            <div className="w-40">
+              <CustomInput
+                  type="date"
+                  name="dateTo"
+                  label="Do:"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="h-10"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <DataTable
-        data={filteredLogs}
-        keyExtractor={(item) => item.id}
-        emptyMessage="Nie znaleziono wpisów czasu pracy."
-        rowTitle={(item) => (item.note ? `Opis: ${item.note}` : "Brak opisu")}
-        columns={
-          [
-            {
-              key: "employeeName",
-              header: "Pracownik",
-              className: "p-4 text-gray-800 font-medium w-40",
-              headerClassName: "p-4 w-40",
-            },
-            {
-              key: "date",
-              header: "Data",
-              className: "p-4 text-gray-700 whitespace-nowrap w-32",
-              headerClassName: "p-4 w-32",
-            },
-            {
-              key: "projectName",
-              header: "Projekt",
-              className: "p-4 text-gray-700 truncate w-48",
-              headerClassName: "p-4 w-48",
-            },
-            {
-              key: "taskName",
-              header: "Zadanie",
-              className: "p-4 text-gray-700 font-medium truncate w-48",
-              headerClassName: "p-4 w-48",
-            },
-            {
-              key: "hours",
-              header: "Godz.",
-              className: "p-4 text-gray-800 font-bold text-center w-24",
-              headerClassName: "p-4 text-center w-24",
-            },
-            {
-              key: "isOvertime",
-              header: "Nadg.",
-              render: (item) => <OvertimeBadge isOvertime={item.isOvertime} />,
-              className: "p-4 w-10",
-              headerClassName: "p-4 text-center w-10",
-              align: "center",
-            },
-          ] as TableColumn<WorkLog>[]
-        }
-        actions={
-          [
-            {
-              icon: <FaEdit size={16} />,
-              label: "Edytuj",
-              onClick: (item) => handleOpenEditModal(item),
-              variant: "blue",
-              hidden: (item) => !hasFullAccess && item.userId !== currentUserId,
-            },
-            {
-              icon: <FaTrash size={16} />,
-              label: "Usuń",
-              onClick: async (item) => {
-                const deletePromise = async () => {
-                  const response = await fetch(`/api/work-logs/${item.id}`, {
-                    method: "DELETE",
-                  });
+        {/* Table */}
+        <DataTable
+            data={filteredLogs}
+            keyExtractor={(item) => item.id}
+            className="max-h-[65vh]"
+            emptyMessage="Nie znaleziono wpisów czasu pracy."
+            rowTitle={(item) => (item.note ? `Opis: ${item.note}` : "Brak opisu")}
+            columns={
+              [
+                {
+                  key: "employeeName",
+                  header: "Pracownik",
+                  className: "p-4 text-gray-800 font-medium w-40",
+                  headerClassName: "p-4 w-40",
+                },
+                {
+                  key: "date",
+                  header: "Data",
+                  className: "p-4 text-gray-700 whitespace-nowrap w-32",
+                  headerClassName: "p-4 w-32",
+                },
+                {
+                  key: "projectName",
+                  header: "Projekt",
+                  className: "p-4 text-gray-700 truncate w-48",
+                  headerClassName: "p-4 w-48",
+                },
+                {
+                  key: "taskName",
+                  header: "Zadanie",
+                  className: "p-4 text-gray-700 font-medium truncate w-48",
+                  headerClassName: "p-4 w-48",
+                },
+                {
+                  key: "hours",
+                  header: "Godz.",
+                  className: "p-4 text-gray-800 font-bold text-center w-24",
+                  headerClassName: "p-4 text-center w-24",
+                },
+                {
+                  key: "isOvertime",
+                  header: "Nadg.",
+                  render: (item) => <OvertimeBadge isOvertime={item.isOvertime} />,
+                  className: "p-4 w-10",
+                  headerClassName: "p-4 text-center w-10",
+                  align: "center",
+                },
+              ] as TableColumn<WorkLog>[]
+            }
+            actions={
+              [
+                {
+                  icon: <FaEdit size={16} />,
+                  label: "Edytuj",
+                  onClick: (item) => handleOpenEditModal(item),
+                  variant: "blue",
+                  hidden: (item) => !hasFullAccess && item.userId !== currentUserId,
+                },
+                {
+                  icon: <FaTrash size={16} />,
+                  label: "Usuń",
+                  onClick: async (item) => {
+                    const deletePromise = async () => {
+                      const response = await fetch(`/api/work-logs/${item.id}`, {
+                        method: "DELETE",
+                      });
 
-                  const data = await response.json();
-                  if (!data.ok) {
-                    throw new Error(data.error || "Failed to delete work log");
-                  }
+                      const data = await response.json();
+                      if (!data.ok) {
+                        throw new Error(data.error || "Failed to delete work log");
+                      }
 
-                  return data;
-                };
+                      return data;
+                    };
 
-                await toast.promise(deletePromise(), {
-                  loading: "Usuwanie wpisu...",
-                  success: "Wpis został usunięty!",
-                  error: (err) => `Błąd: ${err.message}`,
-                });
+                    await toast.promise(deletePromise(), {
+                      loading: "Usuwanie wpisu...",
+                      success: "Wpis został usunięty!",
+                      error: (err) => `Błąd: ${err.message}`,
+                    });
 
-                const refreshedData = await refreshList();
-                if (refreshedData) {
-                  setWorkLogs(transformWorkLogData(refreshedData));
-                }
-              },
-              variant: "red",
-              hidden: (item) => !hasFullAccess && item.userId !== currentUserId,
-            },
-          ] as TableAction<WorkLog>[]
-        }
-      />
-    </>
+                    const refreshedData = await refreshList();
+                    if (refreshedData) {
+                      setWorkLogs(transformWorkLogData(refreshedData));
+                    }
+                  },
+                  variant: "red",
+                  hidden: (item) => !hasFullAccess && item.userId !== currentUserId,
+                },
+              ] as TableAction<WorkLog>[]
+            }
+        />
+      </>
   );
 }
